@@ -1983,6 +1983,7 @@ class UserInfo {
                            //      await $.wait(16000);
                            //  }
                             //全部都等25秒-------防止新增任务还要修改 但是会增加任务时间
+                            await $.wait(25000);
                                // 领取任务奖励
                             res && await user.getReward(item.sceneId,item.taskId);
 
