@@ -3,7 +3,7 @@
     自动添加任务后，如果时间不对，请自己修改 0 0/30 * * * ?
 
     [Script]
-    cron "0 0/30 * * * ?" script-path=kbg_58house.js, tag=58同城梦想小镇合成房子, enabled=true
+    cron "0 0/40 * * * ?" script-path=kbg_58house.js, tag=58同城梦想小镇合成房子, enabled=true
 */
 const axios = require("axios");
 const jsname = '58同城梦想小镇合成房子'
