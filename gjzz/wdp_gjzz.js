@@ -1,9 +1,9 @@
 /*
     gjzz 签到
-    自动添加任务后，如果时间不对，请自己修改 0 0,8 * * * ?
+    自动添加任务后，如果时间不对，请自己修改 10 0,10 * * *
 
     [Script]
-    cron "0 0,8 * * * ?" script-path=kbg_58sjb.js, tag=58同城我家收取金币, enabled=true
+    cron "10 0,10 * * *" script-path=kbg_58sjb.js, tag=58同城我家收取金币, enabled=true
 */
 const axios = require("axios");
 const jsname = '58同城我家收取金币'
