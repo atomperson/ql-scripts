@@ -1,0 +1,29 @@
+{
+  "type": "module",
+  "name": "ql_scripts",
+  "version": "1.0.0",
+  "description": "青龙自用脚本,方便自己开发和学习",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/wang-dapeng1/ql_scripts.git"
+  },
+  "author": "wdp",
+  "license": "ISC",
+  "dependencies": {
+    "Promise": "^1.0.5",
+    "axios": "^0.27.2",
+    "data-fns": "^0.1.8",
+    "date-fns": "^2.28.0",
+    "got": "^12.1.0",
+    "https-proxy-agent": "^5.0.1",
+    "jquery": "^3.3.1",
+    "jsdom": "^11.6.2",
+    "moment": "^2.29.4",
+    "socks-proxy-agent": "^7.0.0",
+    "ts-md5": "^1.2.11"
+  }
+}
