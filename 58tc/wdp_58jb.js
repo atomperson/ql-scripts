@@ -1956,39 +1956,33 @@ class UserInfo {
                         const taskIdStr = `${item.sceneId}-${item.taskId}`;
                         // 屏蔽任务
                         if (!shields.includes(taskIdStr)) {
-                            
-                            //一下是根据具体任务  划分的时间 
-                            if (WAIT_TASK15.includes(taskIdStr)) {
-                                await $.wait(16000);
-                            }                         // 等到25s
-                             else if (WAIT_TASK25.includes(taskIdStr)) {
-                                await $.wait(25000);
-                            }
-   
+
                             // 做任务
                             const res = await user.doTask(item.sceneId,item.taskId);
                          
-                            //一下是根据具体任务  划分的时间 
-                            if (WAIT_TASK15.includes(taskIdStr)) {
-                                await $.wait(16000);
-                            }                         // 等到25s
-                             else if (WAIT_TASK25.includes(taskIdStr)) {
-                                await $.wait(25000);
-                            }
-
-
-                           //一下是根据模块大致划分的时间
-                            // 以下sceneId分类下的任务运行时间间隔需大于10s,避免执行任务异常
-                            if (WAIT_TASK10.includes(item.sceneId)) {
-                                await $.wait(11000);
-                            }
-                            //// 以下sceneId分类下的任务运行时间间隔需大于20s,避免执行任务异常
-                            else if (WAIT_TASK20.includes(item.sceneId)) {
-                                await $.wait(21000);
-                            } 
-                            else{
-
-                            }
+                           //  //一下是根据具体任务  划分的时间
+                           //  if (WAIT_TASK15.includes(taskIdStr)) {
+                           //      await $.wait(16000);
+                           //  }                         // 等到25s
+                           //   else if (WAIT_TASK25.includes(taskIdStr)) {
+                           //      await $.wait(25000);
+                           //  }
+                           //
+                           //
+                           // //一下是根据模块大致划分的时间
+                           //  // 以下sceneId分类下的任务运行时间间隔需大于10s,避免执行任务异常
+                           //  if (WAIT_TASK10.includes(item.sceneId)) {
+                           //      await $.wait(11000);
+                           //  }
+                           //  //// 以下sceneId分类下的任务运行时间间隔需大于20s,避免执行任务异常
+                           //   if (WAIT_TASK20.includes(item.sceneId)) {
+                           //      await $.wait(21000);
+                           //  }
+                           //  else{
+                           //      //默认都等16 秒 防止更新任务总是自己修改
+                           //      await $.wait(16000);
+                           //  }
+                            //全部都等25秒-------防止新增任务还要修改 但是会增加任务时间
                                // 领取任务奖励
                             res && await user.getReward(item.sceneId,item.taskId);
 

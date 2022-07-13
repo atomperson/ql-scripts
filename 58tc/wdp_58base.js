@@ -368,7 +368,8 @@ class UserInfo {
             this.gainOre += Number(result.result.gainOre);
             return true;
         } else {
-            addNotifyStr(`账号[${this.index}-${this.nickName}]神奇矿山收取矿石失败，需要手动过验证，请及时处理，23点过后将损失0.3元，活动路径：58同城app->我的->神奇矿->游戏赚矿石下面的神奇矿山，手动收取矿石`)
+            addNotifyStr(`账号[${this.index}-${this.nickName}]神奇矿山收取矿石失败,需要手动过收取`)
+            //，需要手动过验证，请及时处理，23点过后将损失0.3元，活动路径：58同城app->我的->神奇矿->游戏赚矿石下面的神奇矿山，手动收取矿石
             // await notify.sendNotify($.name, `账号[${this.index}]神奇矿山收取矿石失败，需要手动过验证，路径：58同城app->我的->神奇矿->游戏赚矿石下面的神奇矿石，手动收取矿石` )
             return false;
         }
@@ -386,7 +387,8 @@ class UserInfo {
         if (result.code == 0) {
             console.log(`账号[${this.index}]神奇矿山召唤小帮手成功`)
         } else {
-            addNotifyStr(`账号[${this.index}-${this.nickName}]神奇矿山召唤小帮手失败: ${result.message}, 需手动召唤，否则每天少10mg（0.26元）收益，活动路径：58同城app->我的->神奇矿->游戏赚矿石下面的神奇矿山，手动召唤小帮手`)
+            addNotifyStr(`账号[${this.index}-${this.nickName}]神奇矿山召唤小帮手失败, 需手动召唤`)
+            //，否则每天少10mg（0.26元）收益，活动路径：58同城app->我的->神奇矿->游戏赚矿石下面的神奇矿山，手动召唤小帮手
         }
     }
 
@@ -762,7 +764,8 @@ class UserInfo {
         if (result.code == 0) {
             console.log(`账号[${this.index}]报名${type}${item.number}期成功，预计可获得${result.result.averageRewardOre}矿石`)
         } else {
-            addNotifyStr(`账号[${this.index}-${this.nickName}]报名${type}${item.number}期失败: ${result.message}，需手动处理，否则每天少1mg矿石收益，活动路径：58同城app->我的->神奇矿->游戏赚矿石下面的早起打卡，进去报名`)
+            addNotifyStr(`账号[${this.index}-${this.nickName}]报名${type}${item.number}期失败，需手动进行报名`)
+            //，需手动处理，否则每天少1mg矿石收益，活动路径：58同城app->我的->神奇矿->游戏赚矿石下面的早起打卡，进去报名
         }
     }
 
@@ -778,7 +781,8 @@ class UserInfo {
         if (result.code == 0) {
             console.log(`账号[${this.index}]打卡成功`)
         } else {
-            addNotifyStr(`账号[${this.index}-${this.nickName}]打卡失败: ${result.message}，请手动打打卡，8点后将损失0.4元。打卡路径：我的->神奇矿->早起打卡'`)
+            addNotifyStr(`账号[${this.index}-${this.nickName}]打卡失败,请手动打打卡`)
+            //，请手动打打卡，8点后将损失0.4元。打卡路径：我的->神奇矿->早起打卡'
         }
     }
 
@@ -1754,7 +1758,7 @@ class UserInfo {
         if (result.code == 0) {
             console.log(`账号[${this.index}]初始化矿山成功`)
         } else {
-            console.log(`账号[${this.index}]初始化矿山${step}失败: ${result.message}`)
+            console.log(`账号[${this.index}]初始化矿山${step}失败: ${result.message}`,'\n')
         }
     }
 
