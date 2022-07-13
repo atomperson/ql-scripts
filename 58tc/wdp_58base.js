@@ -27,7 +27,7 @@
     [Script]
     cron "1 * * * *" script-path=kbg_58sjb.js, tag=58同城, enabled=true
 */
-import axios from "axios";
+const axios = require("axios");
 
 const jsname = '58同城'
 const $ = Env('58同城')
