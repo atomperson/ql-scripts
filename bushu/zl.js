@@ -24,6 +24,9 @@ export zlcookie='123xxx'
 
 脚本地址
 https://kireinasakura.coding.net/p/could/d/there/git/raw/master/zl.js
+
+ [Script]
+    cron "0 0/4 * * *" script-path=zl.js, tag=走路, enabled=true
 */
 
 const $ = new Env("走路");
