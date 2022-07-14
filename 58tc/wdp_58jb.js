@@ -2013,11 +2013,11 @@ class UserInfo {
             console.log(`${TASK_TIME[0]}点到${TASK_TIME[1]}点之间会做金币任务`);
         }
 
-        console.log('\n======== 首页签到再赚矿石 ========');
-        for(let user of userList) {
-            await user.doHomeContinueTask();
-            console.log(`\n`);
-        }
+        // console.log('\n======== 首页签到再赚矿石 ========');
+        // for(let user of userList) {
+        //     await user.doHomeContinueTask();
+        //     console.log(`\n`);
+        // }
 
         console.log('\n======== 查询账户 ========');
         for(let user of userList) {
