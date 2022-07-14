@@ -24,7 +24,7 @@ let userCount = 0
 let phone = ($.isNode() ? process.env.llphonecookie : $.getdata('llphonecookie')) || '';
 
 
-let name = "" //姓名
+let name = "王大朋" //姓名
 
 
 let defaultUA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_8 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.20(0x18001442) NetType/WIFI Language/zh_CN'
