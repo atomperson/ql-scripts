@@ -622,13 +622,13 @@ class UserInfo {
             console.log(`账号[${this.index}]今天${auctionStr}`)
             let maxBid = parseFloat(result.result.userInfo.usableOre)
             let dixBid = 5 + this.index;
-            console.log(`账号[${this.index}]可投入矿石${maxBid}mg，据规则实际投入${330 ? 330 - dixBid : parseInt(maxBid) - dixBid}mg`)
+           // console.log(`账号[${this.index}]可投入矿石${maxBid}mg，据规则实际投入${330 ? 330 - dixBid : parseInt(maxBid) - dixBid}mg`)
             // todo 最后参与10分钟竞拍，可以计算出一个相对较大概率的数字
             if (this.runTask == 1) {
                 if (this.auction.status == 0 && maxBid > dixBid) {
-                    let tnmp = maxBid - dixBid > 330 ? 330 - dixBid : parseInt(maxBid) - dixBid; // 留6mg矿石挖矿
+                   // let tnmp = maxBid - dixBid > 330 ? 330 - dixBid : parseInt(maxBid) - dixBid; // 留6mg矿石挖矿
                     await $.wait(500)
-                    await this.auctionBid(tnmp);
+                    await this.auctionBid(1);
                 }
             }
         } else {
