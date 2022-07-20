@@ -21,8 +21,8 @@ const $ = new Env('和家亲');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const {log} = console;
 const Notify = 1; //0为关闭通知，1为打开通知,默认为1
-const debug = 1; //0为关闭调试，1为打开调试,默认为0
-const uaNum = 1; //随机UA，从0-20随便选一个填上去
+const debug = 0; //0为关闭调试，1为打开调试,默认为0
+const uaNum = 12; //随机UA，从0-20随便选一个填上去
 const autoWithdraw = 1; //0为关闭自动提现，1为打开自动提现,默认为1
 //////////////////////
 let scriptVersion = "1.0.4";
