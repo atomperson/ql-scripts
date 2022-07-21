@@ -1056,6 +1056,63 @@ class UserInfo {
             }
         }
     }
+    // 保养矿车
+    async maintenance() {
+        const mineCarPercent = Number(this.mineMaininfo.updateInfo.mineCarPercent);
+        //损坏程度大于%20
+        if (0.2 < mineCarPercent) {
+            console.log('需要保养！！')
+            let url = `https://dreamtown.58.com/web/minecar/maintenance`
+            let body = ``
+            let urlObject = populateUrlObject(url, this.cookie, body)
+            await httpRequest('get', urlObject)
+            let result = httpResult;
+            if (!result) return
+            // console.log(JSON.stringify(result))
+            if (result.code == 0) {
+                console.log(`账号[${this.index}]保养矿车成功`);
+            } else {
+                console.log(`账号[${this.index}]保养矿车失败: ${result.message}`)
+            }
+
+        }else{
+            console.log('矿车损坏程度小于20%，不需要保养！！')
+
+        }
+
+    }
+
+    // 矿车升级
+    async maintenanceandupgrade() {
+
+        const nextMineCarCapacityLimit = Number(this.mineMaininfo.updateInfo.nextMineCarCapacityLimit);
+        //损坏程度大于%20
+        console.log(`下次升级数量 ${nextMineCarCapacityLimit}`);//升级成功不需要在维修
+        if (nextMineCarCapacityLimit!==null) {
+            console.log('矿车升级！！')
+            let url = `https://dreamtown.58.com/web/minecar/upgrade`
+            let body = ``
+            let urlObject = populateUrlObject(url, this.cookie, body)
+            await httpRequest('get', urlObject)
+            let result = httpResult;
+            if (!result) return
+            console.log(JSON.stringify(result))
+            if (result.code == 0) {
+                console.log(`账号[${this.index}]矿车升级成功`);//升级成功不需要在维修
+                return;
+            } else {
+                console.log(`账号[${this.index}]矿车升级失败: ${result.message}`)
+            }
+
+        }else{
+            console.log('矿车已经满级，不需要升级！！')
+
+        }
+        console.log('开始执行维修矿车！！')
+        await this.maintenance();
+
+
+    }
 
     // 查询抽奖次数
     async rouletteInfo() {
@@ -1898,6 +1955,9 @@ class UserInfo {
 
             // 唤醒金币矿工
             await user.doWakeupEmploy();
+            await $.wait(500);
+            //矿车升级及保养
+            await user.maintenanceandupgrade();
             await $.wait(500);
 
             console.log(`\n`)
