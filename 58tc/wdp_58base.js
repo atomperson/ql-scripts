@@ -1074,21 +1074,17 @@ class UserInfo {
             } else {
                 console.log(`账号[${this.index}]保养矿车失败: ${result.message}`)
             }
-
-        }else{
+        } else {
             console.log('矿车损坏程度小于20%，不需要保养！！')
 
         }
 
     }
-
     // 矿车升级
     async maintenanceandupgrade() {
-
         const nextMineCarCapacityLimit = Number(this.mineMaininfo.updateInfo.nextMineCarCapacityLimit);
-        //损坏程度大于%20
-        console.log(`下次升级数量 ${nextMineCarCapacityLimit}`);//升级成功不需要在维修
-        if (nextMineCarCapacityLimit!==null) {
+        if (nextMineCarCapacityLimit != 0) {
+            console.log(`下次升级数量 ${nextMineCarCapacityLimit}`);//升级成功不需要在维修
             console.log('矿车升级！！')
             let url = `https://dreamtown.58.com/web/minecar/upgrade`
             let body = ``
@@ -1103,17 +1099,12 @@ class UserInfo {
             } else {
                 console.log(`账号[${this.index}]矿车升级失败: ${result.message}`)
             }
-
-        }else{
+        } else {
             console.log('矿车已经满级，不需要升级！！')
-
         }
         console.log('开始执行维修矿车！！')
         await this.maintenance();
-
-
     }
-
     // 查询抽奖次数
     async rouletteInfo() {
         let url = `https://magicisland.58.com/web/roulette/info`
@@ -1815,7 +1806,7 @@ class UserInfo {
         if (result.code == 0) {
             console.log(`账号[${this.index}]初始化矿山成功`)
         } else {
-            console.log(`账号[${this.index}]初始化矿山${step}失败: ${result.message}`,'\n')
+            console.log(`账号[${this.index}]初始化矿山${step}失败: ${result.message}`, '\n')
         }
     }
 
@@ -1895,11 +1886,11 @@ class UserInfo {
         })
 
         console.log('\n======== 现金签到 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             await user.oreMainpage(false);
             await $.wait(200);
         }
-        for(let user of userList) {
+        for (let user of userList) {
             await user.cashSigninlist();
             // 未签到的去签到
             if (user.cashSign) {
@@ -1911,13 +1902,13 @@ class UserInfo {
         }
 
         console.log('\n======== 首页签到再赚矿石 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             await user.doHomeContinueTask();
             console.log(`\n`)
         }
 
         console.log('\n======== 我的家签到 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             // 查询我的家签到状态
             await user.houseSignStatus();
             await $.wait(500);
@@ -1926,7 +1917,7 @@ class UserInfo {
 
         console.log('\n======== 神奇矿山（挖矿） ========')
         console.log('活动路径：我的->神奇矿->免费领矿石')
-        for(let user of userList) {
+        for (let user of userList) {
             // 神奇矿页面查询
             await user.getMineMaininfo();
             const cumulativeOre = Number(user.mineMaininfo?.superInfo?.cumulativeOre || 0).toFixed(2) || '0.00'
@@ -1947,7 +1938,7 @@ class UserInfo {
             await user.doEmploy();
             await $.wait(200);
 
-            if (['1','2'].includes(user.runTask)) {
+            if (['1', '2'].includes(user.runTask)) {
                 // 吃鸡腿加速
                 await user.doDrumstick();
                 await $.wait(6000);
@@ -1965,8 +1956,8 @@ class UserInfo {
 
         // 未绑定微信账号不能参加
         console.log('\n======== 小游戏：神奇矿山 ========')
-        for(let user of userList) {
-            if (['1','2'].includes(user.runTask)) {
+        for (let user of userList) {
+            if (['1', '2'].includes(user.runTask)) {
                 // 查询神奇矿山主页
                 await user.miningUserInfo();
                 await $.wait(500);
@@ -1978,7 +1969,7 @@ class UserInfo {
         }
 
         console.log('\n======== 小游戏：早起打卡 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             // 查询神奇矿主页
             await user.oreMainpage(false);
             await $.wait(500);
@@ -1990,7 +1981,7 @@ class UserInfo {
 
         console.log('\n======== 小游戏：低价竞拍 ========')
         // 只有能提现账号才参加
-        for(let user of userList) {
+        for (let user of userList) {
             if (user.runTask == 1) {
                 // 查询低价竞拍主页
                 await user.auctionInfo();
