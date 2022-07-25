@@ -9,8 +9,8 @@ const $ = Env('东风雪铁龙')
 const logDebug = 0
 
 const ckkey = 'wbtcCookie';
-//const axios = require("axios");
-import axios from "axios";
+const axios = require("axios");
+//import axios from "axios";
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -24,17 +24,14 @@ let userCookie = ($.isNode() ? process.env[ckkey] : $.getdata(ckkey)) || '';
 let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
 let userList = []
 
-let userIdx = 0
-let userCount = 0
-//let dfxtlphone=process.env.dfxtlphone;
-let dfxtlphone = '19121901086';
-//let dfxtlpassword=process.env.dfxtlpassword;
-let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
-//let Sign=process.env.dfxtlSign
-let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
-//app的sign 签名
-//let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
-let TimeStamp = '2068854542000';
+let dfxtlphone=process.env.dfxtlphone;
+let dfxtlpassword=process.env.dfxtlpassword;
+let Sign=process.env.dfxtlSign;   //app的sign 签名
+let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
+// let dfxtlphone = '19121901086';
+// let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
+// let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
+// let TimeStamp = '2068854542000';
 
 
 let dfxtlphoneArr = [];
@@ -363,7 +360,7 @@ async function publishPostsNew(token, data1,userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('发表帖子成功！！！')
+        console.log('发表帖子成功！！！,主题为'+data1.title)
     } else {
         console.log('发表帖子失败：' + result.message)
 
@@ -400,7 +397,7 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
         var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
         infoData.imageUrl=imageArr[imageNo];//随机图片url
         await publishPostsNew(token, infoData,userid)
-        await $.wait(200);
+        await $.wait(1000);
 
     } else {
         console.log('发表帖子失败：' + result.message)
