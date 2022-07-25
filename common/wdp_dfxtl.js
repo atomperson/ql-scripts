@@ -1,8 +1,9 @@
 /*
     东风雪铁龙
-
-    [Script]
-    cron "0 0,19 * * *" script-path=wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
+ [task_local]
+   #和家亲
+   [Script]
+    cron "0 0,7,13 * * *" script-path=wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
 */
 const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
@@ -84,10 +85,10 @@ let curHour = (new Date()).getHours()
             //发表帖子
            // await pushtizi(token, userid);
             await queryChoicenessByUserDTO(token, userid,'1083380194470035815');
-
-
-
-
+            //scoreGet 获取积分详情
+            await scoreGet(token);
+            //任务完成情况
+            await taskList(token);
         }
 
 
@@ -404,8 +405,40 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
 
     }
 }
+//查询积分
+async function scoreGet(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/get`
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        console.log('积分查询成功,积分为'+result.data.totalScore)
+    } else {
+        console.log('发表帖子失败：' + result.message)
 
+    }
+}
+//查询任务完成情况
+async function taskList(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/member/taskList`
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        console.log('查询任务完成情况成功！！！');
+       var qichangtask= result.data.typeTaskList[0];
+        console.log(JSON.stringify(qichangtask))
+    } else {
+        console.log('发表帖子失败：' + result.message)
 
+    }
+}
 ///////////////////////////////////////////////////////////////////
 
 async function Envs() {
