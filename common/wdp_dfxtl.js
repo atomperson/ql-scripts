@@ -9,8 +9,8 @@ const $ = Env('东风雪铁龙')
 const logDebug = 0
 
 const ckkey = 'wbtcCookie';
-const axios = require("axios");
-//import axios from "axios";
+//const axios = require("axios");
+import axios from "axios";
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -26,15 +26,15 @@ let userList = []
 
 let userIdx = 0
 let userCount = 0
-let dfxtlphone=process.env.dfxtlphone;
-//let dfxtlphone = '19121901086';
-let dfxtlpassword=process.env.dfxtlpassword;
-//let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
-let Sign=process.env.dfxtlSign
-//let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
+//let dfxtlphone=process.env.dfxtlphone;
+let dfxtlphone = '19121901086';
+//let dfxtlpassword=process.env.dfxtlpassword;
+let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
+//let Sign=process.env.dfxtlSign
+let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
 //app的sign 签名
-let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
-//let TimeStamp = '2068854542000';
+//let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
+let TimeStamp = '2068854542000';
 
 
 let dfxtlphoneArr = [];
@@ -349,10 +349,10 @@ async function publishPostsNew(token, data1,userid) {
     data.paragraphs.paragraphContent = str2;//去掉p 标签
     data.title = data1.title;
     data.userId = userid;
-    data.bbsFile.createBy = userid;
-    data.bbsFile.compressPath=data1.imageUrl;//图片影像
-    data.bbsFile.fileAddress=data1.imageUrl;//图片影像
-    data.bbsFile.fileAddressSmall=data1.imageUrl;//图片影像
+    data.bbsFile[0].createBy = userid;
+    data.bbsFile[0].compressPath=data1.imageUrl;//图片影像
+    data.bbsFile[0].fileAddress=data1.imageUrl;//图片影像
+    data.bbsFile[0].fileAddressSmall=data1.imageUrl;//图片影像
 
     //图片随机 TOdo
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/posts/publishPostsNew`
