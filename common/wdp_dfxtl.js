@@ -2,7 +2,7 @@
     东风雪铁龙
 
     [Script]
-    cron "0 0,19 * * *" script-path=dfxtl.js, tag=东风雪铁龙, enabled=true
+    cron "0 0,19 * * *" script-path=wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
 */
 const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
