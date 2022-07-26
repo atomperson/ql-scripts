@@ -1,9 +1,9 @@
 /*
-    东风雪铁龙
- [task_local]
-   #和家亲
-   [Script]
-    cron "0 0,7,13 * * *" script-path=wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
+东风雪铁龙
+
+[task_local]
+#东风雪铁龙
+0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
 */
 const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
@@ -40,7 +40,21 @@ let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr=[];//图片资源
-
+let followlistArr =
+    ["7dc97bf0de78bab54875d174ef9451d9",
+        "cdbe4efe46d8878699db28f90faa220b",
+        "9d39d8f4994157b877865960df68e739",
+        "e3e4cdd6f381ccfeff79d48f10d5cb1a",
+        "fe5bcda5d33c4fa85798ebcfc0587788",
+        "077f6a4f076533164392afbde694b745",
+        "27d39a62716d4d78da92189bc23b280d",
+        "7254b938431544ead0b24a51cc467e75",
+        "1083380194470035815",
+        "1083383046328336425",
+        "f08debf231478d8b09122395d6f2a76d",
+        "1110061510565568551",
+        "1083448226751995978",
+        "1083381053463511169"];
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -71,27 +85,21 @@ let curHour = (new Date()).getHours()
             var userid = dfxtlTokenArr[index].userInfoVo.id;
 
             //var token='ISOFTSTONE.eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTcyMDEwMTA4NiIsImF1dGgiOiIiLCJleHAiOjE2NTkxNTc2NDR9.APpGQySJT0S56tAyTyM56O6iy-De-PL79fKNgSC_N4SL9frXGMzfbIxPoPlxLN6wkxABscSy4PgtaEZOohj7Cw';
-            console.log(`token为:\n ${token}`);
-            //获取任务列表
-            // await taskList(token);
+            // console.log(`token为:\n ${token}`);
             //签到
-            // await sign(token,userid);
-            //开始评论
-            //await selectAdvertCarousel(token);
-            //查询最近的帖子  -----查询评论
-            // await queryChoicenessNewList(token,'1102626767558049804') ;
-            console.log('\n============  ============')
-
-            //发表帖子
-           // await pushtizi(token, userid);
-            await queryChoicenessByUserDTO(token, userid,'1083380194470035815');
+            await sign(token, userid);
+            //评论任务  -------------查询最近的帖子
+            await queryChoicenessNewList(token);
+            //发表帖子   // await queryChoicenessByUserDTO(token, userid,'7254b938431544ead0b24a51cc467e75');//  1083380194470035815
+            //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
+            await followList(token, userid);
+            console.log('\n============ 任务完成结束开始查询用户信息 ============')
             //scoreGet 获取积分详情
-            await scoreGet(token);
+            const score = await scoreGet(token);
             //任务完成情况
-            await taskList(token);
+            const taskinfo = await taskList(token);
+            addNotifyStr(`手机号 ${dfxtlphoneArr[index]}: 账户得分为${score}\n任务完成情况为${JSON.stringify(taskinfo)}`)
         }
-
-
         showmsg()
     }
 })()
@@ -106,7 +114,7 @@ async function dfxtllogin(num) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/auth/loginForPwd`
     let body = {
         "pushId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
-        "password": dfxtlpasswordArr[num],
+        "password": dfxtlpassword,
         "areaCode": "",
         "pwdType": 1,
         "deviceId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
@@ -121,22 +129,6 @@ async function dfxtllogin(num) {
     if (result.code == 0) {
         console.log('登录成功！');
         dfxtlTokenArr[num] = result.data;
-    } else {
-        console.log('登录失败：' + result.message)
-
-    }
-}
-
-async function taskList(token) {
-    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/member/taskList`
-    let body = ''
-    let urlObject = populateUrlObject(url, token, body)
-    await httpRequest('get', urlObject)
-    let result = httpResult;
-    if (!result) return
-    //console.log(JSON.stringify(result))
-    if (result.code == 0) {
-        console.log('任查询成功')
     } else {
         console.log('登录失败：' + result.message)
 
@@ -223,7 +215,7 @@ async function putComment(token, data) {
 }
 
 //查询最近更新的帖子
-async function queryChoicenessNewList(token, topicId) {
+async function queryChoicenessNewList(token) {
     //1102626767558049804
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
     let body = {"pageNum": "1", "pageSize": "10"};
@@ -253,7 +245,7 @@ async function queryChoicenessNewList(token, topicId) {
                 "sendMsgType": 0
             }
             await putComment(token, aa);
-            await $.wait(500);
+            await $.wait(1000);
         }
 
     } else {
@@ -262,116 +254,41 @@ async function queryChoicenessNewList(token, topicId) {
     }
 }
 
-async function pushtizi(token, userid) {
-    var aa = "{\"id\":\"1113054243778461773\",\"chonicenessType\":\"6\",\"showDateString\":null,\"postsType\":0,\"title\":\"这14个汽车故障灯亮起，你一定要重视（3）\",\"contentShort\":\"对于很多新手车主朋友来说，对车上常见的一些仪表指示灯还不是很熟悉，或者是只见过，却不知道有什么作用，它为什么会亮灯？亮灯了又该如何应对处理呢？\\n3、胎压指示灯作用：监测汽车轮胎胎压状况\\n亮灯原因：轮胎...\",\"content\":\"<p>对于很多新手车主朋友来说，对车上常见的一些仪表指示灯还不是很熟悉，或者是只见过，却不知道有什么作用，它为什么会亮灯？亮灯了又该如何应对处理呢？\\n3、胎压指示灯作用：监测汽车轮胎胎压状况\\n亮灯原因：轮胎压力不足或者压力过高\\n如何应对：应立即停车检查车胎的情况，通常有以下几种情况会出现胎压指示灯亮：轮胎被扎漏气、胎压过高、低胎压行车时间过长，如果胎压高，可以自己放一些气，如果胎压低，应该立即更换备胎或去4S店、维修厂调整胎压。</p>\",\"publisher\":\"娟子\",\"publisherPhone\":\"13545868855\",\"publishTime\":\"2022-07-24 12:36:49\",\"publishAdress\":null,\"readCount\":0,\"likeCount\":0,\"commentCount\":0,\"forwardCount\":0,\"shareCount\":0,\"isSensitivityPost\":0,\"isEssencePost\":0,\"isRecommendPost\":0,\"isHotPost\":0,\"sourceApp\":\"DC\",\"sourceType\":\"IOS\",\"createBy\":\"1083380194470035815\",\"createTime\":\"2022-07-24 12:36:49\",\"isLiked\":0,\"status\":1,\"machineStauts\":1,\"publishStatus\":1,\"coverImg\":null,\"coordinate\":{\"id\":\"1113054243778461777\",\"postId\":\"1113054243778461773\",\"longitude\":null,\"latitude\":null,\"address\":\"\"},\"mactalkName\":null,\"atUserList\":[],\"campus\":null,\"videoId\":null,\"videoStatus\":null,\"paragraphs\":[{\"id\":\"1113054243778461774\",\"parentId\":\"1113054243778461773\",\"parentType\":0,\"paragraphType\":0,\"paragraphContent\":\"这14个汽车故障灯亮起，你一定要重视（3）\",\"sourceApp\":\"DC\",\"sourceType\":\"IOS\",\"sourceVersion\":\"1.8\",\"sortNum\":1,\"fileId\":null,\"bbsFile\":null},{\"id\":\"1113054243778461775\",\"parentId\":\"1113054243778461773\",\"parentType\":0,\"paragraphType\":1,\"paragraphContent\":null,\"sourceApp\":\"DC\",\"sourceType\":\"IOS\",\"sourceVersion\":\"1.8\",\"sortNum\":1,\"fileId\":\"1113054243778461776\",\"bbsFile\":{\"id\":\"1113054243778461776\",\"fileTemType\":\"0\",\"fileTemId\":\"1113054243778461773\",\"fileAddress\":\"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-24243d5f2c151c9a05151c9a05243d5f2c.jpg\",\"fileAddressSmall\":\"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-24243d5f2c151c9a05151c9a05243d5f2c.jpg\",\"fileType\":\"0\",\"publisher\":\"娟子\",\"publisherPhone\":\"13545868855\",\"publishTime\":\"2022-07-24 12:36:49\",\"createBy\":\"1083380194470035815\",\"createDate\":\"2022-07-24 12:36:49\",\"updateBy\":\"1083380194470035815\",\"updateTime\":\"2022-07-24 12:36:49\",\"isEnable\":\"1\",\"sourceApp\":\"DC\",\"sourceType\":\"IOS\",\"videoTime\":null,\"videoSize\":null}}],\"carId\":null,\"carName\":null,\"userDetailVo\":{\"id\":\"1083380194470035816\",\"userId\":\"1083380194470035815\",\"uid\":null,\"nickName\":\"娟子\",\"totalScore\":4410,\"usableScore\":4410,\"growth\":9060,\"growthName\":\"白银会员\",\"gradeRuleSort\":\"2\",\"growthIcon\":\"\",\"count\":24,\"continuousCount\":24,\"isEnable\":1,\"isCarAttest\":0,\"isRecommend\":0,\"isPlus\":0,\"postsMute\":0,\"postsMuteDate\":null,\"commonetMute\":0,\"commentMuteDate\":null,\"isMute\":0,\"sourceApp\":\"DC\",\"followCount\":0,\"fansCount\":1,\"releaseCount\":27,\"essenceCount\":0,\"commentCount\":0,\"likeCount\":0,\"favoritesCount\":0,\"userName\":null,\"realName\":null,\"phone\":\"135****8855\",\"sex\":null,\"birthday\":null,\"avatar\":\"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJpC3FhW8n3haxonxeqVicPU4fZ2fCTNiaic8bynEqsEuo6icL694VPSVclhyJ3KibM578D2HKiceiaVh7cA/132\",\"email\":null,\"isInvite\":0,\"registerTime\":\"2022-07-01 15:00:35\",\"personalProfile\":null,\"userDescription\":null,\"isMutual\":0,\"isFans\":0,\"isFollow\":1,\"isBlack\":0,\"userIdentificationVoList\":null,\"userIdentificationName\":null,\"defaultCarName\":null,\"defaultAddress\":null,\"classify\":null,\"classifyNames\":null,\"xingeToken\":null,\"sourceType\":\"IOS\",\"deviceId\":null,\"isSigned\":0,\"beanId\":null,\"isPublishUser\":null,\"cars\":null,\"sourceAppVer\":null,\"navinfoId\":null,\"badges\":null,\"receiveBadges\":null,\"receiveBadgeNum\":null,\"nameListType\":0,\"badgeUrl\":null,\"nameListTime\":null,\"sourceRegister\":null},\"topicVOList\":[],\"fileVOList\":[{\"id\":\"1113054243778461776\",\"fileTemType\":\"0\",\"fileTemId\":\"1113054243778461773\",\"fileType\":\"0\",\"fileAddress\":\"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-24243d5f2c151c9a05151c9a05243d5f2c.jpg\",\"fileAddressSmall\":\"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-24243d5f2c151c9a05151c9a05243d5f2c.jpg\",\"publisher\":\"娟子\",\"publisherPhone\":\"13545868855\",\"publishTime\":\"2022-07-24 12:36:49\",\"createBy\":\"1083380194470035815\",\"createDate\":\"2022-07-24 12:36:49\",\"updateBy\":\"1083380194470035815\",\"updateTime\":\"2022-07-24 12:36:49\",\"isEnable\":\"1\",\"sourceApp\":\"DC\",\"sourceType\":\"IOS\",\"videoTime\":null,\"videoSize\":null}],\"sourceVersion\":null,\"hotFlag\":null,\"bizType\":null,\"bizId\":null,\"auditBy\":\"959\",\"auditName\":null,\"auditTime\":null,\"auditMassage\":null,\"commentVO\":null}";
-    var oldDate = JSON.parse(aa);
-    var paragraphs = oldDate.paragraphs;
-    var paragraph1 = '';
-    var paragraph0 = '';
-    for (var i = 0; i < paragraphs.length; i++) {
-        if (paragraphs[i].paragraphType == '1') {
-            paragraph1 = paragraphs[i];
-        } else if (paragraphs[i].paragraphType == '0') {
-            paragraph0 = paragraphs[i];
+
+//查询 账号关注的用户数量
+async function followList(token, userid) {
+    //followlistArr 关注人数的数组
+    if (followlistArr.length == 0) {
+        let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/follow/followList`
+        let body = {"pageNum": "1", "pageSize": "100", "userId": "1110115713052827653"}; //主账号157得关注 写死
+        let urlObject = populateUrlObject(url, token, body)
+        await httpRequest('post', urlObject)
+        let result = httpResult;
+        if (!result) return
+        // console.log(JSON.stringify(result))
+        if (result.code == 0) {
+            console.log('查询 账号关注的用户数量成功！！！');
+            followlistArr = result.data.list;
+
+        } else {
+            console.log('查询 账号关注的用户数量失败：' + result.message)
         }
-    }
-    var reqData = {
-        content: oldDate.content,
-        postsType: oldDate.postsType,
-        pickType: 1, //默认先传1
-        paragraphs: {
-            paragraphContent: oldDate.title, //需要去掉 p标签 先用title
-            paragraphType: 0,
-        },
-        //挂在哪个主题
-        topicVOList: [
-            {
-                "contentCount": 4817,
-                "fileVOList": [
-                    {
-                        "createBy": "17",
-                        "createDate": "2022-07-13 03:25:01",
-                        "fileAddress": "https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg",
-                        "fileAddressSmall": "https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85",
-                        "fileTemId": "1089045376593117191",
-                        "fileTemType": "2",
-                        "fileType": "0",
-                        "id": "1101547940492624005",
-                        "isEnable": "1",
-                        "publishTime": "2022-07-13 03:25:01",
-                        "publisher": "孙焕辰",
-                        "sourceApp": "DC",
-                        "sourceType": "SYSTEM",
-                        "updateTime": "2022-07-13 03:25:01"
-                    }
-                ],
-                "id": "1089045376593117191",
-                "selectedType": 2,
-                "title": "生活有你 爱有天逸"
-            }
-        ],
-        atUserList: [],
-        bbsFile: [
-            {
-                compressPath: paragraph1.bbsFile.fileAddress,//先用这个号地址
-                createBy: userid,  //自己的id
-                fileAddress: paragraph1.bbsFile.fileAddress,
-                fileAddressSmall: paragraph1.bbsFile.fileAddressSmall,
-                fileTemType: paragraph1.bbsFile.fileTemType,
-                fileType: paragraph1.bbsFile.fileType,
-                isSelectPic: false,
-                localPath: '"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"',
-
-            }
-        ],
-        userId: userid,//自己填!!!
-        sourceApp: oldDate.sourceApp,
-        sourceType: 'ANDROID',
-        "coordinateDto": {
-            "address": "",
-            "latitude": "",
-            "longitude": ""
-        },
-        title: oldDate.title,
-
-    };
-    await publishPostsNew(token, reqData)
-}
-
-//发表帖子---
-async function publishPostsNew(token, data1,userid) {
-    var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
-    var data = JSON.parse(aa2);
-    data.content = data1.content;
-    var str2 = data1.content.replace("<p>","").replace("</p>","");
-    data.paragraphs.paragraphContent = str2;//去掉p 标签
-    data.title = data1.title;
-    data.userId = userid;
-    data.bbsFile[0].createBy = userid;
-    data.bbsFile[0].compressPath=data1.imageUrl;//图片影像
-    data.bbsFile[0].fileAddress=data1.imageUrl;//图片影像
-    data.bbsFile[0].fileAddressSmall=data1.imageUrl;//图片影像
-
-    //图片随机 TOdo
-    let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/posts/publishPostsNew`
-    let body = data;
-    let urlObject = populateUrlObject(url, token, body)
-    await httpRequest('post', urlObject)
-    let result = httpResult;
-    if (!result) return
-    //console.log(JSON.stringify(result))
-    if (result.code == 0) {
-        console.log('发表帖子成功！！！,主题为'+data1.title)
     } else {
-        console.log('发表帖子失败：' + result.message)
-
+        console.log('使用已经查询账号关注的用户！！！');
     }
+    await $.wait(1000);
+    var followlistNo = Math.floor((followlistArr.length) * Math.random());//随机取一名关注的用户
+    var otherid = followlistArr[followlistNo];//随机用户id
+    console.log(JSON.stringify(otherid));
+    //查询该用户的帖子信息
+    await queryChoicenessByUserDTO(token, userid, otherid)
+
 }
 
 //查询某个用户发帖数
 async function queryChoicenessByUserDTO(token, userid,otherid) {
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessByUserDTO`
-    let body = {"pageNum": "1", "pageSize": "100", "userId": otherid};
+    let body = {"pageNum": "1", "pageSize": "500", "userId": otherid};
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -396,8 +313,8 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
         //获取随机数据 该用户的某个帖子
         var infoData = result.data.list[aNumber1];
         var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
-        infoData.imageUrl=imageArr[imageNo];//随机图片url
-        await publishPostsNew(token, infoData,userid)
+        infoData.imageUrl = imageArr[imageNo];//随机图片url
+        await publishPostsNew(token, infoData, userid)
         await $.wait(1000);
 
     } else {
@@ -405,6 +322,38 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
 
     }
 }
+
+//发表帖子---
+async function publishPostsNew(token, data1, userid) {
+    var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
+    var data = JSON.parse(aa2);
+    data.content = data1.content;
+    var str2 = data1.content.replace("<p>", "").replace("</p>", "");
+    data.paragraphs.paragraphContent = str2;//去掉p 标签
+    data.title = data1.title;
+    data.userId = userid;
+    data.bbsFile[0].createBy = userid;
+    data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
+    data.bbsFile[0].fileAddress = data1.imageUrl;//图片影像
+    data.bbsFile[0].fileAddressSmall = data1.imageUrl;//图片影像
+
+    //图片随机 TOdo
+    let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/posts/publishPostsNew`
+    let body = data;
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        console.log('发表帖子成功！！！,主题为' + data1.title)
+    } else {
+        console.log('发表帖子失败：' + result.message)
+
+    }
+}
+
+
 //查询积分
 async function scoreGet(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/get`
@@ -416,6 +365,7 @@ async function scoreGet(token) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         console.log('积分查询成功,积分为'+result.data.totalScore)
+        return result.data.totalScore;
     } else {
         console.log('发表帖子失败：' + result.message)
 
@@ -432,13 +382,26 @@ async function taskList(token) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         console.log('查询任务完成情况成功！！！');
-       var qichangtask= result.data.typeTaskList[0];
-        console.log(JSON.stringify(qichangtask))
+        //日常任务  typeId=‘2’
+        var qichangtask = result.data.typeTaskList[0];
+        let taskinfo = qichangtask.taskList.filter(ele => {
+            //37为评论  17为每日签到   4为参与热门发帖  5 发帖内容加精
+            return ele.id == '37' || ele.id == '17' || ele.id == '4'
+        }).map(el2 => {
+            return {
+                '任务名称': el2.name,
+                '是否完成：': (el2.isFinish == 1 ? '已完成' : '未完成'),
+                '完成数量：': el2.currentTaskCount + '/' + el2.limitScore
+            };
+        })
+        return taskinfo
     } else {
-        console.log('发表帖子失败：' + result.message)
+        console.log('查询任务完成情况失败：' + result.message)
 
     }
 }
+
+
 ///////////////////////////////////////////////////////////////////
 
 async function Envs() {
@@ -458,26 +421,26 @@ async function Envs() {
         log(`\n提示：未填写提现变量，不会执行自动提现`)
     }
 
-    if (dfxtlpassword) {
-        if (dfxtlpassword.indexOf("@") != -1) {
-            dfxtlpassword.split("@").forEach((item) => {
-                dfxtlpasswordArr.push(item);
-            });
-        } else if (dfxtlpassword.indexOf("\n") != -1) {
-            dfxtlpassword.split("\n").forEach((item) => {
-                dfxtlpasswordArr.push(item);
-            });
-        } else {
-            dfxtlpasswordArr.push(dfxtlpassword);
-        }
-    } else {
-        log(`\n 【${$.name}】：未填写变量 dfxtlpassword`)
-        return;
-    }
+    // if (dfxtlpassword) {
+    //     if (dfxtlpassword.indexOf("@") != -1) {
+    //         dfxtlpassword.split("@").forEach((item) => {
+    //             dfxtlpasswordArr.push(item);
+    //         });
+    //     } else if (dfxtlpassword.indexOf("\n") != -1) {
+    //         dfxtlpassword.split("\n").forEach((item) => {
+    //             dfxtlpasswordArr.push(item);
+    //         });
+    //     } else {
+    //         dfxtlpasswordArr.push(dfxtlpassword);
+    //     }
+    // } else {
+    //     log(`\n 【${$.name}】：未填写变量 dfxtlpassword`)
+    //     return;
+    // }
 
-    if (dfxtlpasswordArr.length >= 1 && dfxtlphoneArr.length != dfxtlpasswordArr.length) {
-        log(`提示：请将提现变量与普通变量一一对应，否则会出现问题`)
-    }
+    // if (dfxtlpasswordArr.length >= 1 && dfxtlphoneArr.length != dfxtlpasswordArr.length) {
+    //     log(`提示：请将提现变量与普通变量一一对应，否则会出现问题`)
+    // }
 
     return true;
 }
