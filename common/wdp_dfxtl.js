@@ -98,7 +98,7 @@ let curHour = (new Date()).getHours()
             const score = await scoreGet(token);
             //任务完成情况
             const taskinfo = await taskList(token);
-            addNotifyStr(`手机号 ${dfxtlphoneArr[index]}: 账户得分为${score}\n任务完成情况为${JSON.stringify(taskinfo)}`)
+            addNotifyStr(`手机号 ${dfxtlphoneArr[index]}: 账户得分为${score}\n任务完成情况为${JSON.stringify(taskinfo)}`,false)
         }
         showmsg()
     }
@@ -214,11 +214,11 @@ async function putComment(token, data) {
     }
 }
 
-//查询最近更新的帖子
+//查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
 async function queryChoicenessNewList(token) {
     //1102626767558049804
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
-    let body = {"pageNum": "1", "pageSize": "10"};
+    let body = {"pageNum": "1", "pageSize": "100"};//一次查100条
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -227,9 +227,11 @@ async function queryChoicenessNewList(token) {
     if (result.code == 0) {
         console.log('最近帖子 查询需要评论的帖子成功！！！')
         var data = result.data.list;
-        for (let index = 0; index < data.length; index++) {
-            var conectTemId = data[index].id;
-            var pickType = data[index].chonicenessType;
+        for (let index = 0; index < 4; index++) {//一次评价4条
+            var aNumber = (100) * Math.random();
+            var aNumber1 = Math.floor(aNumber);//0-100随机取一条
+            var conectTemId = data[aNumber1].id;
+            var pickType = data[aNumber1].chonicenessType;
 
             var aa = {
                 "bbsFileList": [],
@@ -486,7 +488,7 @@ function addNotifyStr(str, log = true) {
 
 //通知
 async function showmsg() {
-    if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
+   // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
     notifyBody = jsname + "运行通知\n\n" + notifyStr
     if (notifyFlag == 1) {
         $.msg(notifyBody);
