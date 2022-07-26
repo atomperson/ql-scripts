@@ -21,19 +21,18 @@ let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla
 let userList = []
 
 
-let token='';//token
-let userid='';//userid
-let oneid='';//oneid
-let typecodeArr='';//任何集合
+let token = '';//token
+let userid = '';//userid
+let oneid = '';//oneid
+let typecodeArr = '';//任何集合
 let bjqcTokenArr = [];
 //  格式 header里的Authorization(去掉Bearer)用#连起来   Authorizatio#userid#oneid
 let bjqcToken = ($.isNode() ? process.env.bjqcCookie : $.getdata('bjqcToken')) || '';
 //let bjqcToken='8a8d81de81fd7e87018235da76aa62d5?var=Android2.11.1&oneId=e0e1853f17e4453ba6d11d4914e6fab9#e5d160d27a15aebd6a0ee4dfea14012f'
 
 
-
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
-let imageArr=[];//图片资源
+let imageArr = [];//图片资源
 
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
@@ -63,9 +62,9 @@ let curHour = (new Date()).getHours()
             console.log('\n======== 检查登录状态 ========')
             //登录
             var bjqcTokenArrqqqq = bjqcTokenArr[index].split('#');
-            token=bjqcTokenArrqqqq[1];
-            userid=bjqcTokenArrqqqq[0].split('?')[0];
-            oneid=bjqcTokenArrqqqq[0].split('oneId=')[1];
+            token = bjqcTokenArrqqqq[1];
+            userid = bjqcTokenArrqqqq[0].split('?')[0];
+            oneid = bjqcTokenArrqqqq[0].split('oneId=')[1];
 
             await $.wait(200);
             //查询任务完成信息
@@ -81,15 +80,15 @@ let curHour = (new Date()).getHours()
             await getplazas('2');
             await $.wait(500);
             //获取奖励
-            for(let i=0;i<typecodeArr.length;i++){
+            for (let i = 0; i < typecodeArr.length; i++) {
                 //post----日常发帖 ，forward----转发，comment---评论 等等------
                 await forward(typecodeArr[i].code)
                 await $.wait(500);
             }
             //查询任务完成信息和积分信息
-            let user=await getuserinfo();
-            let score= await getscore();
-            addNotifyStr(`手机号 ${score.mobile}: 账户得分为${score.score}\n任务完成情况为${JSON.stringify(user)}`,true)
+            let user = await getuserinfo();
+            let score = await getscore();
+            addNotifyStr(`手机号 ${score.mobile}: 账户得分为${score.score}\n任务完成情况为${JSON.stringify(user)}`, true)
 
         }
         showmsg()
@@ -104,8 +103,8 @@ let curHour = (new Date()).getHours()
 
 //任务详情查询
 async function behaviour() {
-    if(typecodeArr.length==0){
-        let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/pointRule/behaviour?oneid='+oneid;
+    if (typecodeArr.length == 0) {
+        let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/pointRule/behaviour?oneid=' + oneid;
         let body = ''
         let urlObject = populateUrlObject(url, '', body)
         await httpRequest('get', urlObject)
@@ -114,8 +113,8 @@ async function behaviour() {
         //console.log(JSON.stringify(result))
         if (result.returnCode == 1) {
             console.log('任务详情查询成功')
-            typecodeArr=result.returnDataList.map(ele=>{
-                return {code:ele.code,channel:ele.channel,triggers:ele.triggers,daynum:ele.daynum};
+            typecodeArr = result.returnDataList.map(ele => {
+                return {code: ele.code, channel: ele.channel, triggers: ele.triggers, daynum: ele.daynum};
             })
         } else {
             console.log('任务详情查询失败：' + result.returnMsg)
@@ -125,7 +124,7 @@ async function behaviour() {
 
 // 签到
 async function sign() {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/sign?id='+userid+'&var=Android2.11.1&oneId='+oneid ;
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/sign?id=' + userid + '&var=Android2.11.1&oneId=' + oneid;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
@@ -139,25 +138,33 @@ async function sign() {
 
     }
 }
+
 // 获取贴吧信息
 async function getplazas(type) {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/zone/dynamic/plazas' ;
-    let body = {"orderType":"updateTime","postNum":0,"pageSize":20,"lastZoneId":0,"tabCode":"ALL","pageNum":0};
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/zone/dynamic/plazas';
+    let body = {
+        "orderType": "updateTime",
+        "postNum": 0,
+        "pageSize": 20,
+        "lastZoneId": 0,
+        "tabCode": "ALL",
+        "pageNum": 0
+    };
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 200) {
-        var tiezilist=result.data.content;
+        var tiezilist = result.data.content;
         var aNumber = (20) * Math.random();
         var aNumber1 = Math.floor(aNumber);//0-20随机取一条
-        if(type=='1'){ //type 为 为评论   2为发表帖子
-            var commentid= tiezilist[aNumber1].id;
+        if (type == '1') { //type 为 为评论   2为发表帖子
+            var commentid = tiezilist[aNumber1].id;
             await $.wait(500);
             await comments(commentid);
-        }else{
-            var tt=tiezilist[aNumber1];
+        } else {
+            var tt = tiezilist[aNumber1];
             await $.wait(500);
             await pushtiezi(tt);
         }
@@ -166,11 +173,12 @@ async function getplazas(type) {
 
     }
 }
+
 // 评论消息
 async function comments(commentid) {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/posts/'+commentid+'/comments' ;
-    var commentInfo=await poem(commentid);
-    let body = {"replycommentid":commentid,"content":commentInfo};
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/posts/' + commentid + '/comments';
+    var commentInfo = await poem(commentid);
+    let body = {"replycommentid": commentid, "content": commentInfo};
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -178,14 +186,32 @@ async function comments(commentid) {
     //console.log(JSON.stringify(result))
     console.log('评论成功');//因为没有返回码值 先直接判断成功
 }
+
 //发表帖子
 async function pushtiezi(data) {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v4/posts' ;
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v4/posts';
 
-    var body={"bbsType":0,"bbsTypeId":0,"images":[{"name":"mmexport1658634024185.jpg","seq":0,"url":"http://baicapp.oss-cn-beijing.aliyuncs.com/1657566487432"}],"latitude":0.0,"longitude":0.0,"postItemPojos":[{"content":"\\n第一次加入北京汽车大家庭。哈哈哈","type":1},{"content":"http://baicapp.oss-cn-beijing.aliyuncs.com/1657566487432","type":2}],"tabCode":"POST_TAB_3","topics":[{"id":"8a8d800881b895b401820f3758873d55","name":"#暑期大片# ","state":1}],"userid":"8a8d81de81fd7e87018235da76aa62d5"};
-    body.userid=userid;//userid
-    body.images=data.images;//图片
-    body.postItemPojos[0].content=data.content;
+    var body = {
+        "bbsType": 0,
+        "bbsTypeId": 0,
+        "images": [{
+            "name": "mmexport1658634024185.jpg",
+            "seq": 0,
+            "url": "http://baicapp.oss-cn-beijing.aliyuncs.com/1657566487432"
+        }],
+        "latitude": 0.0,
+        "longitude": 0.0,
+        "postItemPojos": [{
+            "content": "\\n第一次加入北京汽车大家庭。哈哈哈",
+            "type": 1
+        }, {"content": "http://baicapp.oss-cn-beijing.aliyuncs.com/1657566487432", "type": 2}],
+        "tabCode": "POST_TAB_3",
+        "topics": [{"id": "8a8d800881b895b401820f3758873d55", "name": "#暑期大片# ", "state": 1}],
+        "userid": "8a8d81de81fd7e87018235da76aa62d5"
+    };
+    body.userid = userid;//userid
+    body.images = data.images;//图片
+    body.postItemPojos[0].content = data.content;
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -195,7 +221,7 @@ async function pushtiezi(data) {
 
 // 获取奖励
 async function forward(type) {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/pointRule/points?oneid='+oneid+'&code='+type ;
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/pointRule/points?oneid=' + oneid + '&code=' + type;
     let body = '';
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
@@ -203,49 +229,54 @@ async function forward(type) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.returnCode == 1) {
-        console.log('登录获取奖励成功' )
+        console.log('登录获取奖励成功')
     } else if (result.returnCode == 2003) {
-        console.log(type+'暂无可领取奖励' )
-    }else {
+        console.log(type + '暂无可领取奖励')
+    } else {
         console.log('获取奖励失败：' + result.returnMsg)
     }
 }
 
 //任务详情查询
 async function getuserinfo() {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/pointRule/behaviour?oneid='+oneid;
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/pointRule/behaviour?oneid=' + oneid;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
     let result = httpResult;
     if (!result) return
     if (result.returnCode == 1) {
-       // console.log('任务详情查询成功')
-        var userinfo1=result.returnDataList.map(ele=>{
+        // console.log('任务详情查询成功')
+        var userinfo1 = result.returnDataList.map(ele => {
             //triggers:ele.triggers,daynum:ele.daynum
-            if(ele.triggers==null||ele.daynum==''||ele.daynum==null||ele.triggers==0){
+            if (ele.triggers == null || ele.daynum == '' || ele.daynum == null || ele.triggers == 0) {
                 //return  false;
-            }else{
-                return {"名称":ele.channel,"完成情况":(ele.triggers==ele.daynum?'已完成':'未完成'+ele.daynum+'/'+ele.triggers)};
+            } else {
+                return {
+                    "名称": ele.channel,
+                    "完成情况": (ele.triggers == ele.daynum ? '已完成' : '未完成' + ele.daynum + '/' + ele.triggers)
+                };
             }
         })
-        var userinfo=userinfo1.filter(ele=>ele!=undefined);
+        var userinfo = userinfo1.filter(ele => ele != undefined);
         return userinfo;
     } else {
         console.log('登录失败：' + result.returnMsg)
     }
 }
+
 //积分信息查询
 async function getscore() {
-    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/users/'+userid+'?var=Android2.11.1&oneId='+oneid;
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/users/' + userid + '?var=Android2.11.1&oneId=' + oneid;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
     let result = httpResult;
     if (!result) return
     console.log('积分信息 详情查询成功')
-    return {score:result.member.totalpoints,mobile:result.member.mobile};
+    return {score: result.member.totalpoints, mobile: result.member.mobile};
 }
+
 ///////////////////////////////////////////////////////////////////
 /**
  * 获取随机诗词
@@ -254,9 +285,10 @@ async function poem() {
     let urlObject = populateUrlObject('https://v1.jinrishici.com/all.json', '', '')
     await httpRequest('post', urlObject);
     let result = httpResult;
-    var shici=result.content+'\n'+'————————《'+result.origin+'》'+result.author;
+    var shici = result.content + '\n' + '————————《' + result.origin + '》' + result.author;
     return shici;
 }
+
 async function Envs() {
     if (bjqcToken) {
         if (bjqcToken.indexOf("@") != -1) {
@@ -316,8 +348,8 @@ function populateUrlObject(url, cookie, body = '') {
             "SourceApp": "DC",
             "SourceType": "ANDROID",
             "SourceAppVer": "1.8.1",
-            "authorization": 'Bearer '+token,
-            "security-sign":"3c3049386af626e90d7479e5f6ffdd15|435a97ac-585a-4c56-b976-bfd1866a278d|1658806402133",
+            "authorization": 'Bearer ' + token,
+            "security-sign": "3c3049386af626e90d7479e5f6ffdd15|435a97ac-585a-4c56-b976-bfd1866a278d|1658806402133",
         },
     }
     if (body) urlObject.body = body
