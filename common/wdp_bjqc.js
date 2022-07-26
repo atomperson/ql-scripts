@@ -8,12 +8,10 @@ https://api.smartservice.bjev.com.cn/gateway-api/v1/users/xxxxxxxxx
 [task_local]
 #北京汽车
 58 0,9-22/4 * * * wdp_bjqc.js, tag=北京汽车, enabled=true
-
 定时：一天一两次
 cron: 45 7,20 * * *
-
-const $ = new Env("北京汽车")
 */
+const $ = new Env("北京汽车")
 const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
 const logDebug = 0
