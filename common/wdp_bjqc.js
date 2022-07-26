@@ -1,9 +1,18 @@
 /*
-东风雪铁龙
-
+北京汽车
+邀请注册：http://wx.smartservice.bjev.com.cn/register.html?id=8a8d81de81fd7e8701823589a4aa5bcb
+积分换实物
+自动完成签到和转发任务，其他任务不会做
+https://api.smartservice.bjev.com.cn/gateway-api/v1/users/xxxxxxxxx
+捉包把上面url的后面那串id，跟header里的Authorization(去掉Bearer)用#连起来，填到bjqcCookie里
 [task_local]
-#东风雪铁龙
-0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
+#北京汽车
+58 0,9-22/4 * * * wdp_bjqc.js, tag=北京汽车, enabled=true
+
+定时：一天一两次
+cron: 45 7,20 * * *
+
+const $ = new Env("北京汽车")
 */
 const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
