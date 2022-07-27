@@ -13,7 +13,6 @@
 cron: 36 7,20 * * *
 */
 const jsname = '长安深蓝'
-const $ = Env('长安深蓝')
 const logDebug = 0
 
 const axios = require("axios");
