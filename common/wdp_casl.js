@@ -31,7 +31,7 @@ let userinfo='';
 let token = '';//token
 
 let caslTokenArr = [];
-let caslToken = ($.isNode() ? process.env.caslCookie : $.getdata('caslCookie')) || '';
+let caslToken = ($.isNode() ? process.env.caslapp : $.getdata('caslCookie')) || '';
 //let caslToken='' ;
 
 
