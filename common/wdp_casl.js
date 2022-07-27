@@ -12,9 +12,9 @@
 定时：一天一两次
 cron: 36 7,20 * * *
 */
+const $ = Env('长安深蓝')
 const jsname = '长安深蓝'
 const logDebug = 0
-
 const axios = require("axios");
 //import axios from "axios";
 
