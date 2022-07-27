@@ -135,7 +135,7 @@ async function sign() {
     let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/sign?id=' + userid + '&var=Android2.11.1&oneId=' + oneid;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
-    await httpRequest('get', urlObject)
+    await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
     console.log(JSON.stringify(result))
@@ -146,12 +146,12 @@ async function sign() {
 
     }
 }
-// 签到
+// 签到1
 async function sign1() {
     let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/sign?id='+userid;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
-    await httpRequest('get', urlObject)
+    await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
     console.log(JSON.stringify(result))
@@ -316,7 +316,7 @@ async function poem() {
 async function Envs() {
     if (bjqcToken) {
         if (bjqcToken.indexOf("@") != -1) {
-            dfxtlphone.split("@").forEach((item) => {
+            bjqcToken.split("@").forEach((item) => {
                 bjqcTokenArr.push(item);
             });
         } else if (bjqcToken.indexOf("\n") != -1) {
