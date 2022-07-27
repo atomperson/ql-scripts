@@ -11,7 +11,6 @@ https://api.smartservice.bjev.com.cn/gateway-api/v1/users/xxxxxxxxx
 定时：一天一两次
 cron: 45 7,20 * * *
 */
-const $ = new Env("北京汽车")
 const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
 const logDebug = 0
@@ -35,7 +34,7 @@ let typecodeArr = '';//任何集合
 let bjqcTokenArr = [];
 //  格式 header里的Authorization(去掉Bearer)用#连起来   Authorizatio#userid#oneid
 let bjqcToken = ($.isNode() ? process.env.bjqcCookie : $.getdata('bjqcToken')) || '';
-//let bjqcToken='8a8d81de81fd7e87018235da76aa62d5?var=Android2.11.1&oneId=e0e1853f17e4453ba6d11d4914e6fab9#e5d160d27a15aebd6a0ee4dfea14012f'
+//let bjqcToken='8a8d81de81fd7e87018235da76aa62d5?var=Android2.11.1&oneId=e0e1853f17e4453ba6d11d4914e6fab9#6dd1b788573f65e626f936cd1bc364e5@8a8d81de81fd7e8701823a00c7af535c?var=Android2.11.1&oneId=d6a30f7c5095458ba31c27a74535189b#9a9bd64fb412a567f9110f6075e997b5';
 
 
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
@@ -79,6 +78,8 @@ let curHour = (new Date()).getHours()
             await $.wait(500);
             //签到
             await sign();
+            await sign1();
+
             await $.wait(500);
             //评论    -------------------获取贴吧信息然后再评论
             await getplazas('1');
@@ -132,6 +133,22 @@ async function behaviour() {
 // 签到
 async function sign() {
     let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/sign?id=' + userid + '&var=Android2.11.1&oneId=' + oneid;
+    let body = ''
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    console.log(JSON.stringify(result))
+    if (result.code == 200) {
+        console.log('签到成功')
+    } else {
+        console.log('签到失败：' + result.returnMsg)
+
+    }
+}
+// 签到
+async function sign1() {
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/sign?id='+userid;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
