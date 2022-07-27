@@ -1,15 +1,16 @@
 /*
-北京汽车
-邀请注册：http://wx.smartservice.bjev.com.cn/register.html?id=8a8d81de81fd7e8701823589a4aa5bcb
-积分换实物
-自动完成签到和转发任务，其他任务不会做
-https://api.smartservice.bjev.com.cn/gateway-api/v1/users/xxxxxxxxx
-捉包把上面url的后面那串id，跟header里的Authorization(去掉Bearer)用#连起来，填到bjqcCookie里
+@wdp  7.27 长安深蓝 积分兑换实物
+完成大部分任务。一天几百积分吧，还没上架商城，听说大水？先撸
+抓取域名 app-api.deepal.com.cn
+可app抓包或者小程序抓包都行
+变量 caslCookie  抓取账号请求头Authorization的值就可以
+多账号@分割
+一天1-2次吧。
 [task_local]
-#北京汽车
-58 0,9-22/4 * * * wdp_bjqc.js, tag=北京汽车, enabled=true
+#北京现代
+58 0,9-22/4 * * * wdp_casl.js, tag=长安深蓝, enabled=true
 定时：一天一两次
-cron: 45 7,20 * * *
+cron: 36 7,20 * * *
 */
 const jsname = '长安深蓝'
 const $ = Env('长安深蓝')
