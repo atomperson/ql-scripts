@@ -99,10 +99,10 @@ async function wallet() {
         await httpRequest('get', urlObject)
         let result = httpResult;
         if (!result) return
-        //console.log(JSON.stringify(result))
         if (result.code == 200) {
             console.log('用户信息查询成功')
             userinfo=result.data;
+            console.log(JSON.stringify(userinfo))
         } else {
             console.log('用户信息查询成功失败：' + result.message)
         }
