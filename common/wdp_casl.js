@@ -14,9 +14,9 @@ cron: 36 7,20 * * *
 */
 const $ = Env('长安深蓝')
 const jsname = '长安深蓝'
-const logDebug = 0
+//const logDebug = 0
 const axios = require("axios");
-//import axios from "axios";
+import axios from "axios";
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -32,7 +32,7 @@ let token = '';//token
 
 let caslTokenArr = [];
 let caslToken = ($.isNode() ? process.env.caslapp : $.getdata('caslCookie')) || '';
-//let caslToken='' ;
+//let caslToken='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpbklkIjoxNTUyMTMzNDg3MzE4MTYzNDU3LCJybiI6IlFReXFYUWdOdzVsWlhleDBCcmVlTEl0MU9SUHVtY0R0In0.O1c7hGVuwVcsXQR4KTkjlleohqbbjJh6bw-adgkK91E';
 
 
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
@@ -63,13 +63,16 @@ let curHour = (new Date()).getHours()
             let num = index + 1
             console.log(`\n========= 开始【第 ${num} 个账号】=========\n`)
             console.log('\n======== 检查登录状态 ========')
-            //登录
+            //token获取
             token = caslTokenArr[index] ;
             await $.wait(2000);
-            //查询钱包信息
-            await wallet();
+
             //查询规则
             await viewRule();
+            await $.wait(500);
+            //查看车型
+            await carShow();
+            await $.wait(500);
             //浏览帖子和评论帖子 点赞 收藏   查询帖子列表分页
             await articlequery();
             await $.wait(2000);
@@ -80,6 +83,8 @@ let curHour = (new Date()).getHours()
             //浏览活动和分享活动  参加活动咱不能完成   查询活动列表分页
             await activityquery();
             await $.wait(2000);
+            //查询钱包信息
+            await wallet();
 
         }
         showmsg()
@@ -93,19 +98,21 @@ let curHour = (new Date()).getHours()
 
 //获取钱包信息
 async function wallet() {
-        let url = 'https://app-api.deepal.com.cn/appapi/v1/member/ms/wallet';
-        let body = ''
-        let urlObject = populateUrlObject(url, '', body)
-        await httpRequest('get', urlObject)
-        let result = httpResult;
-        if (!result) return
-        if (result.code == 200) {
-            console.log('用户信息查询成功')
-            userinfo=result.data;
-            console.log(JSON.stringify(userinfo))
-        } else {
-            console.log('用户信息查询成功失败：' + result.message)
-        }
+    let url = 'https://app-api.deepal.com.cn/appapi/v1/member/ms/wallet';
+    let body = ''
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 200) {
+        console.log('用户信息查询成功')
+        userinfo=result.data;
+        //console.log(JSON.stringify(userinfo));
+        addNotifyStr(`手机号 ${userinfo.mobile}: 账户得分为${userinfo.countPoint}\n`, true)
+
+    } else {
+        console.log('用户信息查询成功失败：' + result.message)
+    }
 }
 //查看规则
 async function viewRule(articleId) {
@@ -122,39 +129,59 @@ async function viewRule(articleId) {
         console.log('查看规则失败：' + result.message)
     }
 }
+//查看车型
+async function carShow(articleId) {
+    let url = 'https://app-api.deepal.com.cn/appapi/v1/member/ms/carShow';
+    let body = '';
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 200) {
+        console.log('查看车型成功')
+    } else {
+        console.log('查看车型失败：' + result.message)
+    }
+}
 //查询主题信息列表
 async function articlequery() {
-        let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/article/query';
-        let body = {"body":{"isRecommend":"1"},"index":"1","size":"10","lastId":'0'};
-        let urlObject = populateUrlObject(url, '', body)
-        await httpRequest('post', urlObject)
-        let result = httpResult;
-        if (!result) return
-        //console.log(JSON.stringify(result))
-        if (result.code == 200) {
-            console.log('查询主题信息列表成功')
-            var tiezilist=result.data;
-            for(let i=0;i<tiezilist.length;i++){
-               var articleId= tiezilist[i].id;
-                console.log(`【开始第${i+1}个主题帖子】`)
-
-                //点赞
-                await praises(articleId);
-                await $.wait(5000);
-                //浏览
-                await viewarticle(articleId);
-                await $.wait(5000);
-                //收藏
-                await like(articleId);
-                await $.wait(5000);
-                //评论
-                await comment(articleId);
-                await $.wait(50000);
-            }
-
-        } else {
-            console.log('查询主题信息列表失败：' + result.message)
+    let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/article/query';
+    let body = {"body":{"isRecommend":"1"},"index":"1","size":"1000","lastId":'0'};
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 200) {
+        console.log('查询主题信息列表成功')
+        var tiezilist=result.data;
+        //一次运行随机 遍历3次
+        console.log('开始随机遍历三次发帖！！！')
+        for(let i=0;i<3;i++){
+            var aNumber = (tiezilist.length) * Math.random();
+            var aNumber1 = Math.floor(aNumber);//0-20随机取一条
+            var articleId= tiezilist[aNumber1].id;
+            console.log(`【开始第${i+1}个主题帖子】`)
+            //点赞
+            await praises(articleId);
+            await $.wait(5000);
+            //浏览
+            await viewarticle1(articleId);
+            await $.wait(5000);
+            //收藏
+            await like(articleId);
+            await $.wait(5000);
+            //评论
+            await comment(articleId);
+            await $.wait(50000);
+            //分享
+            await articleshare(articleId);
+            await $.wait(50000);
         }
+
+    } else {
+        console.log('查询主题信息列表失败：' + result.message)
+    }
 }
 
 //首页滑动条
@@ -203,7 +230,7 @@ async function adactivity() {
 //查询活动信息列表
 async function activityquery() {
     let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/activity/query';
-    let body = {"body":{"lat":"0","lng":"0"},"index":"1","size":"10","lastId":"0"};
+    let body = {"body":{"lat":"0","lng":"0"},"index":"1","size":"1000","lastId":"0"};
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -259,20 +286,34 @@ async function activityview(articleId) {
 
 //评论主题
 async function comment(articleId) {
-        var  content='加油'
-        let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/comment';
-        let body = {"articleId":articleId,"memberName":"深蓝5374","memberFace":"","parentId":null,"content":content,"quote":"长安深蓝SL03定购指南-第二弹","authorType":1,"quoteMemberId":"1","quoteMemberName":"长安深蓝","quoteMemberFace":"https://files.deepal.com.cn/member/head-portrait/6c599d214601820c01dedcffcb2a3be2.jpg"};
-        let urlObject = populateUrlObject(url, '', body)
-        await httpRequest('post', urlObject)
-        let result = httpResult;
-        if (!result) return
-        if (result.code == 200) {
-            console.log('评论主题成功')
-        } else {
-            console.log('评论主题失败：' + result.message)
-        }
+    var  content='加油'
+    let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/comment';
+    let body = {"articleId":articleId,"memberName":"深蓝5374","memberFace":"","parentId":null,"content":content,"quote":"长安深蓝SL03定购指南-第二弹","authorType":1,"quoteMemberId":"1","quoteMemberName":"长安深蓝","quoteMemberFace":"https://files.deepal.com.cn/member/head-portrait/6c599d214601820c01dedcffcb2a3be2.jpg"};
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 200) {
+        console.log('评论主题成功')
+    } else {
+        console.log('评论主题失败：' + result.message)
+    }
 }
-
+//分享主题
+async function articleshare(articleId) {
+    var  content='加油'
+    let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/article/'+articleId+'/share';
+    let body = '';
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 200) {
+        console.log('分享主题成功')
+    } else {
+        console.log('分享主题失败：' + result.message)
+    }
+}
 
 //浏览主题
 async function viewarticle(articleId) {
@@ -281,6 +322,20 @@ async function viewarticle(articleId) {
     let body = '';
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 200) {
+        console.log('浏览主题成功')
+    } else {
+        console.log('浏览主题失败：' + result.message)
+    }
+}
+async function viewarticle1(articleId) {
+    var  content='加油'
+    let url = 'https://app-api.deepal.com.cn/appapi/v1/member/ms/article/view';
+    let body = {"articleId":articleId,"type":1};
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
     if (result.code == 200) {
@@ -388,7 +443,7 @@ function populateUrlObject(url, cookie, body = '') {
             'User-Agent': 'Mozilla/5.0 (Linux; Android 9; Mi Note 3 Build/PKQ1.181007.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/4273 MMWEBSDK/20220604 Mobile Safari/537.36 MMWEBID/4710 MicroMessenger/8.0.24.2180(0x28001837) WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64 MiniProgramEnv/android' ,
             'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
             'Accept-Encoding': 'gzip,compress,br,deflate',
-             accept:"application/json",
+            accept:"application/json",
             "authorization":  token,
             charset:"utf-8",
             apptype:"mp",
