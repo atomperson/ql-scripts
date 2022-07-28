@@ -143,12 +143,7 @@ async function sign() {
     let result = httpResult;
     if (!result) return
     console.log(JSON.stringify(result))
-    if (result.code == 200) {
-        console.log('签到成功')
-    } else {
-        console.log('签到失败：' + result.returnMsg)
-
-    }
+    console.log('签到成功')
 }
 // 签到1
 async function sign1() {
@@ -159,12 +154,7 @@ async function sign1() {
     let result = httpResult;
     if (!result) return
     console.log(JSON.stringify(result))
-    if (result.code == 200) {
-        console.log('签到成功')
-    } else {
-        console.log('签到失败：' + result.returnMsg)
-
-    }
+    console.log('签到成功')
 }
 
 // 获取贴吧信息
@@ -197,7 +187,7 @@ async function getplazas(type) {
             await $.wait(500);
             await pushtiezi(tt);
         }else if (type == '3'){
-            //分享
+            //转发
             var commentid = tiezilist[aNumber1].id;
             await $.wait(500);
             await shareinfo(commentid);
