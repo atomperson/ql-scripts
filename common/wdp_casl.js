@@ -16,7 +16,7 @@ const $ = Env('长安深蓝')
 const jsname = '长安深蓝'
 //const logDebug = 0
 const axios = require("axios");
-import axios from "axios";
+//import axios from "axios";
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
