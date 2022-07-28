@@ -7,10 +7,9 @@
 多账号@分割
 一天1-2次吧。
 [task_local]
-#北京现代
-58 0,9-22/4 * * * wdp_casl.js, tag=长安深蓝, enabled=true
+#长安深蓝
+45 7,12,20 * * * wdp_casl.js, tag=长安深蓝, enabled=true
 定时：一天一两次
-cron: 36 7,20 * * *
 */
 const $ = new Env('长安深蓝');
 const jsname = '长安深蓝'

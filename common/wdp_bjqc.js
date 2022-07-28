@@ -7,7 +7,7 @@ https://api.smartservice.bjev.com.cn/gateway-api/v1/users/xxxxxxxxx
 捉包把上面url的后面那串id，跟header里的Authorization(去掉Bearer)用#连起来，填到bjqcCookie里
 [task_local]
 #北京汽车
-58 0,9-22/4 * * * wdp_bjqc.js, tag=北京汽车, enabled=true
+45 7,12,20 * * * wdp_bjqc.js, tag=北京汽车, enabled=true
 定时：一天一两次
 cron: 45 7,20 * * *
 */
