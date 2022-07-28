@@ -98,7 +98,7 @@ let curHour = (new Date()).getHours()
             const score = await scoreGet(token);
             //任务完成情况
             const taskinfo = await taskList(token);
-            addNotifyStr(`手机号 ${dfxtlphoneArr[index]}: 账户得分为${score}\n任务完成情况为${JSON.stringify(taskinfo)}`,false)
+            addNotifyStr(`手机号 ${dfxtlphoneArr[index]}: 账户剩余得分为${score}\n任务完成情况为${JSON.stringify(taskinfo)}`,false)
         }
         showmsg()
     }
@@ -366,8 +366,8 @@ async function scoreGet(token) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('积分查询成功,积分为'+result.data.totalScore)
-        return result.data.totalScore;
+        console.log('积分查询成功,积分剩余为'+result.data.usableScore)
+        return result.data.usableScore;
     } else {
         console.log('发表帖子失败：' + result.message)
 
