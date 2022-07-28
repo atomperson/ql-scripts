@@ -74,7 +74,7 @@ let curHour = (new Date()).getHours()
 
             await $.wait(200);
             //查询任务完成信息
-            await behaviour();
+             await behaviour();
             await $.wait(500);
             //签到
             await sign();
@@ -93,6 +93,12 @@ let curHour = (new Date()).getHours()
                 await forward(typecodeArr[i].code)
                 await $.wait(500);
             }
+            //分享 帖子
+            await getplazas('3');
+            await $.wait(500);
+             //await shareinfo('8a8d805781b895b6018234fc4b39295b');
+
+
             //查询任务完成信息和积分信息
             let user = await getuserinfo();
             let score = await getscore();
@@ -183,14 +189,22 @@ async function getplazas(type) {
         var tiezilist = result.data.content;
         var aNumber = (20) * Math.random();
         var aNumber1 = Math.floor(aNumber);//0-20随机取一条
-        if (type == '1') { //type 为 为评论   2为发表帖子
+        if (type == '1') { //type 为 为评论   2为发表帖子 3 为分享
             var commentid = tiezilist[aNumber1].id;
             await $.wait(500);
             await comments(commentid);
-        } else {
+        } else if (type == '2'){
+            //发帖子
             var tt = tiezilist[aNumber1];
             await $.wait(500);
             await pushtiezi(tt);
+        }else if (type == '3'){
+            //分享
+            var commentid = tiezilist[aNumber1].id;
+            await $.wait(500);
+            await shareinfo(commentid);
+        }else{
+
         }
     } else {
         console.log('获取贴吧信息失败：' + result.returnMsg)
@@ -287,6 +301,16 @@ async function getuserinfo() {
     } else {
         console.log('登录失败：' + result.returnMsg)
     }
+}
+
+//分享
+async function shareinfo(otherid) {
+    let url = 'https://api.smartservice.bjev.com.cn/gateway-api/v1/user/noteForword?id='+userid+'&otherId='+otherid+'&var=Android2.11.1&oneId='+oneid ;
+    let body = ''
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    console.log('分享成功')
 }
 
 //积分信息查询
