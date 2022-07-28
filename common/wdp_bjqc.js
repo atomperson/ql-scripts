@@ -12,7 +12,7 @@ https://api.smartservice.bjev.com.cn/gateway-api/v1/users/xxxxxxxxx
 cron: 45 7,20 * * *
 */
 const jsname = '东风雪铁龙'
-const $ = Env('东风雪铁龙')
+const $ = new Env('北京汽车');
 const logDebug = 0
 
 const axios = require("axios");
