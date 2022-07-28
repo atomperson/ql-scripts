@@ -156,7 +156,7 @@ async function articlequery() {
         var tiezilist=result.data;
         //一次运行随机 遍历3次
         console.log('开始随机遍历三次发帖！！！')
-        for(let i=0;i<3;i++){
+        for(let i=0;i<2;i++){
             var aNumber = (tiezilist.length) * Math.random();
             var aNumber1 = Math.floor(aNumber);//0-20随机取一条
             var articleId= tiezilist[aNumber1].id;
@@ -229,7 +229,7 @@ async function adactivity() {
 //查询活动信息列表
 async function activityquery() {
     let url = 'https://app-api.deepal.com.cn/appapi/v1/m_app/activity/query';
-    let body = {"body":{"lat":"0","lng":"0"},"index":"1","size":"1000","lastId":"0"};
+    let body = {"body":{"cityCode":"-1","cityName":"全国","lat":0,"lng":0},"index":1,"size":100,"lastId":0};
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
