@@ -87,18 +87,16 @@ let curHour = (new Date()).getHours()
             //发表帖子
             await getplazas('2');
             await $.wait(500);
+            //分享 帖子
+            await getplazas('3');
+            await $.wait(1000);
+            //await shareinfo('8a8d805781b895b6018234fc4b39295b');
             //获取奖励
             for (let i = 0; i < typecodeArr.length; i++) {
                 //post----日常发帖 ，forward----转发，comment---评论 等等------
                 await forward(typecodeArr[i].code)
-                await $.wait(500);
+                await $.wait(1000);
             }
-            //分享 帖子
-            await getplazas('3');
-            await $.wait(500);
-             //await shareinfo('8a8d805781b895b6018234fc4b39295b');
-
-
             //查询任务完成信息和积分信息
             let user = await getuserinfo();
             let score = await getscore();
