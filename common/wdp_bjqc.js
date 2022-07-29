@@ -38,7 +38,12 @@ let bjqcToken = ($.isNode() ? process.env.bjqcCookie : $.getdata('bjqcToken')) |
 
 
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
-let imageArr = [];//图片资源
+let tieziimages = [];//图片资源
+let tiezicontentArr = [];//帖子正文资源
+let tiezilist = [];//帖子返回全报文资源
+
+
+
 
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
@@ -74,11 +79,11 @@ let curHour = (new Date()).getHours()
 
             await $.wait(200);
             //查询任务完成信息
-             await behaviour();
+            await behaviour();
             await $.wait(500);
             //签到
-            await sign();
-            await sign1();
+             await sign();
+             await sign1();
 
             await $.wait(500);
             //评论    -------------------获取贴吧信息然后再评论
@@ -163,7 +168,7 @@ async function getplazas(type) {
     let body = {
         "orderType": "updateTime",
         "postNum": 0,
-        "pageSize": 20,
+        "pageSize": 2000,
         "lastZoneId": 0,
         "tabCode": "ALL",
         "pageNum": 0
@@ -175,15 +180,47 @@ async function getplazas(type) {
     //console.log(JSON.stringify(result))
     if (result.code == 200) {
         var tiezilist = result.data.content;
-        var aNumber = (20) * Math.random();
-        var aNumber1 = Math.floor(aNumber);//0-20随机取一条
+        var aNumber = (tiezilist.length) * Math.random();
+        var aNumber1 = Math.floor(aNumber);//随机取一条
         if (type == '1') { //type 为 为评论   2为发表帖子 3 为分享
             var commentid = tiezilist[aNumber1].id;
             await $.wait(500);
             await comments(commentid);
         } else if (type == '2'){
             //发帖子
-            var tt = tiezilist[aNumber1];
+            //获取图片集合
+            if(tieziimages.length==0){
+                tieziimages = tiezilist.filter(ele=>{
+                    if(ele.images!=null&&ele.images.length>0){
+                        return true
+                    }
+                }).map(
+                    ele2=>{
+                        return ele2.images;
+                    }
+                );
+            }
+            if(tiezicontentArr.length==0){
+                //type 为3是官方发帖  0 和 1为用户发帖但要过滤 content 为空的包含汉字的   &&Check_chinese(ele.content)
+                tiezicontentArr = tiezilist.filter(ele=>ele.type!=1&&!isEmpty(ele.content)).filter(ele2=>{
+                    if(Check_chinese(ele2.content)){
+                        //包含文字则取消特殊符号
+                        var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+                        ele2.content = ele2.content.replace(re1,'');//执行替换成空字符
+                        return true;
+                    }else{
+                        return false;
+                    }
+                })
+            }
+            var aNumber = (tieziimages.length) * Math.random();
+            var aNumber2 = Math.floor(aNumber);//随机取一条 图片
+            var aNumber = (tiezicontentArr.length) * Math.random();
+            var aNumber3 = Math.floor(aNumber);//随机取一条 帖子正文
+            var tt={
+                images:tieziimages[aNumber2],
+                content:tiezicontentArr[aNumber3].content,
+            }
             await $.wait(500);
             await pushtiezi(tt);
         }else if (type == '3'){
@@ -314,6 +351,12 @@ async function getscore() {
 }
 
 ///////////////////////////////////////////////////////////////////
+//html剔除富文本标签，留下纯文本
+function getSimpleText(html){
+    var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+    var msg = html.replace(re1,'');//执行替换成空字符
+    return msg;
+}
 /**
  * 获取随机诗词
  */
@@ -577,6 +620,28 @@ function MD5Encrypt(a) {
     for (a = n(a), x = l(a), t = 1732584193, u = 4023233417, v = 2562383102, w = 271733878, o = 0; o < x.length; o += 16) p = t, q = u, r = v, s = w, t = h(t, u, v, w, x[o + 0], y, 3614090360), w = h(w, t, u, v, x[o + 1], z, 3905402710), v = h(v, w, t, u, x[o + 2], A, 606105819), u = h(u, v, w, t, x[o + 3], B, 3250441966), t = h(t, u, v, w, x[o + 4], y, 4118548399), w = h(w, t, u, v, x[o + 5], z, 1200080426), v = h(v, w, t, u, x[o + 6], A, 2821735955), u = h(u, v, w, t, x[o + 7], B, 4249261313), t = h(t, u, v, w, x[o + 8], y, 1770035416), w = h(w, t, u, v, x[o + 9], z, 2336552879), v = h(v, w, t, u, x[o + 10], A, 4294925233), u = h(u, v, w, t, x[o + 11], B, 2304563134), t = h(t, u, v, w, x[o + 12], y, 1804603682), w = h(w, t, u, v, x[o + 13], z, 4254626195), v = h(v, w, t, u, x[o + 14], A, 2792965006), u = h(u, v, w, t, x[o + 15], B, 1236535329), t = i(t, u, v, w, x[o + 1], C, 4129170786), w = i(w, t, u, v, x[o + 6], D, 3225465664), v = i(v, w, t, u, x[o + 11], E, 643717713), u = i(u, v, w, t, x[o + 0], F, 3921069994), t = i(t, u, v, w, x[o + 5], C, 3593408605), w = i(w, t, u, v, x[o + 10], D, 38016083), v = i(v, w, t, u, x[o + 15], E, 3634488961), u = i(u, v, w, t, x[o + 4], F, 3889429448), t = i(t, u, v, w, x[o + 9], C, 568446438), w = i(w, t, u, v, x[o + 14], D, 3275163606), v = i(v, w, t, u, x[o + 3], E, 4107603335), u = i(u, v, w, t, x[o + 8], F, 1163531501), t = i(t, u, v, w, x[o + 13], C, 2850285829), w = i(w, t, u, v, x[o + 2], D, 4243563512), v = i(v, w, t, u, x[o + 7], E, 1735328473), u = i(u, v, w, t, x[o + 12], F, 2368359562), t = j(t, u, v, w, x[o + 5], G, 4294588738), w = j(w, t, u, v, x[o + 8], H, 2272392833), v = j(v, w, t, u, x[o + 11], I, 1839030562), u = j(u, v, w, t, x[o + 14], J, 4259657740), t = j(t, u, v, w, x[o + 1], G, 2763975236), w = j(w, t, u, v, x[o + 4], H, 1272893353), v = j(v, w, t, u, x[o + 7], I, 4139469664), u = j(u, v, w, t, x[o + 10], J, 3200236656), t = j(t, u, v, w, x[o + 13], G, 681279174), w = j(w, t, u, v, x[o + 0], H, 3936430074), v = j(v, w, t, u, x[o + 3], I, 3572445317), u = j(u, v, w, t, x[o + 6], J, 76029189), t = j(t, u, v, w, x[o + 9], G, 3654602809), w = j(w, t, u, v, x[o + 12], H, 3873151461), v = j(v, w, t, u, x[o + 15], I, 530742520), u = j(u, v, w, t, x[o + 2], J, 3299628645), t = k(t, u, v, w, x[o + 0], K, 4096336452), w = k(w, t, u, v, x[o + 7], L, 1126891415), v = k(v, w, t, u, x[o + 14], M, 2878612391), u = k(u, v, w, t, x[o + 5], N, 4237533241), t = k(t, u, v, w, x[o + 12], K, 1700485571), w = k(w, t, u, v, x[o + 3], L, 2399980690), v = k(v, w, t, u, x[o + 10], M, 4293915773), u = k(u, v, w, t, x[o + 1], N, 2240044497), t = k(t, u, v, w, x[o + 8], K, 1873313359), w = k(w, t, u, v, x[o + 15], L, 4264355552), v = k(v, w, t, u, x[o + 6], M, 2734768916), u = k(u, v, w, t, x[o + 13], N, 1309151649), t = k(t, u, v, w, x[o + 4], K, 4149444226), w = k(w, t, u, v, x[o + 11], L, 3174756917), v = k(v, w, t, u, x[o + 2], M, 718787259), u = k(u, v, w, t, x[o + 9], N, 3951481745), t = c(t, p), u = c(u, q), v = c(v, r), w = c(w, s);
     var O = m(t) + m(u) + m(v) + m(w);
     return O.toLowerCase()
+}
+
+function Check_chinese(val){
+    var reg = new RegExp("[\\u4E00-\\u9FFF]+","g");
+    if(reg.test(val)){
+        return true;
+    }else{
+        return false;
+        //alert("不包含汉字！");
+    }
+}
+
+function isEmpty(val) {
+    if (val === undefined || val === null || val === "") {
+        return true;
+    } else {
+        var value = val.trim();
+        if (value === "") {
+            return true;
+        }
+        return false;
+    }
 }
 
 function Env(t, e) {
