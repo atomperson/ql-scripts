@@ -148,11 +148,11 @@ async function sign(token, userid) {
     await httpRequest('get', urlObject)
     let result = httpResult;
     if (!result) return
-    console.log(JSON.stringify(result))
+    //console.log(JSON.stringify(result))
     if (result.code == 0) {
         console.log('签到成功')
     } else {
-        console.log('登录失败：' + result.message)
+        console.log('签到失败：' + result.message)
 
     }
 }
