@@ -95,10 +95,15 @@ let curHour = (new Date()).getHours()
             await followList(token, userid);
             console.log('\n============ 任务完成结束开始查询用户信息 ============')
             //scoreGet 获取积分详情
+
+
             const score = await scoreGet(token);
+            addNotifyStr(`=====手机号【 ${dfxtlphoneArr[index]}】: 账户剩余得分为${score}`,false)
             //任务完成情况
-            const taskinfo = await taskList(token);
-            addNotifyStr(`手机号 ${dfxtlphoneArr[index]}: 账户剩余得分为${score}\n任务完成情况为${JSON.stringify(taskinfo)}`,false)
+            await taskList(token);
+            //商城订单信息
+            await userOrderList(token);
+
         }
         showmsg()
     }
@@ -269,14 +274,14 @@ async function followList(token, userid) {
         if (!result) return
         // console.log(JSON.stringify(result))
         if (result.code == 0) {
-            console.log('查询 账号关注的用户数量成功！！！');
+            // console.log('查询 账号关注的用户数量成功！！！');
             followlistArr = result.data.list;
 
         } else {
             console.log('查询 账号关注的用户数量失败：' + result.message)
         }
     } else {
-        console.log('使用已经查询账号关注的用户！！！');
+        //console.log('使用已经查询账号关注的用户！！！');
     }
     await $.wait(1000);
     var followlistNo = Math.floor((followlistArr.length) * Math.random());//随机取一名关注的用户
@@ -297,7 +302,7 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('查询某个用户发帖数成功！！！')
+        // console.log('查询某个用户发帖数成功！！！')
         var total = result.data.total;
         //组织随机图片数据------------------------
         if(imageArr.length==0){
@@ -366,7 +371,7 @@ async function scoreGet(token) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('积分查询成功,积分剩余为'+result.data.usableScore)
+        // console.log('积分查询成功,积分剩余为'+result.data.usableScore)
         return result.data.usableScore;
     } else {
         console.log('发表帖子失败：' + result.message)
@@ -383,7 +388,7 @@ async function taskList(token) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('查询任务完成情况成功！！！');
+        // console.log('查询任务完成情况成功！！！');
         //日常任务  typeId=‘2’
         var qichangtask = result.data.typeTaskList[0];
         let taskinfo = qichangtask.taskList.filter(ele => {
@@ -391,18 +396,47 @@ async function taskList(token) {
             return ele.id == '37' || ele.id == '17' || ele.id == '4'
         }).map(el2 => {
             return {
-                '任务名称': el2.name,
-                '是否完成：': (el2.isFinish == 1 ? '已完成' : '未完成'),
-                '完成数量：': el2.currentTaskCount + '/' + el2.limitScore
+                'name': el2.name,
+                'isfinish': (el2.isFinish == 1 ? '已完成' : '未完成'),
+                'total': el2.currentTaskCount + '/' + el2.limitScore
             };
         })
-        return taskinfo
+        addNotifyStr('任务完成情况:');
+        for (let index = 0; index < taskinfo.length; index++) {
+            addNotifyStr(`${taskinfo[index].name}:${taskinfo[index].isfinish}(${taskinfo[index].total})`,false)
+        }
     } else {
         console.log('查询任务完成情况失败：' + result.message)
 
     }
 }
 
+//查询商城订单
+async function userOrderList(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/list?orderStatus=&pageNum=1&pageSize=10&sourceApp=DC`
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        // console.log('查询商城订单成功！！！');
+        var total=result.data.total;
+        addNotifyStr(` 订单数量： ${total}个`,false)
+
+        var list=result.data.list;
+        for (var j = 0; j < list.length; j++) {
+            var skuName= list[j].skuName;
+            var orderStatusDetailStr= list[j].orderStatusDetailStr;
+            addNotifyStr(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
+
+        }
+    } else {
+        console.log('查询商城订单失败：' + result.message)
+
+    }
+}
 
 ///////////////////////////////////////////////////////////////////
 
@@ -488,7 +522,7 @@ function addNotifyStr(str, log = true) {
 
 //通知
 async function showmsg() {
-   // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
+    // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
     notifyBody = jsname + "运行通知\n\n" + notifyStr
     if (notifyFlag == 1) {
         $.msg(notifyBody);
