@@ -77,7 +77,7 @@ let curHour = (new Date()).getHours()
             // await $.wait(delay()); //  随机延时
             let num = index + 1
             console.log(`\n========= 开始【第 ${num} 个账号】=========\n`)
-            console.log('\n======== 检查登录状态 ========')
+            // console.log('\n======== 检查登录状态 ========')
             //登录
             await dfxtllogin(index);
             await $.wait(200);
@@ -103,6 +103,7 @@ let curHour = (new Date()).getHours()
             await taskList(token);
             //商城订单信息
             await userOrderList(token);
+            await $.wait(5000);
 
         }
         showmsg()
@@ -125,7 +126,7 @@ async function dfxtllogin(num) {
         "deviceId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
         "account": dfxtlphoneArr[num]
     };
-    console.log('登录获取token')
+    //console.log('登录获取token')
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
