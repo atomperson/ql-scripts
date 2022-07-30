@@ -105,7 +105,11 @@ let curHour = (new Date()).getHours()
             //查询任务完成信息和积分信息
             let user = await getuserinfo();
             let score = await getscore();
-            addNotifyStr(`手机号 ${score.mobile}: 账户得分为${score.score}\n任务完成情况为${JSON.stringify(user)}`, true)
+            addNotifyStr(`手机号 【${score.mobile}【: 账户得分为${score.score}`, true)
+            addNotifyStr(`任务完成情况为:`, true)
+            for(let i=0;i<user.length;i++){
+                addNotifyStr(`${user[i].名称}:${user[i].完成情况}`, true)
+            }
 
         }
         showmsg()
@@ -129,7 +133,7 @@ async function behaviour() {
         if (!result) return
         //console.log(JSON.stringify(result))
         if (result.returnCode == 1) {
-            console.log('任务详情查询成功')
+            //console.log('任务详情查询成功')
             typecodeArr = result.returnDataList.map(ele => {
                 return {code: ele.code, channel: ele.channel, triggers: ele.triggers, daynum: ele.daynum};
             })
@@ -147,7 +151,7 @@ async function sign() {
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
-    console.log(JSON.stringify(result))
+   // console.log(JSON.stringify(result))
     console.log('签到成功')
 }
 // 签到1
@@ -158,7 +162,7 @@ async function sign1() {
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
-    console.log(JSON.stringify(result))
+    //console.log(JSON.stringify(result))
     console.log('签到成功')
 }
 
