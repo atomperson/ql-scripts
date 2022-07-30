@@ -401,7 +401,7 @@ async function taskList(token) {
                 'total': el2.currentTaskCount + '/' + el2.limitScore
             };
         })
-        addNotifyStr('任务完成情况:');
+        addNotifyStr('任务完成情况:',false);
         for (let index = 0; index < taskinfo.length; index++) {
             addNotifyStr(`${taskinfo[index].name}:${taskinfo[index].isfinish}(${taskinfo[index].total})`,false)
         }
