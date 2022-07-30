@@ -105,7 +105,7 @@ let curHour = (new Date()).getHours()
             //查询任务完成信息和积分信息
             let user = await getuserinfo();
             let score = await getscore();
-            addNotifyStr(`手机号 【${score.mobile}【: 账户得分为${score.score}`, true)
+            addNotifyStr(`手机号 【${score.mobile}】: 账户得分为${score.score}`, true)
             addNotifyStr(`任务完成情况为:`, true)
             for(let i=0;i<user.length;i++){
                 addNotifyStr(`${user[i].名称}:${user[i].完成情况}`, true)
@@ -404,7 +404,7 @@ function addNotifyStr(str, log = true) {
 
 //通知
 async function showmsg() {
-    if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
+    // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
     notifyBody = jsname + "运行通知\n\n" + notifyStr
     if (notifyFlag == 1) {
         $.msg(notifyBody);
