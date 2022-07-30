@@ -431,6 +431,34 @@ async function userOrderList(token) {
             var skuName= list[j].skuName;
             var orderStatusDetailStr= list[j].orderStatusDetailStr;
             addNotifyStr(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
+            var id= list[j].id;
+            await getLogisticsTrackMapInfo(token,id)
+
+        }
+    } else {
+        console.log('查询商城订单失败：' + result.message)
+
+    }
+}
+//查询商品详情  87ebbfb3cb036f9247e993a1401ec006
+async function userCommodity(token,commodityId) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userCommodity/detail?commodityId=`+commodityId;
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        // console.log('查询商城订单成功！！！');
+        var total=result.data.total;
+        addNotifyStr(`订单数量： ${total}个`,false)
+
+        var list=result.data.list;
+        for (var j = 0; j < list.length; j++) {
+            var skuName= list[j].skuName;
+            var orderStatusDetailStr= list[j].orderStatusDetailStr;
+            addNotifyStr(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
 
         }
     } else {
@@ -439,6 +467,47 @@ async function userOrderList(token) {
     }
 }
 
+//地址保存
+async function saveUserAddress(token) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/userAddress/saveUserAddress';
+    let body = {"receiverName":"王先生","receiverPhone":"19121901086","address":"百尺竿镇 百尺杆村村东农村信用社","isDefault":0,"provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681"};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+         console.log('地址保存成功！！！');
+    } else {
+        console.log('地址保存失败：' + result.message)
+
+    }
+}
+//快递信息
+async function getLogisticsTrackMapInfo(token,orderid) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/cainiao/getLogisticsTrackMapInfo/1/'+orderid;
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        console.log('快递信息查询成功！！！');
+        var datainfo=result.data;
+        var statis=datainfo.detail[0].logisticName;//发货状态
+        var address=datainfo.addressInfo.address;//地址
+        var receiverPhone=datainfo.addressInfo.receiverPhone;//手机
+        var receiverName=datainfo.addressInfo.receiverName;//姓名
+        addNotifyStr(`地址：${address}`,false)
+        addNotifyStr(`收货人：${receiverName}`,false)
+        addNotifyStr(`手机：${receiverPhone}`,false)
+        addNotifyStr(`${datainfo.expressTypeName}：${datainfo.expressNo}`,false)
+    } else {
+        console.log('快递信息查询失败：' + result.message)
+
+    }
+}
 ///////////////////////////////////////////////////////////////////
 
 async function Envs() {
