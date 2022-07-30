@@ -76,7 +76,7 @@ let curHour = (new Date()).getHours()
 
             // await $.wait(delay()); //  随机延时
             let num = index + 1
-            console.log(`\n========= 开始【第 ${num} 个账号】=========\n`)
+            console.log(`\n============开始【第 ${num} 个账号】============\n`)
             // console.log('\n======== 检查登录状态 ========')
             //登录
             await dfxtllogin(index);
@@ -93,12 +93,12 @@ let curHour = (new Date()).getHours()
             //发表帖子   // await queryChoicenessByUserDTO(token, userid,'7254b938431544ead0b24a51cc467e75');//  1083380194470035815
             //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
             await followList(token, userid);
-            console.log('\n============ 任务完成结束开始查询用户信息 ============')
+            //console.log('\n============ 任务完成结束开始查询用户信息 ============')
             //scoreGet 获取积分详情
 
 
             const score = await scoreGet(token);
-            addNotifyStr(`手机号【 ${dfxtlphoneArr[index]}】: 账户剩余得分为${score}`,false)
+            addNotifyStr(`【手机号:${dfxtlphoneArr[index]},积分:${score}】`,false)
             //任务完成情况
             await taskList(token);
             //商城订单信息
@@ -493,7 +493,7 @@ async function getLogisticsTrackMapInfo(token,orderid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('快递信息查询成功！！！');
+        //console.log('快递信息查询成功！！！');
         var datainfo=result.data;
         var statis=datainfo.detail[0].logisticName;//发货状态
         var address=datainfo.addressInfo.address;//地址
