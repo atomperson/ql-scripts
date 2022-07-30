@@ -98,7 +98,7 @@ let curHour = (new Date()).getHours()
 
 
             const score = await scoreGet(token);
-            addNotifyStr(`=====手机号【 ${dfxtlphoneArr[index]}】: 账户剩余得分为${score}`,false)
+            addNotifyStr(`手机号【 ${dfxtlphoneArr[index]}】: 账户剩余得分为${score}`,false)
             //任务完成情况
             await taskList(token);
             //商城订单信息
@@ -230,7 +230,7 @@ async function queryChoicenessNewList(token) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('最近帖子 查询需要评论的帖子成功！！！')
+        //console.log('最近帖子 查询需要评论的帖子成功！！！')
         var data = result.data.list;
         for (let index = 0; index < 4; index++) {//一次评价4条
             var aNumber = (100) * Math.random();
@@ -286,7 +286,7 @@ async function followList(token, userid) {
     await $.wait(1000);
     var followlistNo = Math.floor((followlistArr.length) * Math.random());//随机取一名关注的用户
     var otherid = followlistArr[followlistNo];//随机用户id
-    console.log(JSON.stringify(otherid));
+    //console.log(JSON.stringify(otherid));
     //查询该用户的帖子信息
     await queryChoicenessByUserDTO(token, userid, otherid)
 
@@ -423,7 +423,7 @@ async function userOrderList(token) {
     if (result.code == 0) {
         // console.log('查询商城订单成功！！！');
         var total=result.data.total;
-        addNotifyStr(` 订单数量： ${total}个`,false)
+        addNotifyStr(`订单数量： ${total}个`,false)
 
         var list=result.data.list;
         for (var j = 0; j < list.length; j++) {
