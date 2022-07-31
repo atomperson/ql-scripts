@@ -1,12 +1,12 @@
 /*
-东风雪铁龙
+东风雪铁龙修改用户信息
 
 [task_local]
-#东风雪铁龙
-0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
+#东风雪铁龙修改用户信息
+0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙修改用户信息, enabled=true
 */
-const jsname = '东风雪铁龙'
-const $ = Env('东风雪铁龙')
+const jsname = '东风雪铁龙修改用户信息'
+const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
 //const ckkey = 'wbtcCookie';
