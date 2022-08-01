@@ -60,11 +60,15 @@ let curHour = (new Date()).getHours()
 
             // await $.wait(delay()); //  随机延时
             let num = index + 1
-            console.log(`\n============开始【第 ${num} 个账号】============\n`)
+            console.log(`\n============开始【第 ${num} 个账号:${dfxtlphoneArr[index]}】============\n`)
             // console.log('\n======== 检查登录状态 ========')
             //登录
             await dfxtllogin(index);
             await $.wait(200);
+            if(isEmpty(dfxtlTokenArr[index])){
+                addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},登录错误】`,true)
+                break;
+            }
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
 
@@ -120,6 +124,7 @@ async function dfxtllogin(num) {
         dfxtlTokenArr[num] = result.data;
     } else {
         console.log('登录失败：' + result.message)
+        dfxtlTokenArr[num]='';
 
     }
 }
@@ -495,6 +500,17 @@ async function getLogisticsTrackMapInfo(token,orderid) {
 }
 ///////////////////////////////////////////////////////////////////
 
+function isEmpty(val) {
+    if (val === undefined || val === null || val === "") {
+        return true;
+    } else {
+        var value = val.trim();
+        if (value === "") {
+            return true;
+        }
+        return false;
+    }
+}
 async function Envs() {
     if (dfxtlphone) {
         if (dfxtlphone.indexOf("@") != -1) {
