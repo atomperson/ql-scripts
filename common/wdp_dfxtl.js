@@ -311,7 +311,7 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
                 }
             }
         }
-        var aNumber = (total) * Math.random();
+        var aNumber = (result.data.list.length) * Math.random();
         var aNumber1 = Math.floor(aNumber);
         //获取随机数据 该用户的某个帖子
         var infoData = result.data.list[aNumber1];
