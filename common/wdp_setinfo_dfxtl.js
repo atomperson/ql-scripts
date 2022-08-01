@@ -10,8 +10,8 @@ const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
 const ckkey = 'wbtcCookie';
-const axios = require("axios");
-//import axios from "axios";
+//const axios = require("axios");
+import axios from "axios";
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -279,7 +279,6 @@ async function selectHomePageData(token) {
                     for(let m=0;m<detailes.length;m++){
                         var commodityId=detailes[m].commodityId
                             list1.push(commodityId)//,//商品id
-                           await detailBycommodityId(token,commodityId);
                     }
                 }
             }
@@ -288,6 +287,11 @@ async function selectHomePageData(token) {
         list2.push(nohaslist);
     } else {
         console.log('获取商店详情失败：' + result.message)
+    }
+    let s0 = new Set(list1); //set 数组过滤重复
+    list1= Array.from(s0);
+    for(let e=0;e<list1.length;e++){
+        await detailBycommodityId(token,list1[e]);
     }
     for (let i=0;i<haslist.length;i++) {
         addNotifyStr('【商品名称】:'+haslist[i].title+',【库存】:'+haslist[i].stock,false);
