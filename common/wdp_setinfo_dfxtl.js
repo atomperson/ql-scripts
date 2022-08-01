@@ -9,7 +9,7 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-//const ckkey = 'wbtcCookie';
+const ckkey = 'wbtcCookie';
 const axios = require("axios");
 //import axios from "axios";
 
@@ -23,13 +23,21 @@ let userCookie ='1';
 
 
 let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
-let userList = []
+let userList = [];
+let list1 = []
+let list2 = []
+let haslist = []
+let nohaslist = []
 
-let dfxtlphone=process.env.dfxtlphone;
-let dfxtlpassword=process.env.dfxtlpassword;
-let Sign=process.env.dfxtlSign;   //app的sign 签名
-let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
+// let dfxtlphone=process.env.dfxtlphone;
+// let dfxtlpassword=process.env.dfxtlpassword;
+// let Sign=process.env.dfxtlSign;   //app的sign 签名
+// let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
+let dfxtlphone = '19121901086';
+let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
+let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
+let TimeStamp = '2068854542000';
 
 
 let avatarLIST = []; //头像数组
@@ -86,15 +94,19 @@ let curHour = (new Date()).getHours()
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
 
+            //查询商品信息
+             await selectHomePageData(token);
+
+
             //获取其他用户图标
-            await queryavatarLIST(token);
-            await changeavatar(token,userid);//修改图标
-            await changeinfo(token,userid);//修改个人中心我喜欢的
-            await changeinfo1(token,userid);//修改性别
-            await changeinfo2(token,userid);//修改生日
-            await changeinfo3(token,userid);//修改个签
-            await changeinfo4(token,userid);//修改姓名
-            await saveUserAddress(token,userid);//修改地址
+            // await queryavatarLIST(token);
+            // await changeavatar(token,userid);//修改图标
+            // await changeinfo(token,userid);//修改个人中心我喜欢的
+            // await changeinfo1(token,userid);//修改性别
+            // await changeinfo2(token,userid);//修改生日
+            // await changeinfo3(token,userid);//修改个签
+            // await changeinfo4(token,userid);//修改姓名
+            // await saveUserAddress(token,userid);//修改地址
 
             await $.wait(5000);
 
@@ -252,6 +264,78 @@ async function changeinfo4(token, userid) {
         console.log('修改姓名失败：' + result.message)
     }
 }
+
+
+//获取商店详情
+async function selectHomePageData(token) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/mallConfig/selectHomePageData?id=';
+    let body = ''
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        console.log('获取商店详情成功')
+        var groupinfo=result.data.group;
+        for(let i=0;i<groupinfo.length;i++){
+            var content=groupinfo[i].content;//主题数据
+            var groupName=groupinfo[i].groupName;//一级主题名称
+            var themeId=groupinfo[i].themeId;//一级主题id
+            for(let j=0;j<content.length;j++){
+                var groupName=content[j].contentName;//二级主题名称
+                var detailes=content[j].detailes;//二级主题数据
+                var contentId=content[j].contentId;//二级主题id
+                var contentType=content[j].contentType;//二级主题类型
+                if(contentType=='banner'){
+                 //这里面都是思思数据 就是行车记录仪
+                }else if(contentType=='floor'){
+                    for(let m=0;m<detailes.length;m++){
+                        var commodityId=detailes[m].commodityId
+                            list1.push(commodityId)//,//商品id
+                           await detailBycommodityId(token,commodityId);
+                    }
+                }
+            }
+        }
+        list2.push(haslist);
+        list2.push(nohaslist);
+    } else {
+        console.log('获取商店详情失败：' + result.message)
+    }
+    for (let i=0;i<haslist.length;i++) {
+        addNotifyStr('【商品名称】:'+haslist[i].title+',【库存】:'+haslist[i].stock,false);
+    }
+    for (let j=0;j<nohaslist.length;j++) {
+        addNotifyStr('【商品名称】:'+nohaslist[j].title+',【库存】:'+nohaslist[j].stock,false);
+    }
+}
+
+// 查询商品库存信息
+async function detailBycommodityId(token,commodityId) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userCommodity/detail?commodityId='+commodityId;
+    var body='';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        var datainfo=result.data;
+        var stock=datainfo.skuList[0].stock;//库存
+        var title=datainfo.title;
+        if(stock>0){
+            haslist.push({"title":title,"stock":stock});
+        }else{
+            nohaslist.push({"title":title,"stock":stock});
+        }
+    } else {
+        console.log('查询商品库存信息失败：' + result.message)
+
+    }
+}
+
+
+
 //查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
 async function queryavatarLIST(token) {
     if(avatarLIST.length==0){
@@ -297,7 +381,7 @@ async function queryavatarLIST(token) {
 async function saveUserAddress(token) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/userAddress/saveUserAddress';
     var  addressList=['玉桥街道-梨花园小区',
-    '梨园北街18号梨花园小区','通州区-梨园地铁站边上 梨花园小区'
+        '梨园北街18号梨花园小区','通州区-梨园地铁站边上 梨花园小区'
     ];
     var aNumber2 = (2) * Math.random();
     var day = Math.floor(aNumber2);
