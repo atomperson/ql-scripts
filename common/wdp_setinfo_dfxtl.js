@@ -29,15 +29,12 @@ let list2 = []
 let haslist = []
 let nohaslist = []
 
+let searchtype='1'; //为查询库存信息 为更改用户信息
+let dfxtlphone=process.env.dfxtlphone;
+let dfxtlpassword=process.env.dfxtlpassword;
+let Sign=process.env.dfxtlSign;   //app的sign 签名
+let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
-// let dfxtlphone=process.env.dfxtlphone;
-// let dfxtlpassword=process.env.dfxtlpassword;
-// let Sign=process.env.dfxtlSign;   //app的sign 签名
-// let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
-let dfxtlphone = '19121901086';
-let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
-let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
-let TimeStamp = '2068854542000';
 
 
 let avatarLIST = []; //头像数组
@@ -79,21 +76,20 @@ let curHour = (new Date()).getHours()
             await $.wait(200);
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
-
-            //查询商品信息
-             await selectHomePageData(token);
-
-
-            //获取其他用户图标
-            // await queryavatarLIST(token);
-            // await changeavatar(token,userid);//修改图标
-            // await changeinfo(token,userid);//修改个人中心我喜欢的
-            // await changeinfo1(token,userid);//修改性别
-            // await changeinfo2(token,userid);//修改生日
-            // await changeinfo3(token,userid);//修改个签
-            // await changeinfo4(token,userid);//修改姓名
-            // await saveUserAddress(token,userid);//修改地址
-
+            if(searchtype==1){
+                //查询商品库存信息
+                await selectHomePageData(token);
+            }else{
+                //获取其他用户图标
+                await queryavatarLIST(token);
+                await changeavatar(token,userid);//修改图标
+                await changeinfo(token,userid);//修改个人中心我喜欢的
+                await changeinfo1(token,userid);//修改性别
+                await changeinfo2(token,userid);//修改生日
+                await changeinfo3(token,userid);//修改个签
+                await changeinfo4(token,userid);//修改姓名
+                await saveUserAddress(token,userid);//修改地址
+            }
             await $.wait(5000);
 
         }
@@ -386,6 +382,9 @@ async function saveUserAddress(token) {
 ///////////////////////////////////////////////////////////////////
 
 async function Envs() {
+    if(searchtype==1){
+         dfxtlphone = '19121901086';
+    }
     if (dfxtlphone) {
         if (dfxtlphone.indexOf("@") != -1) {
             dfxtlphone.split("@").forEach((item) => {
