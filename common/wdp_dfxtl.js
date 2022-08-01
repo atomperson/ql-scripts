@@ -29,10 +29,7 @@ let dfxtlphone=process.env.dfxtlphone;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
-// let dfxtlphone = '19121901086';
-// let dfxtlpassword = 'q3wvHQn0/lwiRT2boRjztA==';
-// let Sign = '4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
-// let TimeStamp = '2068854542000';
+
 
 
 let dfxtlphoneArr = [];
@@ -40,21 +37,8 @@ let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr=[];//图片资源
-let followlistArr =
-    ["7dc97bf0de78bab54875d174ef9451d9",
-        "cdbe4efe46d8878699db28f90faa220b",
-        "9d39d8f4994157b877865960df68e739",
-        "e3e4cdd6f381ccfeff79d48f10d5cb1a",
-        "fe5bcda5d33c4fa85798ebcfc0587788",
-        "077f6a4f076533164392afbde694b745",
-        "27d39a62716d4d78da92189bc23b280d",
-        "7254b938431544ead0b24a51cc467e75",
-        "1083380194470035815",
-        "1083383046328336425",
-        "f08debf231478d8b09122395d6f2a76d",
-        "1110061510565568551",
-        "1083448226751995978",
-        "1083381053463511169"];
+let followlistArr =[];
+
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -84,7 +68,6 @@ let curHour = (new Date()).getHours()
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
 
-            //var token='ISOFTSTONE.eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTcyMDEwMTA4NiIsImF1dGgiOiIiLCJleHAiOjE2NTkxNTc2NDR9.APpGQySJT0S56tAyTyM56O6iy-De-PL79fKNgSC_N4SL9frXGMzfbIxPoPlxLN6wkxABscSy4PgtaEZOohj7Cw';
             // console.log(`token为:\n ${token}`);
             //签到
             await sign(token, userid);
@@ -268,7 +251,7 @@ async function followList(token, userid) {
     //followlistArr 关注人数的数组
     if (followlistArr.length == 0) {
         let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/follow/followList`
-        let body = {"pageNum": "1", "pageSize": "100", "userId": "1110115713052827653"}; //主账号157得关注 写死
+        let body ={"pageNum":"1","pageSize":"100","userId":"1110115713052827653"}; //主账号157得关注 写死
         let urlObject = populateUrlObject(url, token, body)
         await httpRequest('post', urlObject)
         let result = httpResult;
@@ -276,8 +259,10 @@ async function followList(token, userid) {
         // console.log(JSON.stringify(result))
         if (result.code == 0) {
             // console.log('查询 账号关注的用户数量成功！！！');
-            followlistArr = result.data.list;
-
+           var  followlistArrddd = result.data.list;
+            followlistArr= followlistArrddd.map(ele=>{
+                return ele.userId;
+            })
         } else {
             console.log('查询 账号关注的用户数量失败：' + result.message)
         }
