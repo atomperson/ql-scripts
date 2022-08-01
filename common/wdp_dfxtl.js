@@ -285,8 +285,13 @@ async function followList(token, userid) {
 
 //查询某个用户发帖数
 async function queryChoicenessByUserDTO(token, userid,otherid) {
+    //如果图片有数据则查询20条 第一次查询需查询多点 这样可以图片多
+    var pageSize=20;
+    if(imageArr.length==0){
+        pageSize=500;
+    }
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessByUserDTO`
-    let body = {"pageNum": "1", "pageSize": "500", "userId": otherid};
+    let body = {"pageNum": "1", "pageSize": pageSize, "userId": otherid};
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
