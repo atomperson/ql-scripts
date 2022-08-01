@@ -67,7 +67,7 @@ let curHour = (new Date()).getHours()
             await $.wait(200);
             if(dfxtlTokenArr[index]=''){
                 addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},登录错误】`,true)
-                break;
+                continue;
             }
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
