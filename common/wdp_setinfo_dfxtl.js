@@ -9,6 +9,8 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
+let searchtype='1'; //为查询库存信息 为更改用户信息
+
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
 //import axios from "axios";
@@ -29,13 +31,13 @@ let list2 = []
 let haslist = []
 let nohaslist = []
 
-let searchtype='1'; //为查询库存信息 为更改用户信息
+
 let dfxtlphone=process.env.dfxtlphone;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
-// let dfxtlphone='18571416794';
+// let dfxtlphone='15720101086';
 // let dfxtlpassword='q3wvHQn0/lwiRT2boRjztA==';
 // let Sign='4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
 // let TimeStamp ='2068854542000'
@@ -85,7 +87,7 @@ let curHour = (new Date()).getHours()
             if(searchtype==1){
                 //查询商品库存信息
                 await selectHomePageData(token);
-            }else{
+            }else if(searchtype==1){
                 //获取其他用户图标
                 await queryavatarLIST(token);
                 await changeavatar(token,userid);//修改图标
@@ -95,6 +97,10 @@ let curHour = (new Date()).getHours()
                 await changeinfo3(token,userid);//修改个签
                 await changeinfo4(token,userid);//修改姓名
                 await saveUserAddress(token,userid);//修改地址
+            }else{
+                //抢商品
+                await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
+
             }
             await $.wait(5000);
 
@@ -315,11 +321,12 @@ async function detailBycommodityId(token,commodityId) {
         var datainfo=result.data;
         var stock=datainfo.skuList[0].stock;//库存
         var title=datainfo.title;
+        var skuId=datainfo.skuList[0].id;//积分
         var itemScore=datainfo.skuList[0].itemScore;//积分
         if(stock>0){
-            haslist.push({"title":title,"stock":stock});
+            haslist.push({"title":title,"stock":stock,"itemScore":itemScore,"skuId":skuId});
         }else{
-            nohaslist.push({"title":title,"stock":stock,"itemScore":itemScore});
+            nohaslist.push({"title":title,"stock":stock,"itemScore":itemScore,"skuId":skuId});
         }
     } else {
         console.log('查询商品库存信息失败：' + result.message)
@@ -384,6 +391,22 @@ async function saveUserAddress(token) {
         console.log('地址保存成功！！！');
     } else {
         console.log('地址保存失败：' + result.message)
+    }
+}
+//购买商品
+async function userOrdercreate(token,skuId) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/create';
+
+    var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        console.log('购买商品成功！！！');
+    } else {
+        console.log('购买商品失败：' + result.message)
     }
 }
 ///////////////////////////////////////////////////////////////////
