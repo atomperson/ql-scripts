@@ -98,7 +98,7 @@ let curHour = (new Date()).getHours()
 
 
             const score = await scoreGet(token);
-            addNotifyStr(`【手机号:${dfxtlphoneArr[index]},积分:${score}】`,false)
+            addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},积分:${score}】`,false)
             //任务完成情况
             await taskList(token);
             //商城订单信息
