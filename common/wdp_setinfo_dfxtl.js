@@ -35,6 +35,12 @@ let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
+// let dfxtlphone='18571416794';
+// let dfxtlpassword='q3wvHQn0/lwiRT2boRjztA==';
+// let Sign='4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
+// let TimeStamp ='2068854542000'
+
+
 
 
 let avatarLIST = []; //头像数组
@@ -290,7 +296,7 @@ async function selectHomePageData(token) {
         await detailBycommodityId(token,list1[e]);
     }
     for (let i=0;i<haslist.length;i++) {
-        addNotifyStr('【商品名称】:'+haslist[i].title+',【库存】:'+haslist[i].stock,false);
+        addNotifyStr('【商品名称】:'+haslist[i].title+',【库存】:'+haslist[i].stock+'【积分】:'+haslist[i].itemScore,false);
     }
     for (let j=0;j<nohaslist.length;j++) {
         addNotifyStr('【商品名称】:'+nohaslist[j].title+',【库存】:'+nohaslist[j].stock,false);
@@ -309,10 +315,11 @@ async function detailBycommodityId(token,commodityId) {
         var datainfo=result.data;
         var stock=datainfo.skuList[0].stock;//库存
         var title=datainfo.title;
+        var itemScore=datainfo.skuList[0].itemScore;//积分
         if(stock>0){
             haslist.push({"title":title,"stock":stock});
         }else{
-            nohaslist.push({"title":title,"stock":stock});
+            nohaslist.push({"title":title,"stock":stock,"itemScore":itemScore});
         }
     } else {
         console.log('查询商品库存信息失败：' + result.message)
