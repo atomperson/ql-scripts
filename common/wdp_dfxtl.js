@@ -65,7 +65,7 @@ let curHour = (new Date()).getHours()
             //登录
             await dfxtllogin(index);
             await $.wait(200);
-            if(dfxtlTokenArr[index]!=''){
+            if(dfxtlTokenArr[index]=''){
                 addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},登录错误】`,true)
                 break;
             }
