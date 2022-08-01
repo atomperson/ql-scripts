@@ -50,21 +50,7 @@ let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr=[];//图片资源
-let followlistArr =
-    ["7dc97bf0de78bab54875d174ef9451d9",
-        "cdbe4efe46d8878699db28f90faa220b",
-        "9d39d8f4994157b877865960df68e739",
-        "e3e4cdd6f381ccfeff79d48f10d5cb1a",
-        "fe5bcda5d33c4fa85798ebcfc0587788",
-        "077f6a4f076533164392afbde694b745",
-        "27d39a62716d4d78da92189bc23b280d",
-        "7254b938431544ead0b24a51cc467e75",
-        "1083380194470035815",
-        "1083383046328336425",
-        "f08debf231478d8b09122395d6f2a76d",
-        "1110061510565568551",
-        "1083448226751995978",
-        "1083381053463511169"];
+
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -333,14 +319,9 @@ async function detailBycommodityId(token,commodityId) {
 
     }
 }
-
-
-
 //查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
 async function queryavatarLIST(token) {
     if(avatarLIST.length==0){
-
-        //1102626767558049804
         let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
         let body = {"pageNum": "1", "pageSize": "1000"};//一次查100条
         let urlObject = populateUrlObject(url, token, body)
@@ -369,14 +350,9 @@ async function queryavatarLIST(token) {
 
         } else {
             console.log('通过主题id 查询需要评论的帖子失败：' + result.message)
-
         }
-
     }
-
 }
-
-
 //地址保存
 async function saveUserAddress(token) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/userAddress/saveUserAddress';
@@ -386,7 +362,6 @@ async function saveUserAddress(token) {
     var aNumber2 = (2) * Math.random();
     var day = Math.floor(aNumber2);
     var danyuan=day+1;
-
     var aNumber2 = (60) * Math.random();
     var day2 = Math.floor(aNumber2);
     var louhao=day+day2;
@@ -402,10 +377,8 @@ async function saveUserAddress(token) {
         console.log('地址保存成功！！！');
     } else {
         console.log('地址保存失败：' + result.message)
-
     }
 }
-
 ///////////////////////////////////////////////////////////////////
 
 async function Envs() {
