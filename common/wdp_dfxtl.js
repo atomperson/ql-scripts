@@ -286,7 +286,7 @@ async function followList(token, userid) {
 //查询某个用户发帖数
 async function queryChoicenessByUserDTO(token, userid,otherid) {
     //如果图片有数据则查询20条 第一次查询需查询多点 这样可以图片多
-    var pageSize=20;
+    var pageSize=50;
     if(imageArr.length==0){
         pageSize=500;
     }
