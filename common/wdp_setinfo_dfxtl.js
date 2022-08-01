@@ -305,12 +305,12 @@ async function selectHomePageData(token) {
 
     for (let i=0;i<haslist.length;i++) {
         addNotifyStr('商品名称:【'+haslist[i].title+'】',false);
-        addNotifyStr('库存:【'+haslist[i].stock+'】,积分:【'+haslist[i].itemScore+'】,skuId:'+haslist[i].skuId,false);
+        addNotifyStr('库存:【'+haslist[i].stock+'】,积分:'+haslist[i].itemScore+',skuId:'+haslist[i].skuId,false);
     }
     addNotifyStr('=====================【无库存商品】==========',false);
     for (let j=0;j<nohaslist.length;j++) {
         addNotifyStr('商品名称:【'+nohaslist[j].title+'】',false);
-        addNotifyStr('库存:【'+nohaslist[j].stock+'】,积分:【'+nohaslist[j].itemScore+'】',false);
+        addNotifyStr('库存:【'+nohaslist[j].stock+'】,积分:'+nohaslist[j].itemScore+'',false);
 
     }
 }
