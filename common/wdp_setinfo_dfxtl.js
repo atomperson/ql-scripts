@@ -10,8 +10,8 @@ const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
 const ckkey = 'wbtcCookie';
-//const axios = require("axios");
-import axios from "axios";
+const axios = require("axios");
+//import axios from "axios";
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
