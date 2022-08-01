@@ -349,7 +349,7 @@ async function publishPostsNew(token, data1, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('发表帖子成功！！！,主题为' + data1.title)
+        console.log('发表帖子成功！！！,主题为:' + data1.title)
     } else {
         console.log('发表帖子失败：' + result.message)
 
