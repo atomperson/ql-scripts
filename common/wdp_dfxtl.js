@@ -117,7 +117,10 @@ async function dfxtllogin(num) {
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('post', urlObject)
     let result = httpResult;
-    if (!result) return
+    if (!result) {
+        dfxtlTokenArr[num]='';
+        return
+    }
     // console.log(JSON.stringify(result))
     if (result.code == 0) {
       //  console.log('登录成功！');
@@ -125,7 +128,6 @@ async function dfxtllogin(num) {
     } else {
         console.log('登录失败：' + result.message)
         dfxtlTokenArr[num]='';
-
     }
 }
 
