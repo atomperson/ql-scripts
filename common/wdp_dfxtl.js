@@ -16,7 +16,7 @@ const axios = require("axios");
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
-
+let notifyStr1 = ''
 let httpResult //global buffer
 
 let userCookie = ($.isNode() ? process.env[ckkey] : $.getdata(ckkey)) || '';
@@ -57,6 +57,7 @@ let curHour = (new Date()).getHours()
         console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
         // let dfxtlphoneArr dfxtlpasswordArr  dfxtlTokenArr
         var userinfo=[];
+        addNotifyStr1(`【=======查询用户订单信息=======】\n`,false)
         for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
             // await $.wait(delay()); //  随机延时
@@ -87,7 +88,7 @@ let curHour = (new Date()).getHours()
             //任务完成情况
             await taskList(token);
             //商城订单信息
-            await userOrderList(token);
+            await userOrderList(token,dfxtlphoneArr[index]);
             await $.wait(3000);
 
         }
@@ -408,7 +409,7 @@ async function taskList(token) {
 }
 
 //查询商城订单
-async function userOrderList(token) {
+async function userOrderList(token,phone) {
     let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/list?orderStatus=&pageNum=1&pageSize=10&sourceApp=DC`
     let body = '';
     let urlObject = populateUrlObject(url, token, body)
@@ -419,16 +420,18 @@ async function userOrderList(token) {
     if (result.code == 0) {
         // console.log('查询商城订单成功！！！');
         var total=result.data.total;
-        addNotifyStr(`订单数量： ${total}个`,false)
-
         var list=result.data.list;
         for (var j = 0; j < list.length; j++) {
+            addNotifyStr1(`手机号【${phone}】:订单数量： ${total}个`,false)
             var skuName= list[j].skuName;
             var orderStatusDetailStr= list[j].orderStatusDetailStr;
-            addNotifyStr(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
-            var id= list[j].id;
-            await getLogisticsTrackMapInfo(token,id)
-
+            if(orderStatusDetailStr=='已发货'){
+                addNotifyStr1(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
+                var id= list[j].id;
+                await getLogisticsTrackMapInfo(token,id)
+            }else {
+                addNotifyStr1(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
+            }
         }
     } else {
         console.log('查询商城订单失败：' + result.message)
@@ -454,7 +457,6 @@ async function userCommodity(token,commodityId) {
             var skuName= list[j].skuName;
             var orderStatusDetailStr= list[j].orderStatusDetailStr;
             addNotifyStr(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
-
         }
     } else {
         console.log('查询商城订单失败：' + result.message)
@@ -494,10 +496,10 @@ async function getLogisticsTrackMapInfo(token,orderid) {
         var address=datainfo.addressInfo.address;//地址
         var receiverPhone=datainfo.addressInfo.receiverPhone;//手机
         var receiverName=datainfo.addressInfo.receiverName;//姓名
-        addNotifyStr(`地址：${address}`,false)
-        addNotifyStr(`收货人：${receiverName}`,false)
-        addNotifyStr(`手机：${receiverPhone}`,false)
-        addNotifyStr(`${datainfo.expressTypeName}：${datainfo.expressNo}`,false)
+        addNotifyStr1(`地址：${address}`,false)
+        addNotifyStr1(`收货人：${receiverName}`,false)
+        addNotifyStr1(`手机：${receiverPhone}`,false)
+        addNotifyStr1(`${datainfo.expressTypeName}：${datainfo.expressNo}`,false)
     } else {
         console.log('快递信息查询失败：' + result.message)
 
@@ -595,11 +597,13 @@ function addNotifyStr(str, log = true) {
     }
     notifyStr += `${str}\n`
 }
-
+function addNotifyStr1(str, log = true) {
+    notifyStr1 += `${str}\n`
+}
 //通知
 async function showmsg() {
     // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
-    notifyBody = jsname + "运行通知\n\n" + notifyStr
+    notifyBody = jsname + "运行通知\n\n" + notifyStr1+notifyStr
     if (notifyFlag == 1) {
         $.msg(notifyBody);
         if ($.isNode()) {
