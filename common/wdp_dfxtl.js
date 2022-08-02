@@ -37,8 +37,8 @@ let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr=[];//图片资源
-let followlistArr =[];
-
+let followlistArr =[];//关注人的集合
+let NewListArr =[];//最新的帖子的集合
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -80,10 +80,8 @@ let curHour = (new Date()).getHours()
             //发表帖子   // await queryChoicenessByUserDTO(token, userid,'7254b938431544ead0b24a51cc467e75');//  1083380194470035815
             //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
             await followList(token, userid);
-            //console.log('\n============ 任务完成结束开始查询用户信息 ============')
-            //scoreGet 获取积分详情
 
-
+            //获取积分信息
             const score = await scoreGet(token);
             addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},积分:${score}】`,false)
             //任务完成情况
@@ -211,44 +209,46 @@ async function putComment(token, data) {
 
 //查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
 async function queryChoicenessNewList(token) {
-    //1102626767558049804
-    let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
-    let body = {"pageNum": "1", "pageSize": "100"};//一次查100条
-    let urlObject = populateUrlObject(url, token, body)
-    await httpRequest('post', urlObject)
-    let result = httpResult;
-    if (!result) return
-    //console.log(JSON.stringify(result))
-    if (result.code == 0) {
-        //console.log('最近帖子 查询需要评论的帖子成功！！！')
-        var data = result.data.list;
-        for (let index = 0; index < 4; index++) {//一次评价4条
-            var aNumber = (100) * Math.random();
-            var aNumber1 = Math.floor(aNumber);//0-100随机取一条
-            var conectTemId = data[aNumber1].id;
-            var pickType = data[aNumber1].chonicenessType;
-
-            var aa = {
-                "bbsFileList": [],
-                "commentContent": "欣赏雪铁龙，加油棒棒哒",
-                "commentParentId": "",
-                "commentTemId": conectTemId,
-                "commentTemType": pickType,
-                "ids": "",
-                "pageNum": 0,
-                "pageSize": 0,
-                "parentId": "",
-                "replyName": "",
-                "sendMsgType": 0
-            }
-            await putComment(token, aa);
-            await $.wait(1000);
+    if(NewListArr.length==0){
+        //1102626767558049804
+        let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
+        let body = {"pageNum": "1", "pageSize": "200"};//一次查100条
+        let urlObject = populateUrlObject(url, token, body)
+        await httpRequest('post', urlObject)
+        let result = httpResult;
+        if (!result) return
+        //console.log(JSON.stringify(result))
+        if (result.code == 0) {
+            console.log('最近帖子 查询需要评论的帖子成功！！！')
+            NewListArr= result.data.list;
+        } else {
+            console.log('通过主题id 查询需要评论的帖子失败：' + result.message)
         }
-
-    } else {
-        console.log('通过主题id 查询需要评论的帖子失败：' + result.message)
-
     }
+    var data = NewListArr;
+    for (let index = 0; index < 4; index++) {//一次评价4条
+        var aNumber = (200) * Math.random();
+        var aNumber1 = Math.floor(aNumber);//0-100随机取一条
+        var conectTemId = data[aNumber1].id;
+        var pickType = data[aNumber1].chonicenessType;
+
+        var aa = {
+            "bbsFileList": [],
+            "commentContent": "欣赏雪铁龙，加油棒棒哒",
+            "commentParentId": "",
+            "commentTemId": conectTemId,
+            "commentTemType": pickType,
+            "ids": "",
+            "pageNum": 0,
+            "pageSize": 0,
+            "parentId": "",
+            "replyName": "",
+            "sendMsgType": 0
+        }
+        await putComment(token, aa);
+        await $.wait(1000);
+    }
+
 }
 
 
