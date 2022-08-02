@@ -61,7 +61,7 @@ let curHour = (new Date()).getHours()
 
             // await $.wait(delay()); //  随机延时
             let num = index + 1
-            console.log(`\n============开始【第 ${num} 个账号:${dfxtlphoneArr[index]}】============\n`)
+            console.log(`\n============开始【第 ${num} 个账号:${dfxtlphoneArr[index]}】\n`)
             //登录
             await dfxtllogin(index);
             await $.wait(500);
@@ -91,8 +91,8 @@ let curHour = (new Date()).getHours()
             await $.wait(3000);
 
         }
-        console.log(JSON.stringify(userinfo))
         showmsg()
+        console.log(JSON.stringify(userinfo))
     }
 })()
     .catch((e) => $.logErr(e))
