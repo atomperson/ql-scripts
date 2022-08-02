@@ -119,7 +119,7 @@ async function dfxtllogin(num) {
     if (!result) return
     // console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('登录成功！');
+      //  console.log('登录成功！');
         dfxtlTokenArr[num] = result.data;
     } else {
         console.log('登录失败：' + result.message)
@@ -137,7 +137,7 @@ async function sign(token, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('签到成功')
+       // console.log('签到成功')
     } else {
         console.log('签到失败：' + result.message)
 
@@ -200,7 +200,7 @@ async function putComment(token, data) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('评论消息成功！！！')
+       // console.log('评论消息成功！！！')
     } else {
         console.log('评论消息失败：' + result.message)
 
@@ -219,7 +219,7 @@ async function queryChoicenessNewList(token) {
         if (!result) return
         //console.log(JSON.stringify(result))
         if (result.code == 0) {
-            console.log('最近帖子 查询需要评论的帖子成功！！！')
+           // console.log('最近帖子 查询需要评论的帖子成功！！！')
             NewListArr= result.data.list;
         } else {
             console.log('通过主题id 查询需要评论的帖子失败：' + result.message)
@@ -350,7 +350,7 @@ async function publishPostsNew(token, data1, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('发表帖子成功！！！,主题为:' + data1.title)
+      //  console.log('发表帖子成功！！！,主题为:' + data1.title)
     } else {
         console.log('发表帖子失败：' + result.message)
 
