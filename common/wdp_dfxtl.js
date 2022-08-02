@@ -56,12 +56,12 @@ let curHour = (new Date()).getHours()
             8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
         console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
         // let dfxtlphoneArr dfxtlpasswordArr  dfxtlTokenArr
+        var userinfo=[];
         for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
             // await $.wait(delay()); //  随机延时
             let num = index + 1
             console.log(`\n============开始【第 ${num} 个账号:${dfxtlphoneArr[index]}】============\n`)
-            // console.log('\n======== 检查登录状态 ========')
             //登录
             await dfxtllogin(index);
             await $.wait(200);
@@ -71,7 +71,7 @@ let curHour = (new Date()).getHours()
             }
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
-
+            userinfo.push({token:token,userid:userid})
             // console.log(`token为:\n ${token}`);
             //签到
             await sign(token, userid);
@@ -93,6 +93,7 @@ let curHour = (new Date()).getHours()
             await $.wait(5000);
 
         }
+        console.log(JSON.stringify(userinfo))
         showmsg()
     }
 })()
@@ -264,7 +265,7 @@ async function followList(token, userid) {
         // console.log(JSON.stringify(result))
         if (result.code == 0) {
             // console.log('查询 账号关注的用户数量成功！！！');
-           var  followlistArrddd = result.data.list;
+            var  followlistArrddd = result.data.list;
             followlistArr= followlistArrddd.map(ele=>{
                 return ele.userId;
             })
@@ -472,7 +473,7 @@ async function saveUserAddress(token) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-         console.log('地址保存成功！！！');
+        console.log('地址保存成功！！！');
     } else {
         console.log('地址保存失败：' + result.message)
 
