@@ -64,7 +64,7 @@ let curHour = (new Date()).getHours()
             console.log(`\n============开始【第 ${num} 个账号:${dfxtlphoneArr[index]}】============\n`)
             //登录
             await dfxtllogin(index);
-            await $.wait(200);
+            await $.wait(500);
             if(dfxtlTokenArr[index]==''){
                 addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},登录错误】`,true)
                 continue;
@@ -90,7 +90,7 @@ let curHour = (new Date()).getHours()
             await taskList(token);
             //商城订单信息
             await userOrderList(token);
-            await $.wait(5000);
+            await $.wait(3000);
 
         }
         console.log(JSON.stringify(userinfo))
@@ -275,7 +275,7 @@ async function followList(token, userid) {
     } else {
         //console.log('使用已经查询账号关注的用户！！！');
     }
-    await $.wait(1000);
+    await $.wait(500);
     var followlistNo = Math.floor((followlistArr.length) * Math.random());//随机取一名关注的用户
     var otherid = followlistArr[followlistNo];//随机用户id
     //console.log(JSON.stringify(otherid));
@@ -287,7 +287,7 @@ async function followList(token, userid) {
 //查询某个用户发帖数
 async function queryChoicenessByUserDTO(token, userid,otherid) {
     //如果图片有数据则查询20条 第一次查询需查询多点 这样可以图片多
-    var pageSize=50;
+    var pageSize=30;
     if(imageArr.length==0){
         pageSize=500;
     }
@@ -319,7 +319,7 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
         var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
         infoData.imageUrl = imageArr[imageNo];//随机图片url
         await publishPostsNew(token, infoData, userid)
-        await $.wait(1000);
+        await $.wait(500);
 
     } else {
         console.log('发表帖子失败：' + result.message)
