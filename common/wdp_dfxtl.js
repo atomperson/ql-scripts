@@ -139,8 +139,7 @@ async function sign(token, userid) {
     if (result.code == 0) {
        // console.log('签到成功')
     } else {
-        console.log('签到失败：' + result.message)
-
+       // console.log('签到失败：' + result.message)
     }
 }
 
