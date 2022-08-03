@@ -92,7 +92,9 @@ let curHour = (new Date()).getHours()
             let num = index + 1
             console.log(`\n============开始【第 ${num} 个账号】============\n`)
             //登录
-            await dfxtllogin(index);
+            if(!await dfxtllogin(index)){
+                continue;
+            };
             await $.wait(200);
             var token = dfxtlTokenArr[index].tokenValue;
             var userid = dfxtlTokenArr[index].userInfoVo.id;
@@ -175,11 +177,12 @@ async function dfxtllogin(num) {
     if (!result) return
     // console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('登录成功！');
+        //console.log('登录成功！');
         dfxtlTokenArr[num] = result.data;
+        return true;
     } else {
         console.log('登录失败：' + result.message)
-
+        return false;
     }
 }
 
