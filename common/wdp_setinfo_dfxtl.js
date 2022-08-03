@@ -73,8 +73,12 @@ let curHour = (new Date()).getHours()
             //读取文件token    同步方法 不需要回调函数,出错直接抛出
             try {
                 let fireData = fs.readFileSync("./userinfo1.json","utf-8");
-                // console.log(fireData);
-                userinfo1=JSON.parse(fireData);
+                if(fireData!=""){
+                    userinfo1=JSON.parse(fireData);
+                }
+                if(userinfo1.length==0){
+                    isnew=true;
+                }
                 if(userinfo1.length==0){
                     isnew=true;
                 }
