@@ -105,9 +105,9 @@ let curHour = (new Date()).getHours()
             const score = await scoreGet(token);
             addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             //任务完成情况
-            await taskList(token);
+            //await taskList(token);
             //商城订单信息
-            await userOrderList(token, phone);
+            await userOrderList(token, phone,index + 1);
             await $.wait(3000);
 
         }
@@ -451,7 +451,7 @@ async function taskList(token) {
 }
 
 //查询商城订单
-async function userOrderList(token,phone) {
+async function userOrderList(token,phone,index) {
     let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/list?orderStatus=&pageNum=1&pageSize=10&sourceApp=DC`
     let body = '';
     let urlObject = populateUrlObject(url, token, body)
@@ -464,7 +464,7 @@ async function userOrderList(token,phone) {
         var total = result.data.total;
         var list = result.data.list;
         if (list.length > 0) {
-            addNotifyStr1(`手机号【${phone}】:订单数量： ${total}个`, false)
+            addNotifyStr1(`【第${index}个手机号${phone}】:订单数量： ${total}个`, false)
         }
         for (var j = 0; j < list.length; j++) {
             var skuName = list[j].skuName;
