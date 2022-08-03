@@ -78,13 +78,11 @@ let curHour = (new Date()).getHours()
             // await $.wait(delay()); //  随机延时
             let num = index + 1
             console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
-            var needchangetoken=false;
-            //登录  --只是校验token是否正确
-            var data=await testsign(dfxtlTokenArr[index].token, dfxtlTokenArr[index].userid);
-            if(data==undefined||data==null){
+            //token 校验  只是校验token是否正确
+            var needchangetoken=await getSignStatus(dfxtlTokenArr[index].token);
+            if(needchangetoken){
                 console.log('手机号：'+phone+'token失效');
                 await dfxtllogin(index);
-                needchangetoken=true;
             }
 
             await $.wait(500);
@@ -176,16 +174,16 @@ async function sign(token, userid) {
         // console.log('签到失败：' + result.message)
     }
 }
-async function testsign(token, userid) {
-    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/sign/sureNew?userId=` + userid;
+async function getSignStatus(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/sign/getSignStatus`;
     let body = ''
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('get', urlObject)
     let result = httpResult;
-    if(result==undefined||result.code == 401){
-        return null;
+    if(result.code == 0){
+        return false;
     }else{
-        return result;
+        return true;
     }
 }
 //评论列表查询
