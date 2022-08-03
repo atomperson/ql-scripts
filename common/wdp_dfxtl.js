@@ -15,6 +15,12 @@ const axios = require("axios");
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
+
+const userinfo = require('./userinfo');
+
+let searchflag = '1'; //1 默认用token  2 查询数据token
+
+
 let notifyStr = ''
 let notifyStr1 = ''
 let httpResult //global buffer
@@ -54,26 +60,46 @@ let curHour = (new Date()).getHours()
         console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(
             new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
             8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
-        console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
-        // let dfxtlphoneArr dfxtlpasswordArr  dfxtlTokenArr
-        var userinfo=[];
-        addNotifyStr1(`【=======查询用户订单信息=======】\n`,false)
-        for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
+        if (searchflag == '1') {  //1  为使用默认token   2为查询token
+            dfxtlphoneArr = userinfo.userinfoArr;
+        }
+        console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
+        //console.log('有！\n'+userinfo.userinfoArr.length);
+        var userinfo1 = [];
+        addNotifyStr1(`【=======查询用户订单信息=======】\n`, false)
+        for (let index = 0; index < dfxtlphoneArr.length; index++) {
+            var phone = '';
+            if (searchflag == '1') {  //1  为使用默认token   2为查询token
+                phone = dfxtlphoneArr[index].phone;
+            } else {
+                phone = dfxtlphoneArr[index];
+            }
             // await $.wait(delay()); //  随机延时
             let num = index + 1
-            console.log(`\n============开始【第 ${num} 个账号:${dfxtlphoneArr[index]}】\n`)
+            console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
             //登录
-            await dfxtllogin(index);
+            if (searchflag == '2') {
+                await dfxtllogin(index);
+            }
             await $.wait(500);
-            if(dfxtlTokenArr[index]==''){
-                addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},登录错误】`,true)
+            if (dfxtlTokenArr[index] == '') {
+                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
                 continue;
             }
-            var token = dfxtlTokenArr[index].tokenValue;
-            var userid = dfxtlTokenArr[index].userInfoVo.id;
-            userinfo.push({token:token,userid:userid})
-            // console.log(`token为:\n ${token}`);
+            var token = "";
+            var userid = "";
+            if (searchflag == '2') {
+                token = dfxtlTokenArr[index].tokenValue;
+                userid = dfxtlTokenArr[index].userInfoVo.id;
+            } else if (searchflag == '1') {
+                token = dfxtlphoneArr[index].token;
+                userid = dfxtlphoneArr[index].userid
+            }
+
+            if (searchflag == '2') {  //1  为使用默认token   2为查询token
+                userinfo1.push({token: token, userid: userid, phone: phone})
+            }
             //签到
             await sign(token, userid);
             //评论任务  -------------查询最近的帖子
@@ -84,16 +110,19 @@ let curHour = (new Date()).getHours()
 
             //获取积分信息
             const score = await scoreGet(token);
-            addNotifyStr(`【第 (${index+1}) 个手机号:${dfxtlphoneArr[index]},积分:${score}】`,false)
+            addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             //任务完成情况
             await taskList(token);
             //商城订单信息
-            await userOrderList(token,dfxtlphoneArr[index]);
+            await userOrderList(token, phone);
             await $.wait(3000);
 
         }
         showmsg()
-        console.log(JSON.stringify(userinfo))
+        if (searchflag == '2') {  //1  为使用默认token   2为查询token
+            console.log(JSON.stringify(userinfo1))
+        }
+
     }
 })()
     .catch((e) => $.logErr(e))
@@ -101,9 +130,14 @@ let curHour = (new Date()).getHours()
 
 
 /////---------------------------方法
-// let dfxtlphoneArr = [];  // let dfxtlpasswordArr = [];
 // d东风雪铁龙登录
 async function dfxtllogin(num) {
+    var phone = '';
+    if (searchflag == '1') {  //1  为使用默认token   2为查询token
+        phone = dfxtlphoneArr[num].phone;
+    } else {
+        phone = dfxtlphoneArr[num];
+    }
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/auth/loginForPwd`
     let body = {
         "pushId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
@@ -111,7 +145,7 @@ async function dfxtllogin(num) {
         "areaCode": "",
         "pwdType": 1,
         "deviceId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
-        "account": dfxtlphoneArr[num]
+        "account": phone,
     };
     //console.log('登录获取token')
     let urlObject = populateUrlObject(url, '', body)
@@ -123,7 +157,7 @@ async function dfxtllogin(num) {
     }
     // console.log(JSON.stringify(result))
     if (result.code == 0) {
-      //  console.log('登录成功！');
+        //  console.log('登录成功！');
         dfxtlTokenArr[num] = result.data;
     } else {
         console.log('登录失败：' + result.message)
@@ -140,9 +174,9 @@ async function sign(token, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-       // console.log('签到成功')
+        // console.log('签到成功')
     } else {
-       // console.log('签到失败：' + result.message)
+        // console.log('签到失败：' + result.message)
     }
 }
 
@@ -202,7 +236,7 @@ async function putComment(token, data) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-       // console.log('评论消息成功！！！')
+        // console.log('评论消息成功！！！')
     } else {
         console.log('评论消息失败：' + result.message)
 
@@ -221,7 +255,7 @@ async function queryChoicenessNewList(token) {
         if (!result) return
         //console.log(JSON.stringify(result))
         if (result.code == 0) {
-           // console.log('最近帖子 查询需要评论的帖子成功！！！')
+            // console.log('最近帖子 查询需要评论的帖子成功！！！')
             NewListArr= result.data.list;
         } else {
             console.log('通过主题id 查询需要评论的帖子失败：' + result.message)
@@ -352,7 +386,7 @@ async function publishPostsNew(token, data1, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-      //  console.log('发表帖子成功！！！,主题为:' + data1.title)
+        //  console.log('发表帖子成功！！！,主题为:' + data1.title)
     } else {
         console.log('发表帖子失败：' + result.message)
 
@@ -421,18 +455,20 @@ async function userOrderList(token,phone) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         // console.log('查询商城订单成功！！！');
-        var total=result.data.total;
-        var list=result.data.list;
+        var total = result.data.total;
+        var list = result.data.list;
+        if (list.length > 0) {
+            addNotifyStr1(`手机号【${phone}】:订单数量： ${total}个`, false)
+        }
         for (var j = 0; j < list.length; j++) {
-            addNotifyStr1(`手机号【${phone}】:订单数量： ${total}个`,false)
-            var skuName= list[j].skuName;
-            var orderStatusDetailStr= list[j].orderStatusDetailStr;
-            if(orderStatusDetailStr=='已发货'){
-                addNotifyStr1(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
-                var id= list[j].id;
-                await getLogisticsTrackMapInfo(token,id)
-            }else {
-                addNotifyStr1(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
+            var skuName = list[j].skuName;
+            var orderStatusDetailStr = list[j].orderStatusDetailStr;
+            if (orderStatusDetailStr == '已发货') {
+                addNotifyStr1(`[${j + 1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`, false)
+                var id = list[j].id;
+                await getLogisticsTrackMapInfo(token, id)
+            } else {
+                addNotifyStr1(`[${j + 1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`, false)
             }
         }
     } else {
@@ -554,9 +590,6 @@ async function Envs() {
     //     return;
     // }
 
-    // if (dfxtlpasswordArr.length >= 1 && dfxtlphoneArr.length != dfxtlpasswordArr.length) {
-    //     log(`提示：请将提现变量与普通变量一一对应，否则会出现问题`)
-    // }
 
     return true;
 }
