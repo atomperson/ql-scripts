@@ -9,12 +9,13 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='1'; //为查询库存信息 为更改用户信息
+let searchtype='1'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
-//import axios from "axios";
-
+const fs = require("fs");
+// import axios from "axios";
+// import fs from "fs";
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
@@ -36,12 +37,6 @@ let dfxtlphone=process.env.dfxtlphone;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
-
-// let dfxtlphone='15720101086';
-// let dfxtlpassword='q3wvHQn0/lwiRT2boRjztA==';
-// let Sign='4b6a5a5e092903efb696513ca25404d8018ef770d3d493d637c455e8b0a9daa0';
-// let TimeStamp ='2068854542000'
-
 
 
 
@@ -72,13 +67,27 @@ let curHour = (new Date()).getHours()
             new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
             8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
         console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
+        var userinfo1=[];
+        var isnew=false;
+        if(searchtype==4){
+            //读取文件token    同步方法 不需要回调函数,出错直接抛出
+            try {
+                let fireData = fs.readFileSync("./userinfo1.json","utf-8");
+                // console.log(fireData);
+                userinfo1=JSON.parse(fireData);
+                if(userinfo1.length==0){
+                    isnew=true;
+                }
+            } catch (error) {
+                console.log('文件读取错误'+error);
+                return
+            }
+        }
 
         for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
-            // await $.wait(delay()); //  随机延时
             let num = index + 1
             console.log(`\n============开始【第 ${num} 个账号】============\n`)
-            // console.log('\n======== 检查登录状态 ========')
             //登录
             await dfxtllogin(index);
             await $.wait(200);
@@ -87,7 +96,7 @@ let curHour = (new Date()).getHours()
             if(searchtype==1){
                 //查询商品库存信息
                 await selectHomePageData(token);
-            }else if(searchtype==1){
+            }else if(searchtype==2){
                 //获取其他用户图标
                 await queryavatarLIST(token);
                 await changeavatar(token,userid);//修改图标
@@ -97,13 +106,31 @@ let curHour = (new Date()).getHours()
                 await changeinfo3(token,userid);//修改个签
                 await changeinfo4(token,userid);//修改姓名
                 await saveUserAddress(token,userid);//修改地址
-            }else{
+            }else if(searchtype==3){
                 //抢商品
                 await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
 
-            }
-            await $.wait(5000);
+            }else if(searchtype==4){
+                //获取用户token 并保存
+                if(isnew){
+                    userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                }
+            }else{
 
+            }
+            await $.wait(1000);
+
+        }
+        if(searchtype==4){
+            //修改文件
+            fs.writeFile(
+                "./userinfo1.json",
+                JSON.stringify(userinfo1),
+                (err)=>{
+                    if(err)console.log(err);
+                    console.log("文件新增完成"+"文件 userinfo1.json");
+                }
+            )
         }
         showmsg()
     }
