@@ -9,7 +9,7 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='1'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存
+let searchtype='4'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
@@ -33,7 +33,7 @@ let haslist = []
 let nohaslist = []
 
 
-let dfxtlphone=process.env.dfxtlphone;
+let dfxtlphone=process.env.dfxtlphone3;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
@@ -81,9 +81,6 @@ let curHour = (new Date()).getHours()
                 if(userinfo1.length==0){
                     isnew=true;
                 }
-                if(userinfo1.length==0){
-                    isnew=true;
-                }
             } catch (error) {
                 console.log('文件读取错误'+error);
                 return
@@ -120,6 +117,10 @@ let curHour = (new Date()).getHours()
                 //获取用户token 并保存
                 if(isnew){
                     userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                }else{
+                    //TODO
+                    userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+
                 }
             }else{
 
@@ -315,11 +316,11 @@ async function selectHomePageData(token) {
                 var contentId=content[j].contentId;//二级主题id
                 var contentType=content[j].contentType;//二级主题类型
                 if(contentType=='banner'){
-                 //这里面都是思思数据 就是行车记录仪
+                    //这里面都是思思数据 就是行车记录仪
                 }else if(contentType=='floor'){
                     for(let m=0;m<detailes.length;m++){
                         var commodityId=detailes[m].commodityId
-                            list1.push(commodityId)//,//商品id
+                        list1.push(commodityId)//,//商品id
                     }
                 }
             }
@@ -452,7 +453,7 @@ async function userOrdercreate(token,skuId) {
 
 async function Envs() {
     if(searchtype==1){
-         dfxtlphone = '19121901086';
+        dfxtlphone = '19121901086';
     }
     if (dfxtlphone) {
         if (dfxtlphone.indexOf("@") != -1) {
