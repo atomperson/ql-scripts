@@ -11,12 +11,14 @@ const logDebug = 0
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
-//import axios from "axios";
+const fs = require("fs");
+// import axios from "axios";
+// import fs from "fs";
 
+
+// const firstFile = require('./firstFile.json');
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
-
-const userinfo = require('./userinfo');
 
 let searchflag = '1'; //1 默认用token  2 查询数据token
 
@@ -37,9 +39,7 @@ let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
 
-
 let dfxtlphoneArr = [];
-let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr=[];//图片资源
@@ -61,45 +61,40 @@ let curHour = (new Date()).getHours()
             new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
             8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
 
-        if (searchflag == '1') {  //1  为使用默认token   2为查询token
-            dfxtlphoneArr = userinfo.userinfoArr;
+        //读取文件token    同步方法 不需要回调函数,出错直接抛出
+        try {
+            let fireData = fs.readFileSync("./userinfo.json","utf-8");
+            // console.log(fireData);
+            dfxtlTokenArr=JSON.parse(fireData);
+        } catch (error) {
+            console.log('文件读取错误'+error);
+            return
         }
-        console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
-        //console.log('有！\n'+userinfo.userinfoArr.length);
-        var userinfo1 = [];
+        console.log(`\n=================== 共找到 ${dfxtlTokenArr.length} 个账号 ===================`)
         addNotifyStr1(`【=======查询用户订单信息=======】\n`, false)
-        for (let index = 0; index < dfxtlphoneArr.length; index++) {
+        for (let index = 0; index < dfxtlTokenArr.length; index++) {
             var phone = '';
-            if (searchflag == '1') {  //1  为使用默认token   2为查询token
-                phone = dfxtlphoneArr[index].phone;
-            } else {
-                phone = dfxtlphoneArr[index];
-            }
+            phone = dfxtlTokenArr[index].phone;
             // await $.wait(delay()); //  随机延时
             let num = index + 1
             console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
-            //登录
-            if (searchflag == '2') {
+            var needchangetoken=false;
+            //登录  --只是校验token是否正确
+            var data=await testsign(dfxtlTokenArr[index].token, dfxtlTokenArr[index].userid);
+            if(data==undefined||data==null){
+                console.log('手机号：'+phone+'token失效');
                 await dfxtllogin(index);
+                needchangetoken=true;
             }
+
             await $.wait(500);
-            if (dfxtlTokenArr[index] == '') {
+            if (dfxtlTokenArr[index].token == '') {
                 addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
                 continue;
             }
-            var token = "";
-            var userid = "";
-            if (searchflag == '2') {
-                token = dfxtlTokenArr[index].tokenValue;
-                userid = dfxtlTokenArr[index].userInfoVo.id;
-            } else if (searchflag == '1') {
-                token = dfxtlphoneArr[index].token;
-                userid = dfxtlphoneArr[index].userid
-            }
+            var token = dfxtlTokenArr[index].token;
+            var userid = dfxtlTokenArr[index].userid
 
-            if (searchflag == '2') {  //1  为使用默认token   2为查询token
-                userinfo1.push({token: token, userid: userid, phone: phone})
-            }
             //签到
             await sign(token, userid);
             //评论任务  -------------查询最近的帖子
@@ -118,10 +113,18 @@ let curHour = (new Date()).getHours()
             await $.wait(3000);
 
         }
-        showmsg()
-        if (searchflag == '2') {  //1  为使用默认token   2为查询token
-            console.log(JSON.stringify(userinfo1))
+        if (needchangetoken) {
+            //修改文件
+            fs.writeFile(
+                "./userinfo.json",
+                JSON.stringify(dfxtlTokenArr),
+                (err)=>{
+                    if(err)console.log(err);
+                    console.log("文件修改完成");
+                }
+            )
         }
+         showmsg()
 
     }
 })()
@@ -133,11 +136,7 @@ let curHour = (new Date()).getHours()
 // d东风雪铁龙登录
 async function dfxtllogin(num) {
     var phone = '';
-    if (searchflag == '1') {  //1  为使用默认token   2为查询token
-        phone = dfxtlphoneArr[num].phone;
-    } else {
-        phone = dfxtlphoneArr[num];
-    }
+    phone = dfxtlTokenArr[num].phone;
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/auth/loginForPwd`
     let body = {
         "pushId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
@@ -152,16 +151,14 @@ async function dfxtllogin(num) {
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) {
-        dfxtlTokenArr[num]='';
+        dfxtlTokenArr[num].token='';
         return
     }
-    // console.log(JSON.stringify(result))
     if (result.code == 0) {
-        //  console.log('登录成功！');
-        dfxtlTokenArr[num] = result.data;
+        dfxtlTokenArr[num].token=result.data.tokenValue;
     } else {
         console.log('登录失败：' + result.message)
-        dfxtlTokenArr[num]='';
+        dfxtlTokenArr[num].token='';
     }
 }
 
@@ -179,7 +176,18 @@ async function sign(token, userid) {
         // console.log('签到失败：' + result.message)
     }
 }
-
+async function testsign(token, userid) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/sign/sureNew?userId=` + userid;
+    let body = ''
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if(result==undefined||result.code == 401){
+        return null;
+    }else{
+        return result;
+    }
+}
 //评论列表查询
 async function selectAdvertCarousel(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/advertising/selectAdvertCarousel?pushPosition=1`
@@ -573,22 +581,7 @@ async function Envs() {
         log(`\n提示：未填写提现变量，不会执行自动提现`)
     }
 
-    // if (dfxtlpassword) {
-    //     if (dfxtlpassword.indexOf("@") != -1) {
-    //         dfxtlpassword.split("@").forEach((item) => {
-    //             dfxtlpasswordArr.push(item);
-    //         });
-    //     } else if (dfxtlpassword.indexOf("\n") != -1) {
-    //         dfxtlpassword.split("\n").forEach((item) => {
-    //             dfxtlpasswordArr.push(item);
-    //         });
-    //     } else {
-    //         dfxtlpasswordArr.push(dfxtlpassword);
-    //     }
-    // } else {
-    //     log(`\n 【${$.name}】：未填写变量 dfxtlpassword`)
-    //     return;
-    // }
+
 
 
     return true;
