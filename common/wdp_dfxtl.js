@@ -78,7 +78,7 @@ let curHour = (new Date()).getHours()
             // await $.wait(delay()); //  随机延时
             let num = index + 1
             //console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
-            //token 校验  只是校验token是否正确
+            //token 校验token是否正确
             var needchangetoken=await getSignStatus(dfxtlTokenArr[index].token);
             if(needchangetoken){
                 console.log('手机号：'+phone+'token失效');

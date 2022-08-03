@@ -90,7 +90,7 @@ let curHour = (new Date()).getHours()
         for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
             let num = index + 1
-            console.log(`\n============开始【第 ${num} 个账号】============\n`)
+            console.log(`\n==========开始【第 ${num} 个账号】${dfxtlphoneArr[index]}\n`)
             //登录
             if(!await dfxtllogin(index)){
                 continue;
