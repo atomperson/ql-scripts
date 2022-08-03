@@ -66,6 +66,8 @@ let curHour = (new Date()).getHours()
         console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(
             new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
             8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
+        var setlist=new Set(dfxtlphoneArr);
+        dfxtlphoneArr=Array.from(setlist);
         console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
         var userinfo1=[];
         var isnew=false;
