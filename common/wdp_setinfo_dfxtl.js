@@ -33,7 +33,7 @@ let haslist = []
 let nohaslist = []
 
 
-let dfxtlphone=process.env.dfxtlphone3;
+let dfxtlphone=process.env.dfxtlphone;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
@@ -73,18 +73,18 @@ let curHour = (new Date()).getHours()
         var isnew=false;
         if(searchtype==4){
             //读取文件token    同步方法 不需要回调函数,出错直接抛出
-            try {
-                let fireData = fs.readFileSync("./userinfo1.json","utf-8");
-                if(fireData!=""){
-                    userinfo1=JSON.parse(fireData);
-                }
-                if(userinfo1.length==0){
-                    isnew=true;
-                }
-            } catch (error) {
-                console.log('文件读取错误'+error);
-                return
-            }
+            // try {
+            //     let fireData = fs.readFileSync("./userinfo1.json","utf-8");
+            //     if(fireData!=""){
+            //         userinfo1=JSON.parse(fireData);
+            //     }
+            //     if(userinfo1.length==0){
+            //         isnew=true;
+            //     }
+            // } catch (error) {
+            //     console.log('文件读取错误'+error);
+            //     return
+            // }
         }
 
         for (let index = 0; index < dfxtlphoneArr.length; index++) {
