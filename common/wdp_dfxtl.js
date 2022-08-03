@@ -77,7 +77,7 @@ let curHour = (new Date()).getHours()
             phone = dfxtlTokenArr[index].phone;
             // await $.wait(delay()); //  随机延时
             let num = index + 1
-            console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
+            //console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
             //token 校验  只是校验token是否正确
             var needchangetoken=await getSignStatus(dfxtlTokenArr[index].token);
             if(needchangetoken){
@@ -464,17 +464,17 @@ async function userOrderList(token,phone,index) {
         var total = result.data.total;
         var list = result.data.list;
         if (list.length > 0) {
-            addNotifyStr1(`【第${index}个手机号${phone}】:订单数量： ${total}个`, false)
+            addNotifyStr1(`第【${index}】个手机号【${phone}】:订单数量： 【${total}】个`, false)
         }
         for (var j = 0; j < list.length; j++) {
             var skuName = list[j].skuName;
             var orderStatusDetailStr = list[j].orderStatusDetailStr;
             if (orderStatusDetailStr == '已发货') {
-                addNotifyStr1(`[${j + 1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`, false)
+                addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
                 var id = list[j].id;
                 await getLogisticsTrackMapInfo(token, id)
             } else {
-                addNotifyStr1(`[${j + 1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`, false)
+                addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
             }
         }
     } else {
@@ -494,8 +494,7 @@ async function userCommodity(token,commodityId) {
     if (result.code == 0) {
         // console.log('查询商城订单成功！！！');
         var total=result.data.total;
-        addNotifyStr(`订单数量： ${total}个`,false)
-
+        addNotifyStr(`订单数量：【 ${total}【个`,false)
         var list=result.data.list;
         for (var j = 0; j < list.length; j++) {
             var skuName= list[j].skuName;
@@ -540,10 +539,9 @@ async function getLogisticsTrackMapInfo(token,orderid) {
         var address=datainfo.addressInfo.address;//地址
         var receiverPhone=datainfo.addressInfo.receiverPhone;//手机
         var receiverName=datainfo.addressInfo.receiverName;//姓名
-        addNotifyStr1(`地址：${address}`,false)
-        addNotifyStr1(`收货人：${receiverName}`,false)
-        addNotifyStr1(`手机：${receiverPhone}`,false)
-        addNotifyStr1(`${datainfo.expressTypeName}：${datainfo.expressNo}`,false)
+        addNotifyStr1(`地址：【${address}】`,false)
+        addNotifyStr1(`收货人：【${receiverName}】,手机：【${receiverPhone}】`,false)
+        addNotifyStr1(`单号：${datainfo.expressNo}`,false)
     } else {
         console.log('快递信息查询失败：' + result.message)
 
