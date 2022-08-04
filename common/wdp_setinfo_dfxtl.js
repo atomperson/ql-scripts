@@ -9,7 +9,7 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='4'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存
+let searchtype='1'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
@@ -90,7 +90,7 @@ let curHour = (new Date()).getHours()
         for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
             let num = index + 1
-            console.log(`\n==========开始【第 ${num} 个账号】${dfxtlphoneArr[index]}\n`)
+            console.log(`\n============开始【第 ${num} 个账号】============\n`)
             //登录
             if(!await dfxtllogin(index)){
                 continue;

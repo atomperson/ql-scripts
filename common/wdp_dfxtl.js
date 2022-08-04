@@ -38,7 +38,7 @@ let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
-
+let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
@@ -76,13 +76,15 @@ let curHour = (new Date()).getHours()
             var phone = '';
             phone = dfxtlTokenArr[index].phone;
             // await $.wait(delay()); //  随机延时
-            let num = index + 1
-            //console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
-            //token 校验token是否正确
-            var needchangetoken=await getSignStatus(dfxtlTokenArr[index].token);
-            if(needchangetoken){
-                console.log('手机号：'+phone+'token失效');
+            let num = index + 1;
+            if (test100(index)) {
+                console.log('\n============开始【第' + num + '个账号:' + phone + '】\n')
+            }         //console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
+            //token 校验  只是校验token是否正确
+            if (await getSignStatus(dfxtlTokenArr[index].token)) {
+                console.log(`【第 (${index + 1}) 个手机号:${phone},token失效】`);
                 await dfxtllogin(index);
+                changeFlag = true;
             }
 
             await $.wait(500);
@@ -93,12 +95,11 @@ let curHour = (new Date()).getHours()
             var token = dfxtlTokenArr[index].token;
             var userid = dfxtlTokenArr[index].userid
 
-            //签到
+            // //签到
             await sign(token, userid);
-            //评论任务  -------------查询最近的帖子
+            // //评论任务  -------------查询最近的帖子
             await queryChoicenessNewList(token);
-            //发表帖子   // await queryChoicenessByUserDTO(token, userid,'7254b938431544ead0b24a51cc467e75');//  1083380194470035815
-            //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
+            // //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
             await followList(token, userid);
 
             //获取积分信息
@@ -107,22 +108,24 @@ let curHour = (new Date()).getHours()
             //任务完成情况
             //await taskList(token);
             //商城订单信息
-            await userOrderList(token, phone,index + 1);
+            await userOrderList(token, phone, index + 1);
             await $.wait(3000);
 
         }
-        if (needchangetoken) {
+        addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
+        if (changeFlag) {
+            console.log("需要修改文件\n");
             //修改文件
             fs.writeFile(
                 "./userinfo.json",
                 JSON.stringify(dfxtlTokenArr),
-                (err)=>{
-                    if(err)console.log(err);
-                    console.log("文件修改完成");
+                (err) => {
+                    if (err) console.log(err);
+                    console.log("文件修改完成\n");
                 }
             )
         }
-         showmsg()
+        showmsg()
 
     }
 })()
@@ -153,7 +156,8 @@ async function dfxtllogin(num) {
         return
     }
     if (result.code == 0) {
-        dfxtlTokenArr[num].token=result.data.tokenValue;
+        dfxtlTokenArr[num].token = result.data.tokenValue;
+        console.log('token从新获取成功！！！')
     } else {
         console.log('登录失败：' + result.message)
         dfxtlTokenArr[num].token='';
@@ -464,7 +468,7 @@ async function userOrderList(token,phone,index) {
         var total = result.data.total;
         var list = result.data.list;
         if (list.length > 0) {
-            addNotifyStr1(`第【${index}】个手机号【${phone}】:订单数量： 【${total}】个`, false)
+            addNotifyStr1(`\n=======第【${index}】个手机号【${phone}】======\n`, false)
         }
         for (var j = 0; j < list.length; j++) {
             var skuName = list[j].skuName;
@@ -473,7 +477,7 @@ async function userOrderList(token,phone,index) {
                 addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
                 var id = list[j].id;
                 await getLogisticsTrackMapInfo(token, id)
-            } else {
+            } else if (orderStatusDetailStr == '代发货') {
                 addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
             }
         }
@@ -639,6 +643,12 @@ async function showmsg() {
 }
 
 ////////////////////////////////////////////////////////////////////
+
+function test100(num) {
+    var r = /^[1-9]\d*00$/;
+    return r.test(num);
+}
+
 function populateUrlObject(url, cookie, body = '') {
     let host = (url.split('//')[1]).split('/')[0]
     let urlObject = {
