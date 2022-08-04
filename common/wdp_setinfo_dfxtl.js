@@ -19,6 +19,7 @@ const fs = require("fs");
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
+let notifyStr1 = ''
 
 let httpResult //global buffer
 
@@ -91,14 +92,14 @@ let curHour = (new Date()).getHours()
         if(searchtype==5){
             for (let index = 0; index < userinfo1.length; index++) {
                 let num = index + 1
-                console.log(`\n============开始【第 ${num} 个账号】============\n`)
+               // console.log(`\n============开始【第 ${num} 个账号】============\n`)
                 var phone = '';
                 phone = userinfo1[index].phone;
                 var token = userinfo1[index].token;
                 var userid = userinfo1[index].userid;
                 //获取积分信息
                 const score = await scoreGet(token);
-                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+                addNotifyStr1(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
                 //任务完成情况
                 //await taskList(token);
                 //商城订单信息
@@ -602,11 +603,16 @@ function addNotifyStr(str, log = true) {
     }
     notifyStr += `${str}\n`
 }
-
+function addNotifyStr1(str, log = true) {
+    if (log) {
+        console.log(`${str}\n`)
+    }
+    notifyStr1 += `${str}\n`
+}
 //通知
 async function showmsg() {
     // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
-    notifyBody = jsname + "运行通知\n\n" + notifyStr
+    notifyBody = jsname + "运行通知\n\n" + notifyStr+notifyStr1
     if (notifyFlag == 1) {
         $.msg(notifyBody);
         if ($.isNode()) {
