@@ -9,7 +9,7 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='1'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存
+let searchtype='1'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
@@ -71,65 +71,82 @@ let curHour = (new Date()).getHours()
         console.log(`\n=================== 共找到 ${dfxtlphoneArr.length} 个账号 ===================`)
         var userinfo1=[];
         var isnew=false;
-        if(searchtype==4){
+        if(searchtype==5){
             //读取文件token    同步方法 不需要回调函数,出错直接抛出
-            // try {
-            //     let fireData = fs.readFileSync("./userinfo1.json","utf-8");
-            //     if(fireData!=""){
-            //         userinfo1=JSON.parse(fireData);
-            //     }
-            //     if(userinfo1.length==0){
-            //         isnew=true;
-            //     }
-            // } catch (error) {
-            //     console.log('文件读取错误'+error);
-            //     return
-            // }
+            try {
+                let fireData = fs.readFileSync("./userinfo.json","utf-8");
+                if(fireData!=""){
+                    userinfo1=JSON.parse(fireData);
+                }
+                if(userinfo1.length==0){
+                    isnew=true;
+                }
+            } catch (error) {
+                console.log('文件读取错误'+error);
+                return
+            }
         }
 
-        for (let index = 0; index < dfxtlphoneArr.length; index++) {
 
-            let num = index + 1
-            console.log(`\n============开始【第 ${num} 个账号】============\n`)
-            //登录
-            if(!await dfxtllogin(index)){
-                continue;
-            };
-            await $.wait(200);
-            var token = dfxtlTokenArr[index].tokenValue;
-            var userid = dfxtlTokenArr[index].userInfoVo.id;
-            if(searchtype==1){
-                //查询商品库存信息
-                await selectHomePageData(token);
-            }else if(searchtype==2){
-                //获取其他用户图标
-                await queryavatarLIST(token);
-                await changeavatar(token,userid);//修改图标
-                await changeinfo(token,userid);//修改个人中心我喜欢的
-                await changeinfo1(token,userid);//修改性别
-                await changeinfo2(token,userid);//修改生日
-                await changeinfo3(token,userid);//修改个签
-                await changeinfo4(token,userid);//修改姓名
-                await saveUserAddress(token,userid);//修改地址
-            }else if(searchtype==3){
-                //抢商品
-                await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
+        if(searchtype==5){
+            for (let index = 0; index < userinfo1.length; index++) {
+                let num = index + 1
+                console.log(`\n============开始【第 ${num} 个账号】============\n`)
+                var phone = '';
+                phone = userinfo1[index].phone;
+                var token = userinfo1[index].token;
+                var userid = userinfo1[index].userid;
+                //获取积分信息
+                const score = await scoreGet(token);
+                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+                //任务完成情况
+                //await taskList(token);
+                //商城订单信息
+                await userOrderList(token, phone, index + 1);
+            }
+        }else{
+            for (let index = 0; index < dfxtlphoneArr.length; index++) {
+                let num = index + 1
+                console.log(`\n============开始【第 ${num} 个账号】============\n`)
+                //登录
+                if(!await dfxtllogin(index)){
+                    continue;
+                };
+                await $.wait(200);
+                var token = dfxtlTokenArr[index].tokenValue;
+                var userid = dfxtlTokenArr[index].userInfoVo.id;
+                if(searchtype==1){
+                    //查询商品库存信息
+                    await selectHomePageData(token);
+                }else if(searchtype==2){
+                    //获取其他用户图标
+                    await queryavatarLIST(token);
+                    await changeavatar(token,userid);//修改图标
+                    await changeinfo(token,userid);//修改个人中心我喜欢的
+                    await changeinfo1(token,userid);//修改性别
+                    await changeinfo2(token,userid);//修改生日
+                    await changeinfo3(token,userid);//修改个签
+                    await changeinfo4(token,userid);//修改姓名
+                    await saveUserAddress(token,userid);//修改地址
+                }else if(searchtype==3){
+                    //抢商品
+                    await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
 
-            }else if(searchtype==4){
-                //获取用户token 并保存
-                if(isnew){
-                    userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
-                }else{
-                    //TODO
-                    userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                }else if(searchtype==4){
+                    //获取用户token 并保存
+                    if(isnew){
+                        userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                    }else{
+                        //TODO
+                        userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                    }
+                } else{
 
                 }
-            }else{
-
+                await $.wait(1000);
             }
-            await $.wait(1000);
-
         }
+
         if(searchtype==4){
             //修改文件
             fs.writeFile(
@@ -147,6 +164,83 @@ let curHour = (new Date()).getHours()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 
+
+
+
+
+//查询积分
+async function scoreGet(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/get`
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        // console.log('积分查询成功,积分剩余为'+result.data.usableScore)
+        return result.data.usableScore;
+    } else {
+        console.log('查询积分失败：' + result.message)
+
+    }
+}
+//查询商城订单
+async function userOrderList(token,phone,index) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/list?orderStatus=&pageNum=1&pageSize=10&sourceApp=DC`
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        // console.log('查询商城订单成功！！！');
+        var total = result.data.total;
+        var list = result.data.list;
+        if (list.length > 0) {
+            addNotifyStr(`\n=======第【${index}】个手机号【${phone}】======\n`, false)
+        }
+        for (var j = 0; j < list.length; j++) {
+            var skuName = list[j].skuName;
+            var orderStatusDetailStr = list[j].orderStatusDetailStr;
+            if (orderStatusDetailStr == '已发货') {
+                addNotifyStr(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
+                var id = list[j].id;
+                await getLogisticsTrackMapInfo(token, id)
+            } else if (orderStatusDetailStr == '代发货') {
+                addNotifyStr(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
+            }
+        }
+    } else {
+        console.log('查询商城订单失败：' + result.message)
+
+    }
+}
+//快递信息
+async function getLogisticsTrackMapInfo(token,orderid) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/cainiao/getLogisticsTrackMapInfo/1/'+orderid;
+    let body = '';
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        //console.log('快递信息查询成功！！！');
+        var datainfo=result.data;
+        var statis=datainfo.detail[0].logisticName;//发货状态
+        var address=datainfo.addressInfo.address;//地址
+        var receiverPhone=datainfo.addressInfo.receiverPhone;//手机
+        var receiverName=datainfo.addressInfo.receiverName;//姓名
+        addNotifyStr1(`地址：【${address}】`,false)
+        addNotifyStr1(`收货人：【${receiverName}】,手机：【${receiverPhone}】`,false)
+        addNotifyStr1(`单号：${datainfo.expressNo}`,false)
+    } else {
+        console.log('快递信息查询失败：' + result.message)
+
+    }
+}
 /**
  * 获取随机诗词
  */
