@@ -109,7 +109,7 @@ let curHour = (new Date()).getHours()
             //await taskList(token);
             //商城订单信息
             await userOrderList(token, phone, index + 1);
-            await $.wait(3000);
+            await $.wait(2000);
 
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
