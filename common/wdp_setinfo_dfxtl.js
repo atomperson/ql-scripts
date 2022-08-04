@@ -213,7 +213,7 @@ async function userOrderList(token,phone,index) {
             }
         }
     } else {
-        console.log('查询商城订单失败：' + result.message)
+        console.log('查询商城订单失败：' + result.message+'第【'+index+'个手机号'+phone+'】')
 
     }
 }
