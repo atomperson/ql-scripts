@@ -9,7 +9,7 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='1'; //为查询库存信息 为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情
+let searchtype='4'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
@@ -34,7 +34,7 @@ let haslist = []
 let nohaslist = []
 
 
-let dfxtlphone=process.env.dfxtlphone;
+let dfxtlphone=process.env.dfxtlphone3;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
@@ -92,7 +92,7 @@ let curHour = (new Date()).getHours()
         if(searchtype==5){
             for (let index = 0; index < userinfo1.length; index++) {
                 let num = index + 1
-               // console.log(`\n============开始【第 ${num} 个账号】============\n`)
+                // console.log(`\n============开始【第 ${num} 个账号】============\n`)
                 var phone = '';
                 phone = userinfo1[index].phone;
                 var token = userinfo1[index].token;
@@ -111,6 +111,7 @@ let curHour = (new Date()).getHours()
                 console.log(`\n============开始【第 ${num} 个账号】============\n`)
                 //登录
                 if(!await dfxtllogin(index)){
+                    userinfo1.push({token: 'fuck', userid: 'nono', phone: dfxtlphoneArr[index]})
                     continue;
                 };
                 await $.wait(200);
