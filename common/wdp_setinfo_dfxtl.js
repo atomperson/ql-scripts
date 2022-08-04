@@ -233,9 +233,9 @@ async function getLogisticsTrackMapInfo(token,orderid) {
         var address=datainfo.addressInfo.address;//地址
         var receiverPhone=datainfo.addressInfo.receiverPhone;//手机
         var receiverName=datainfo.addressInfo.receiverName;//姓名
-        addNotifyStr1(`地址：【${address}】`,false)
-        addNotifyStr1(`收货人：【${receiverName}】,手机：【${receiverPhone}】`,false)
-        addNotifyStr1(`单号：${datainfo.expressNo}`,false)
+        addNotifyStr(`地址：【${address}】`,false)
+        addNotifyStr(`收货人：【${receiverName}】,手机：【${receiverPhone}】`,false)
+        addNotifyStr(`单号：${datainfo.expressNo}`,false)
     } else {
         console.log('快递信息查询失败：' + result.message)
 
