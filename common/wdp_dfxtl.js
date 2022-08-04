@@ -292,7 +292,7 @@ async function queryChoicenessNewList(token) {
             "sendMsgType": 0
         }
         await putComment(token, aa);
-        await $.wait(1000);
+        await $.wait(500);
     }
 
 }
