@@ -158,6 +158,7 @@ async function dfxtllogin(num) {
     }
     if (result.code == 0) {
         dfxtlTokenArr[num].token = result.data.tokenValue;
+        dfxtlTokenArr[num].userid = result.data.userInfoVo.id;
         console.log('token从新获取成功！！！')
     } else {
         console.log('登录失败：' + result.message)
