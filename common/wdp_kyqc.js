@@ -276,9 +276,9 @@ async function share(detail) {
     let result = httpResult;
     if (!result) return
     if (result.code == 0) {
-        console.log('点赞帖子成功');
+        console.log('分享帖子成功');
     } else {
-        console.log('点赞帖子失败' + result.msg);
+        console.log('分享帖子失败' + result.msg);
     }
 }
 
