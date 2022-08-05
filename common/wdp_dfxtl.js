@@ -70,6 +70,10 @@ let curHour = (new Date()).getHours()
             console.log('文件读取错误'+error);
             return
         }
+        if(dfxtlphoneArr.length!=dfxtlTokenArr.length){
+            console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
+            return
+        }
         console.log(`\n=================== 共找到 ${dfxtlTokenArr.length} 个账号 ===================`)
         addNotifyStr1(`【=======查询用户订单信息=======】\n`, false)
         for (let index = 0; index < dfxtlTokenArr.length; index++) {
@@ -110,7 +114,7 @@ let curHour = (new Date()).getHours()
             //await taskList(token);
             //商城订单信息
             await userOrderList(token, phone, index + 1);
-            await $.wait(2000);
+            await $.wait(4000);
 
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
