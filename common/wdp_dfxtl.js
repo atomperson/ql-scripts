@@ -446,7 +446,7 @@ async function scoreGetlist(token) {
         }).map(ele=>{
             scoreamoun+=ele.score;
         })
-        addNotifyStr('今日【'+nowdata+'】获取积分为：【' + scoreamoun+'】',false);
+        addNotifyStr('今日获取积分为：【' + scoreamoun+'】',false);
         var nowdata2=getDate(2);
         datlist.filter(ele=>{
             if(ele.createTime.split(' ')[0]==nowdata2){
@@ -457,7 +457,7 @@ async function scoreGetlist(token) {
         }).map(ele=>{
             scoreamoun1+=ele.score;
         })
-        addNotifyStr('昨日【'+nowdata2+'】获取积分为：【' + scoreamoun1+'】',false);
+        addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
     } else {
         console.log('查询积分记录失败：' + result.message)
     }
