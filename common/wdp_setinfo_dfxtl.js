@@ -12,10 +12,10 @@ const logDebug = 0
 let searchtype='4'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情
 
 const ckkey = 'wbtcCookie';
-const axios = require("axios");
-const fs = require("fs");
-// import axios from "axios";
-// import fs from "fs";
+// const axios = require("axios");
+// const fs = require("fs");
+import axios from "axios";
+import fs from "fs";
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
@@ -38,6 +38,8 @@ let dfxtlphone=process.env.dfxtlphone3;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
+
+
 
 
 
@@ -131,6 +133,7 @@ let curHour = (new Date()).getHours()
                     await changeinfo4(token,userid);//修改姓名
                     await saveUserAddress(token,userid);//修改地址
                 }else if(searchtype==3){
+                    //变量参数为 手机号
                     //抢商品
                     await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
 
@@ -537,6 +540,10 @@ async function userOrdercreate(token,skuId) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/create';
 
     var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
+
+    var body2= {"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王老师","receiverPhone":"15720101086","provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681","address":"百尺竿镇百尺杆村03694号"}
+
+
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
