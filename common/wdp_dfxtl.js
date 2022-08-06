@@ -90,25 +90,18 @@ let curHour = (new Date()).getHours()
             var token = dfxtlTokenArr[index].token;
             var userid = dfxtlTokenArr[index].userid
 
-            // //签到
-            await sign(token, userid);
-            //获取用户信息
-            await infoget(token, userid);
-            // //评论任务  -------------查询最近的帖子
-            await queryChoicenessNewList(token);
-            // //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
-            await followList(token, userid);
+            await sign(token, userid);//签到
+            await infoget(token, userid); //获取用户信息
+            await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
+            await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
 
-            //获取积分信息
-            const score = await scoreGet(token);
+
+            const score = await scoreGet(token);//获取积分信息
             addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             await scoreGetlist(token);
-            //任务完成情况
-            //await taskList(token);
-            //商城订单信息
-            await userOrderList(token, phone, index + 1);
+            //任务完成情况-------//await taskList(token);
+            await userOrderList(token, phone, index + 1); //商城订单信息
             await $.wait(4000);
-
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
         if (changeFlag) {
