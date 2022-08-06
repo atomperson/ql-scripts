@@ -64,6 +64,10 @@ let curHour = (new Date()).getHours()
     if (typeof $request !== "undefined") {
         await GetRewrite()
     } else {
+        if(searchtype==3){
+            console.log("开始强商品 切换为 dfxtlphone5 变量！！！")
+             dfxtlphone=process.env.dfxtlphone5;
+        }
         if (!(await Envs())) return
         console.log('====================\n')
         console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(
