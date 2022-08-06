@@ -102,6 +102,7 @@ let curHour = (new Date()).getHours()
                 //获取积分信息
                 const score = await scoreGet(token);
                 addNotifyStr1(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+                await scoreGetlist(token);
                 //任务完成情况
                 //await taskList(token);
                 //商城订单信息
@@ -188,6 +189,45 @@ async function scoreGet(token) {
     } else {
         console.log('查询积分失败：' + result.message)
 
+    }
+}
+//查询积分记录
+async function scoreGetlist(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/list`
+    let body = {"pageSize":15,"pageNum":1,"operateType":1};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    var scoreamoun=0;
+    var scoreamoun1=0;
+    if (result.code == 0) {
+        var datlist=result.data.list;
+        var nowdata=getDate(1);
+        datlist.filter(ele=>{
+            if(ele.createTime.split(' ')[0]==nowdata){
+                return true
+            }else{
+                return  false;
+            }
+        }).map(ele=>{
+            scoreamoun+=ele.score;
+        })
+        addNotifyStr1('今日获取积分为：【' + scoreamoun+'】',false);
+        var nowdata2=getDate(2);
+        datlist.filter(ele=>{
+            if(ele.createTime.split(' ')[0]==nowdata2){
+                return true
+            }else{
+                return  false;
+            }
+        }).map(ele=>{
+            scoreamoun1+=ele.score;
+        })
+        //addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
+    } else {
+        console.log('查询积分记录失败：' + result.message)
     }
 }
 //查询商城订单
@@ -556,7 +596,24 @@ async function userOrdercreate(token,skuId) {
     }
 }
 ///////////////////////////////////////////////////////////////////
-
+//获取  1 今天   2 昨天
+function getDate(type){
+    var myDate ='';
+    if(type==1){
+        myDate=new Date();
+    }else{
+        var time=(new Date).getTime()-24*60*60*1000;
+        myDate=new Date(time);
+    }
+    const getFullYear = myDate.getFullYear();
+    const getMonth = myDate.getMonth()+1 > 9? myDate.getMonth()+1:'0'+(myDate.getMonth()+1);
+    const date =myDate.getDate() > 9 ? myDate.getDate() : ("0" + myDate.getDate());
+    const getHours = myDate.getHours();
+    const getMinutes = myDate.getMinutes();
+    const getSeconds = myDate.getSeconds();
+    const t = getFullYear+'-'+getMonth+'-'+date;
+    return t;
+}
 async function Envs() {
     if(searchtype==1){
         dfxtlphone = '19121901086';
