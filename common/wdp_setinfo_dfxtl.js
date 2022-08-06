@@ -12,10 +12,10 @@ const logDebug = 0
 let searchtype='4'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
 
 const ckkey = 'wbtcCookie';
-// const axios = require("axios");
-// const fs = require("fs");
-import axios from "axios";
-import fs from "fs";
+const axios = require("axios");
+const fs = require("fs");
+// import axios from "axios";
+// import fs from "fs";
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
