@@ -594,7 +594,7 @@ async function userOrdercreate(token,skuId,phone) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('购买商品成功！【'+phone+'】，地址【'+body.addres);
+        console.log('购买商品成功！【'+phone+'】，地址【'+body.address);
         console.log('姓名【'+body.receiverName+'】电话 【'+body.receiverPhone+'】\n');
     } else {
         console.log('购买商品失败：' + result.message)
