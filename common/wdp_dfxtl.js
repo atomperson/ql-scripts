@@ -9,29 +9,19 @@ const jsname = '东风雪铁龙'
 const $ = Env('东风雪铁龙')
 const logDebug = 0
 
-const ckkey = 'wbtcCookie';
 const axios = require("axios");
 const fs = require("fs");
 // import axios from "axios";
 // import fs from "fs";
 
-
 // const firstFile = require('./firstFile.json');
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
-
-let searchflag = '1'; //1 默认用token  2 查询数据token
-
 
 let notifyStr = ''
 let notifyStr1 = ''
 let httpResult //global buffer
 
-let userCookie = ($.isNode() ? process.env[ckkey] : $.getdata(ckkey)) || '';
-
-
-let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
-let userList = []
 
 let dfxtlphone=process.env.dfxtlphone;
 let dfxtlpassword=process.env.dfxtlpassword;
@@ -41,6 +31,7 @@ let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
+let username = '';
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr=[];//图片资源
 let followlistArr =[];//关注人的集合
@@ -101,6 +92,8 @@ let curHour = (new Date()).getHours()
 
             // //签到
             await sign(token, userid);
+            //获取用户信息
+            await infoget(token, userid);
             // //评论任务  -------------查询最近的帖子
             await queryChoicenessNewList(token);
             // //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
@@ -180,6 +173,21 @@ async function sign(token, userid) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         // console.log('签到成功')
+    } else {
+        // console.log('签到失败：' + result.message)
+    }
+}
+//获取用户信息
+async function infoget(token, userid) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-u/v1/user/info/get';
+    let body = ''
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    if (result.code == 0) {
+        username= result.data.nickName;
     } else {
         // console.log('签到失败：' + result.message)
     }
@@ -378,7 +386,106 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
 
     }
 }
+async function randomtitle(title) {
 
+    var titleresult=[];
+    titleresult.push(username+"的分享"+'     '+title);
+    titleresult.push(title+'      ' +username+"的分享");
+    titleresult.push(username+"的分享"+'-----'+title);
+    titleresult.push(title+'-------' +username+"的分享");
+    titleresult.push(title);
+    titleresult.push(title+' ');
+    titleresult.push(title+' 、');
+    titleresult.push(title+'  ');
+    titleresult.push(title+'   ');
+    titleresult.push(title+'     ');
+    titleresult.push(title+'      ');
+    titleresult.push(title+'       ');
+    titleresult.push(title+'      ');
+    titleresult.push(title+'  ');
+    titleresult.push(title+'  1');
+    titleresult.push(title+'  2');
+    titleresult.push(title+'  3');
+    titleresult.push(title+'  4');
+    titleresult.push(title+'  5');
+    titleresult.push(title+'  6');
+    titleresult.push(title+'  7');
+    titleresult.push(title+'  8');
+    titleresult.push(title+'  9');
+    titleresult.push(title+'  0');
+    titleresult.push(title+'  success');
+    titleresult.push(title+'  cover');
+
+    titleresult.push(title+'-------' +username);
+    titleresult.push(username+"的生活"+'     '+title);
+    titleresult.push(title+'      ' +username+"的生活");
+    titleresult.push(username+"的生活"+'-----'+title);
+    titleresult.push(title+'-------' +username+"的生活");
+    titleresult.push(username+"的生活"+'     ');
+    titleresult.push('      ' +username+"的生活");
+    titleresult.push(username+"的生活"+'-----');
+    titleresult.push('-------' +username+"的生活");
+    titleresult.push(username+"--雪铁龙加油"+'     ');
+    titleresult.push('      ' +username+"雪铁龙加油");
+    titleresult.push(username+"雪铁龙加油"+'-----');
+    titleresult.push('-------' +username+"雪铁龙加油");
+    titleresult.push(username+"--凡尔赛之神"+'     ');
+    titleresult.push('      ' +username+"--凡尔赛之神");
+    titleresult.push(username+"--凡尔赛之神"+'-----');
+    titleresult.push('-------' +username+"--凡尔赛之神");
+
+    titleresult.push('by '+username+"--凡尔赛之神"+'     ');
+    titleresult.push('     by ' +username+"--凡尔赛之神");
+    titleresult.push(username+"--凡尔赛之神"+'-----');
+    titleresult.push('-------' +username+"--凡尔赛之神");
+
+    titleresult.push("--凡尔赛之神"+'  by '+username);
+    titleresult.push("--凡尔赛之神"+'-----by '+username);
+    titleresult.push("--小凡尔赛"+'             by '+username);
+    titleresult.push("--小凡尔赛"+'----       -by '+username);
+
+    titleresult.push("--雪铁龙加油"+'  by 【'+username+'】');
+    titleresult.push("--雪铁龙加油"+'-----by  '+username);
+    titleresult.push("--雪铁龙加油"+'             by --'+username);
+    titleresult.push("--雪铁龙加油"+'----       -by '+username);
+
+    titleresult.push("--祝雪铁龙大卖"+'  by 【'+username+'】');
+    titleresult.push("--祝雪铁龙大卖"+'-----by  '+username);
+    titleresult.push("--祝雪铁龙大卖"+'             by --'+username);
+    titleresult.push("--祝雪铁龙大卖"+'----       -by '+username);
+    titleresult.push("--祝雪铁龙大卖"+'              '+username);
+
+    titleresult.push("--开上凡尔赛--- 一生凡尔赛"+'  by 【'+username+'】');
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'-----by  '+username);
+    titleresult.push("--开上凡尔赛 --一生凡尔赛"+'             by --'+username);
+    titleresult.push("--开上凡尔赛 -一生凡尔赛"+'----       -by '+username);
+    titleresult.push("--开上凡尔赛，一生凡尔赛"+'              '+username);
+
+
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'  by 【'+username+'】');
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'-----by  '+username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'             by --'+username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'----       -by '+username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'              '+username);
+
+
+    titleresult.push("开上凡尔赛，一生凡尔赛"+'  by 【'+username+'】');
+    titleresult.push("开上凡尔赛，一生凡尔赛"+'-----by  '+username);
+    titleresult.push("开上凡尔赛，一生凡尔赛"+'             by --'+username);
+    titleresult.push("开上凡尔赛，一生凡尔赛"+'----       -by '+username);
+    titleresult.push("开上凡尔赛，一生凡尔赛"+'              '+username);
+
+    titleresult.push("雪铁龙 yyds"+'  by 【'+username+'】');
+    titleresult.push("雪铁龙 yyds"+'-----by  '+username);
+    titleresult.push("雪铁龙 yyds"+'             by --'+username);
+    titleresult.push("雪铁龙 yyds"+'----       -by '+username);
+    titleresult.push("雪铁龙 yyds"+'              '+username);
+
+    var aNumber = (titleresult.length) * Math.random();
+    var aNumber1 = Math.floor(aNumber);
+    return titleresult[aNumber1];
+
+}
 //发表帖子---
 async function publishPostsNew(token, data1, userid) {
     var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
@@ -386,7 +493,7 @@ async function publishPostsNew(token, data1, userid) {
     data.content = data1.content;
     var str2 = data1.content.replace("<p>", "").replace("</p>", "");
     data.paragraphs.paragraphContent = str2;//去掉p 标签
-    data.title = data1.title;
+    data.title =await randomtitle(data1.title);
     data.userId = userid;
     data.bbsFile[0].createBy = userid;
     data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
@@ -462,7 +569,7 @@ async function scoreGetlist(token) {
         }).map(ele=>{
             scoreamoun1+=ele.score;
         })
-        addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
+        //addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
     } else {
         console.log('查询积分记录失败：' + result.message)
     }
@@ -657,28 +764,7 @@ async function GetRewrite() {
         let uid = ppu.match(/UID=(\w+)/)[1]
         let ck = 'PPU=' + ppu
 
-        if (userCookie) {
-            if (userCookie.indexOf('UID=' + uid) == -1) {
-                userCookie = userCookie + '@' + ck
-                $.setdata(userCookie, ckkey);
-                ckList = userCookie.split('@')
-                $.msg(jsname + ` 获取第${ckList.length}个${ckkey}成功: ${ck}`)
-            } else {
-                console.log(jsname + ` 找到重复的${ckkey}，准备替换: ${ck}`)
-                ckList = userCookie.split('@')
-                for (let i = 0; i < ckList.length; i++) {
-                    if (ckList[i].indexOf('UID=' + uid) > -1) {
-                        ckList[i] = ck
-                        break;
-                    }
-                }
-                userCookie = ckList.join('@')
-                $.setdata(userCookie, ckkey);
-            }
-        } else {
-            $.setdata(ck, ckkey);
-            $.msg(jsname + ` 获取第1个${ckkey}成功: ${ck}`)
-        }
+
     }
 }
 
