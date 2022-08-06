@@ -9,7 +9,7 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='4'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
+let searchtype='3'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
 
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
@@ -66,7 +66,7 @@ let curHour = (new Date()).getHours()
     } else {
         if(searchtype==3){
             console.log("开始强商品 切换为 dfxtlphone5 变量！！！")
-             dfxtlphone=process.env.dfxtlphone5;
+            dfxtlphone=process.env.dfxtlphone5;
         }
         if (!(await Envs())) return
         console.log('====================\n')
@@ -140,7 +140,7 @@ let curHour = (new Date()).getHours()
                 }else if(searchtype==3){
                     //变量参数为 手机号
                     //抢商品
-                    await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
+                    await userOrdercreate(token,'1031569179343501243',dfxtlphoneArr[index]);
 
                 }else if(searchtype==4){
                     //获取用户token 并保存
@@ -580,12 +580,12 @@ async function saveUserAddress(token) {
     }
 }
 //购买商品
-async function userOrdercreate(token,skuId) {
+async function userOrdercreate(token,skuId,phone) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/create';
 
-    var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
+    //var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
 
-    var body2= {"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王老师","receiverPhone":"15720101086","provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681","address":"百尺竿镇百尺杆村03694号"}
+    var body= {"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王老师","receiverPhone":"15720101086","provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681","address":"百尺竿镇百尺杆村03694号"}
 
 
     let urlObject = populateUrlObject(url, token, body)
@@ -594,7 +594,8 @@ async function userOrdercreate(token,skuId) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('购买商品成功！！！');
+        console.log('购买商品成功！【'+phone+'】，地址【'+body.addres);
+        console.log('姓名【'+body.receiverName+'】电话 【'+body.receiverPhone+'】\n');
     } else {
         console.log('购买商品失败：' + result.message)
     }
