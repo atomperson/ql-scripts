@@ -67,6 +67,7 @@ let curHour = (new Date()).getHours()
             console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
             return
         }
+        console.log(`\n openflag 为  ${openflag} 执行操作为 ： ${(openflag==1?'账号做任务':'查询账号积分信息和快递信息')}\n`)
         console.log(`\n=================== 共找到 ${dfxtlTokenArr.length} 个账号 ===================`)
         addNotifyStr1(`【=======查询用户订单信息=======】\n`, false)
         for (let index = 0; index < dfxtlTokenArr.length; index++) {
