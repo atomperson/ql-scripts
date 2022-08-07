@@ -38,7 +38,7 @@ let followlistArr = [];//关注人的集合
 let NewListArr = [];//最新的帖子的集合
 let phoneErrorArr = [];//错误手机号集合
 let phoneSuccessArr = [];//正确手机号集合
-let checkphone=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
+let checkphoneFlag=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -115,7 +115,7 @@ let curHour = (new Date()).getHours()
             })
         }
         //是否生成 错误和 正确手机数组
-        if (checkphone) {
+        if (checkphoneFlag) {
             checkphone();
         }
 
