@@ -3,7 +3,7 @@
 
 [task_local]
 #东风雪铁龙
-0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
+6 0,5,12,17 * * * wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
 */
 const jsname = '东风雪铁龙'
 const $ = new Env('东风雪铁龙');
