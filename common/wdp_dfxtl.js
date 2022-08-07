@@ -15,7 +15,8 @@ const fs = require("fs");
 // import fs from "fs";
 
 const openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
-// const firstFile = require('./firstFile.json');
+let checkphoneFlag=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
+
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
 
@@ -38,7 +39,6 @@ let followlistArr = [];//关注人的集合
 let NewListArr = [];//最新的帖子的集合
 let phoneErrorArr = [];//错误手机号集合
 let phoneSuccessArr = [];//正确手机号集合
-let checkphoneFlag=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -67,7 +67,8 @@ let curHour = (new Date()).getHours()
             console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
             return
         }
-        console.log(`\n openflag 为  ${openflag} 执行操作为 ： ${(openflag==1?'账号做任务':'查询账号积分信息和快递信息')}\n`)
+        console.log(`\n openflag 为  ${openflag} 执行操作为 ：【 ${(openflag==1?'账号做任务':'查询账号积分信息和快递信息')}】\n`)
+        console.log(`\n checkphoneFlag 为  ${checkphoneFlag} 执行操作为 ：【 ${(checkphoneFlag==true?'错误账号生成json文件':'不进行错误账号json文件')}】\n`)
         console.log(`\n=================== 共找到 ${dfxtlTokenArr.length} 个账号 ===================`)
         addNotifyStr1(`【=======查询用户订单信息=======】\n`, false)
         for (let index = 0; index < dfxtlTokenArr.length; index++) {
