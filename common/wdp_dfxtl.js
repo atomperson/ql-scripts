@@ -14,6 +14,7 @@ const fs = require("fs");
 // import axios from "axios";
 // import fs from "fs";
 
+const openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
 // const firstFile = require('./firstFile.json');
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -23,19 +24,22 @@ let notifyStr1 = ''
 let httpResult //global buffer
 
 
-let dfxtlphone=process.env.dfxtlphone;
-let dfxtlpassword=process.env.dfxtlpassword;
-let Sign=process.env.dfxtlSign;   //app的sign 签名
-let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
+let dfxtlphone = process.env.dfxtlphone;
+let dfxtlpassword = process.env.dfxtlpassword;
+let Sign = process.env.dfxtlSign;   //app的sign 签名
+let TimeStamp = process.env.dfxtlTime//app的sign 签名时间
 
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
 let username = '';
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
-let imageArr=[];//图片资源
-let followlistArr =[];//关注人的集合
-let NewListArr =[];//最新的帖子的集合
+let imageArr = [];//图片资源
+let followlistArr = [];//关注人的集合
+let NewListArr = [];//最新的帖子的集合
+let phoneErrorArr = [];//错误手机号集合
+let phoneSuccessArr = [];//正确手机号集合
+let checkphone=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
@@ -48,20 +52,19 @@ let curHour = (new Date()).getHours()
     } else {
         if (!(await Envs())) return
         console.log('====================\n')
-        console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(
-            new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
-            8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
+        console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
 
         //读取文件token    同步方法 不需要回调函数,出错直接抛出
         try {
-            let fireData = fs.readFileSync("./userinfo.json","utf-8");
-            // console.log(fireData);
-            dfxtlTokenArr=JSON.parse(fireData);
+            let fireData = fs.readFileSync("./userinfo.json", "utf-8");
+            dfxtlTokenArr = JSON.parse(fireData);
         } catch (error) {
-            console.log('文件读取错误'+error);
+            console.log('文件读取错误' + error);
             return
         }
-        if(dfxtlphoneArr.length!=dfxtlTokenArr.length){
+        console.log('手机号数组数量：' + dfxtlphoneArr.length);
+        console.log('token数组数量：' + dfxtlTokenArr.length);
+        if (dfxtlphoneArr.length != dfxtlTokenArr.length) {
             console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
             return
         }
@@ -74,48 +77,50 @@ let curHour = (new Date()).getHours()
             let num = index + 1;
             if (test100(index)) {
                 console.log('\n============开始【第' + num + '个账号:' + phone + '】\n')
-            }         //console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
+            }
             //token 校验  只是校验token是否正确
             if (await getSignStatus(dfxtlTokenArr[index].token)) {
                 console.log(`【第 (${index + 1}) 个手机号:${phone},token失效】`);
                 await dfxtllogin(index);
                 changeFlag = true;
             }
-
             await $.wait(500);
             if (dfxtlTokenArr[index].token == '') {
                 addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
+                phoneErrorArr.push(phone);//错误手机数组
                 continue;
             }
+            phoneSuccessArr.push(phone);//正确手机数组
             var token = dfxtlTokenArr[index].token;
             var userid = dfxtlTokenArr[index].userid
-
-            await sign(token, userid);//签到
-            await infoget(token, userid); //获取用户信息
-            await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
-            await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制 再去复制帖子 发帖
-
-
+            if (openflag == 1) {
+                await sign(token, userid);//签到
+                await infoget(token, userid); //获取用户信息
+                await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
+                await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
+                await $.wait(4000);
+            }
             const score = await scoreGet(token);//获取积分信息
             addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             await scoreGetlist(token);
             //任务完成情况-------//await taskList(token);
             await userOrderList(token, phone, index + 1); //商城订单信息
-            await $.wait(4000);
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
         if (changeFlag) {
             console.log("需要修改文件\n");
             //修改文件
-            fs.writeFile(
-                "./userinfo.json",
-                JSON.stringify(dfxtlTokenArr),
-                (err) => {
-                    if (err) console.log(err);
-                    console.log("文件修改完成\n");
-                }
-            )
+            fs.writeFile("./userinfo.json", JSON.stringify(dfxtlTokenArr), (err) => {
+                if (err) console.log(err);
+                console.log("文件修改完成\n");
+            })
         }
+        //是否生成 错误和 正确手机数组
+        if (checkphone) {
+            checkphone();
+        }
+
+
         showmsg()
 
     }
@@ -125,6 +130,23 @@ let curHour = (new Date()).getHours()
 
 
 /////---------------------------方法
+
+async function checkphone(){
+        //修改文件
+        fs.writeFile("./phone1.json",
+            JSON.stringify(phoneErrorArr),
+            (err) => {
+                if (err) console.log(err);
+                console.log("文件修改完成1\n");
+            })
+        //修改文件
+        fs.writeFile("./phone2.json",
+            JSON.stringify(phoneSuccessArr),
+            (err) => {
+                if (err) console.log(err);
+                console.log("文件修改完成2\n");
+            });
+}
 // d东风雪铁龙登录
 async function dfxtllogin(num) {
     var phone = '';
@@ -143,7 +165,7 @@ async function dfxtllogin(num) {
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) {
-        dfxtlTokenArr[num].token='';
+        dfxtlTokenArr[num].token = '';
         return
     }
     if (result.code == 0) {
@@ -152,7 +174,7 @@ async function dfxtllogin(num) {
         console.log('token从新获取成功！！！')
     } else {
         console.log('登录失败：' + result.message)
-        dfxtlTokenArr[num].token='';
+        dfxtlTokenArr[num].token = '';
     }
 }
 
@@ -170,6 +192,7 @@ async function sign(token, userid) {
         // console.log('签到失败：' + result.message)
     }
 }
+
 //获取用户信息
 async function infoget(token, userid) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-u/v1/user/info/get';
@@ -180,23 +203,25 @@ async function infoget(token, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        username= result.data.nickName;
+        username = result.data.nickName;
     } else {
         // console.log('签到失败：' + result.message)
     }
 }
+
 async function getSignStatus(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/sign/getSignStatus`;
     let body = ''
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('get', urlObject)
     let result = httpResult;
-    if(result.code == 0){
+    if (result.code == 0) {
         return false;
-    }else{
+    } else {
         return true;
     }
 }
+
 //评论列表查询
 async function selectAdvertCarousel(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/advertising/selectAdvertCarousel?pushPosition=1`
@@ -262,7 +287,7 @@ async function putComment(token, data) {
 
 //查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
 async function queryChoicenessNewList(token) {
-    if(NewListArr.length==0){
+    if (NewListArr.length == 0) {
         //1102626767558049804
         let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
         let body = {"pageNum": "1", "pageSize": "200"};//一次查100条
@@ -273,7 +298,7 @@ async function queryChoicenessNewList(token) {
         //console.log(JSON.stringify(result))
         if (result.code == 0) {
             // console.log('最近帖子 查询需要评论的帖子成功！！！')
-            NewListArr= result.data.list;
+            NewListArr = result.data.list;
         } else {
             console.log('通过主题id 查询需要评论的帖子失败：' + result.message)
         }
@@ -310,7 +335,7 @@ async function followList(token, userid) {
     //followlistArr 关注人数的数组
     if (followlistArr.length == 0) {
         let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/follow/followList`
-        let body ={"pageNum":"1","pageSize":"100","userId":"1110115713052827653"}; //主账号157得关注 写死
+        let body = {"pageNum": "1", "pageSize": "100", "userId": "1110115713052827653"}; //主账号157得关注 写死
         let urlObject = populateUrlObject(url, token, body)
         await httpRequest('post', urlObject)
         let result = httpResult;
@@ -318,8 +343,8 @@ async function followList(token, userid) {
         // console.log(JSON.stringify(result))
         if (result.code == 0) {
             // console.log('查询 账号关注的用户数量成功！！！');
-            var  followlistArrddd = result.data.list;
-            followlistArr= followlistArrddd.map(ele=>{
+            var followlistArrddd = result.data.list;
+            followlistArr = followlistArrddd.map(ele => {
                 return ele.userId;
             })
         } else {
@@ -338,11 +363,11 @@ async function followList(token, userid) {
 }
 
 //查询某个用户发帖数
-async function queryChoicenessByUserDTO(token, userid,otherid) {
+async function queryChoicenessByUserDTO(token, userid, otherid) {
     //如果图片有数据则查询20条 第一次查询需查询多点 这样可以图片多
-    var pageSize=30;
-    if(imageArr.length==0){
-        pageSize=500;
+    var pageSize = 30;
+    if (imageArr.length == 0) {
+        pageSize = 500;
     }
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessByUserDTO`
     let body = {"pageNum": "1", "pageSize": pageSize, "userId": otherid};
@@ -355,10 +380,10 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
         // console.log('查询某个用户发帖数成功！！！')
         var total = result.data.total;
         //组织随机图片数据------------------------
-        if(imageArr.length==0){
+        if (imageArr.length == 0) {
             for (var i = 0; i < total; i++) {
-                var imagelist=result.data.list[i].fileVOList;
-                if(imagelist.length>0){
+                var imagelist = result.data.list[i].fileVOList;
+                if (imagelist.length > 0) {
                     for (var j = 0; j < imagelist.length; j++) {
                         imageArr.push(imagelist[j].fileAddress);
                     }
@@ -379,106 +404,108 @@ async function queryChoicenessByUserDTO(token, userid,otherid) {
 
     }
 }
+
 async function randomtitle(title) {
 
-    var titleresult=[];
-    titleresult.push(username+"的分享"+'     '+title);
-    titleresult.push(title+'      ' +username+"的分享");
-    titleresult.push(username+"的分享"+'-----'+title);
-    titleresult.push(title+'-------' +username+"的分享");
+    var titleresult = [];
+    titleresult.push(username + "的分享" + '     ' + title);
+    titleresult.push(title + '      ' + username + "的分享");
+    titleresult.push(username + "的分享" + '-----' + title);
+    titleresult.push(title + '-------' + username + "的分享");
     titleresult.push(title);
-    titleresult.push(title+' ');
-    titleresult.push(title+' 、');
-    titleresult.push(title+'  ');
-    titleresult.push(title+'   ');
-    titleresult.push(title+'     ');
-    titleresult.push(title+'      ');
-    titleresult.push(title+'       ');
-    titleresult.push(title+'      ');
-    titleresult.push(title+'  ');
-    titleresult.push(title+'  1');
-    titleresult.push(title+'  2');
-    titleresult.push(title+'  3');
-    titleresult.push(title+'  4');
-    titleresult.push(title+'  5');
-    titleresult.push(title+'  6');
-    titleresult.push(title+'  7');
-    titleresult.push(title+'  8');
-    titleresult.push(title+'  9');
-    titleresult.push(title+'  0');
-    titleresult.push(title+'  success');
-    titleresult.push(title+'  cover');
+    titleresult.push(title + ' ');
+    titleresult.push(title + ' 、');
+    titleresult.push(title + '  ');
+    titleresult.push(title + '   ');
+    titleresult.push(title + '     ');
+    titleresult.push(title + '      ');
+    titleresult.push(title + '       ');
+    titleresult.push(title + '      ');
+    titleresult.push(title + '  ');
+    titleresult.push(title + '  1');
+    titleresult.push(title + '  2');
+    titleresult.push(title + '  3');
+    titleresult.push(title + '  4');
+    titleresult.push(title + '  5');
+    titleresult.push(title + '  6');
+    titleresult.push(title + '  7');
+    titleresult.push(title + '  8');
+    titleresult.push(title + '  9');
+    titleresult.push(title + '  0');
+    titleresult.push(title + '  success');
+    titleresult.push(title + '  cover');
 
-    titleresult.push(title+'-------' +username);
-    titleresult.push(username+"的生活"+'     '+title);
-    titleresult.push(title+'      ' +username+"的生活");
-    titleresult.push(username+"的生活"+'-----'+title);
-    titleresult.push(title+'-------' +username+"的生活");
-    titleresult.push(username+"的生活"+'     ');
-    titleresult.push('      ' +username+"的生活");
-    titleresult.push(username+"的生活"+'-----');
-    titleresult.push('-------' +username+"的生活");
-    titleresult.push(username+"--雪铁龙加油"+'     ');
-    titleresult.push('      ' +username+"雪铁龙加油");
-    titleresult.push(username+"雪铁龙加油"+'-----');
-    titleresult.push('-------' +username+"雪铁龙加油");
-    titleresult.push(username+"--凡尔赛之神"+'     ');
-    titleresult.push('      ' +username+"--凡尔赛之神");
-    titleresult.push(username+"--凡尔赛之神"+'-----');
-    titleresult.push('-------' +username+"--凡尔赛之神");
+    titleresult.push(title + '-------' + username);
+    titleresult.push(username + "的生活" + '     ' + title);
+    titleresult.push(title + '      ' + username + "的生活");
+    titleresult.push(username + "的生活" + '-----' + title);
+    titleresult.push(title + '-------' + username + "的生活");
+    titleresult.push(username + "的生活" + '     ');
+    titleresult.push('      ' + username + "的生活");
+    titleresult.push(username + "的生活" + '-----');
+    titleresult.push('-------' + username + "的生活");
+    titleresult.push(username + "--雪铁龙加油" + '     ');
+    titleresult.push('      ' + username + "雪铁龙加油");
+    titleresult.push(username + "雪铁龙加油" + '-----');
+    titleresult.push('-------' + username + "雪铁龙加油");
+    titleresult.push(username + "--凡尔赛之神" + '     ');
+    titleresult.push('      ' + username + "--凡尔赛之神");
+    titleresult.push(username + "--凡尔赛之神" + '-----');
+    titleresult.push('-------' + username + "--凡尔赛之神");
 
-    titleresult.push('by '+username+"--凡尔赛之神"+'     ');
-    titleresult.push('     by ' +username+"--凡尔赛之神");
-    titleresult.push(username+"--凡尔赛之神"+'-----');
-    titleresult.push('-------' +username+"--凡尔赛之神");
+    titleresult.push('by ' + username + "--凡尔赛之神" + '     ');
+    titleresult.push('     by ' + username + "--凡尔赛之神");
+    titleresult.push(username + "--凡尔赛之神" + '-----');
+    titleresult.push('-------' + username + "--凡尔赛之神");
 
-    titleresult.push("--凡尔赛之神"+'  by '+username);
-    titleresult.push("--凡尔赛之神"+'-----by '+username);
-    titleresult.push("--小凡尔赛"+'             by '+username);
-    titleresult.push("--小凡尔赛"+'----       -by '+username);
+    titleresult.push("--凡尔赛之神" + '  by ' + username);
+    titleresult.push("--凡尔赛之神" + '-----by ' + username);
+    titleresult.push("--小凡尔赛" + '             by ' + username);
+    titleresult.push("--小凡尔赛" + '----       -by ' + username);
 
-    titleresult.push("--雪铁龙加油"+'  by 【'+username+'】');
-    titleresult.push("--雪铁龙加油"+'-----by  '+username);
-    titleresult.push("--雪铁龙加油"+'             by --'+username);
-    titleresult.push("--雪铁龙加油"+'----       -by '+username);
+    titleresult.push("--雪铁龙加油" + '  by 【' + username + '】');
+    titleresult.push("--雪铁龙加油" + '-----by  ' + username);
+    titleresult.push("--雪铁龙加油" + '             by --' + username);
+    titleresult.push("--雪铁龙加油" + '----       -by ' + username);
 
-    titleresult.push("--祝雪铁龙大卖"+'  by 【'+username+'】');
-    titleresult.push("--祝雪铁龙大卖"+'-----by  '+username);
-    titleresult.push("--祝雪铁龙大卖"+'             by --'+username);
-    titleresult.push("--祝雪铁龙大卖"+'----       -by '+username);
-    titleresult.push("--祝雪铁龙大卖"+'              '+username);
+    titleresult.push("--祝雪铁龙大卖" + '  by 【' + username + '】');
+    titleresult.push("--祝雪铁龙大卖" + '-----by  ' + username);
+    titleresult.push("--祝雪铁龙大卖" + '             by --' + username);
+    titleresult.push("--祝雪铁龙大卖" + '----       -by ' + username);
+    titleresult.push("--祝雪铁龙大卖" + '              ' + username);
 
-    titleresult.push("--开上凡尔赛--- 一生凡尔赛"+'  by 【'+username+'】');
-    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'-----by  '+username);
-    titleresult.push("--开上凡尔赛 --一生凡尔赛"+'             by --'+username);
-    titleresult.push("--开上凡尔赛 -一生凡尔赛"+'----       -by '+username);
-    titleresult.push("--开上凡尔赛，一生凡尔赛"+'              '+username);
-
-
-    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'  by 【'+username+'】');
-    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'-----by  '+username);
-    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'             by --'+username);
-    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'----       -by '+username);
-    titleresult.push("--开上凡尔赛 ---一生凡尔赛"+'              '+username);
+    titleresult.push("--开上凡尔赛--- 一生凡尔赛" + '  by 【' + username + '】');
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛" + '-----by  ' + username);
+    titleresult.push("--开上凡尔赛 --一生凡尔赛" + '             by --' + username);
+    titleresult.push("--开上凡尔赛 -一生凡尔赛" + '----       -by ' + username);
+    titleresult.push("--开上凡尔赛，一生凡尔赛" + '              ' + username);
 
 
-    titleresult.push("开上凡尔赛，一生凡尔赛"+'  by 【'+username+'】');
-    titleresult.push("开上凡尔赛，一生凡尔赛"+'-----by  '+username);
-    titleresult.push("开上凡尔赛，一生凡尔赛"+'             by --'+username);
-    titleresult.push("开上凡尔赛，一生凡尔赛"+'----       -by '+username);
-    titleresult.push("开上凡尔赛，一生凡尔赛"+'              '+username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛" + '  by 【' + username + '】');
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛" + '-----by  ' + username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛" + '             by --' + username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛" + '----       -by ' + username);
+    titleresult.push("--开上凡尔赛 ---一生凡尔赛" + '              ' + username);
 
-    titleresult.push("雪铁龙 yyds"+'  by 【'+username+'】');
-    titleresult.push("雪铁龙 yyds"+'-----by  '+username);
-    titleresult.push("雪铁龙 yyds"+'             by --'+username);
-    titleresult.push("雪铁龙 yyds"+'----       -by '+username);
-    titleresult.push("雪铁龙 yyds"+'              '+username);
+
+    titleresult.push("开上凡尔赛，一生凡尔赛" + '  by 【' + username + '】');
+    titleresult.push("开上凡尔赛，一生凡尔赛" + '-----by  ' + username);
+    titleresult.push("开上凡尔赛，一生凡尔赛" + '             by --' + username);
+    titleresult.push("开上凡尔赛，一生凡尔赛" + '----       -by ' + username);
+    titleresult.push("开上凡尔赛，一生凡尔赛" + '              ' + username);
+
+    titleresult.push("雪铁龙 yyds" + '  by 【' + username + '】');
+    titleresult.push("雪铁龙 yyds" + '-----by  ' + username);
+    titleresult.push("雪铁龙 yyds" + '             by --' + username);
+    titleresult.push("雪铁龙 yyds" + '----       -by ' + username);
+    titleresult.push("雪铁龙 yyds" + '              ' + username);
 
     var aNumber = (titleresult.length) * Math.random();
     var aNumber1 = Math.floor(aNumber);
     return titleresult[aNumber1];
 
 }
+
 //发表帖子---
 async function publishPostsNew(token, data1, userid) {
     var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
@@ -486,7 +513,7 @@ async function publishPostsNew(token, data1, userid) {
     data.content = data1.content;
     var str2 = data1.content.replace("<p>", "").replace("</p>", "");
     data.paragraphs.paragraphContent = str2;//去掉p 标签
-    data.title =await randomtitle(data1.title);
+    data.title = await randomtitle(data1.title);
     data.userId = userid;
     data.bbsFile[0].createBy = userid;
     data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
@@ -531,42 +558,43 @@ async function scoreGet(token) {
 //查询积分记录
 async function scoreGetlist(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/list`
-    let body = {"pageSize":15,"pageNum":1,"operateType":1};
+    let body = {"pageSize": 15, "pageNum": 1, "operateType": 1};
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
     //console.log(JSON.stringify(result))
-    var scoreamoun=0;
-    var scoreamoun1=0;
+    var scoreamoun = 0;
+    var scoreamoun1 = 0;
     if (result.code == 0) {
-        var datlist=result.data.list;
-        var nowdata=getDate(1);
-        datlist.filter(ele=>{
-            if(ele.createTime.split(' ')[0]==nowdata){
+        var datlist = result.data.list;
+        var nowdata = getDate(1);
+        datlist.filter(ele => {
+            if (ele.createTime.split(' ')[0] == nowdata) {
                 return true
-            }else{
-                return  false;
+            } else {
+                return false;
             }
-        }).map(ele=>{
-            scoreamoun+=ele.score;
+        }).map(ele => {
+            scoreamoun += ele.score;
         })
-        addNotifyStr('今日获取积分为：【' + scoreamoun+'】',false);
-        var nowdata2=getDate(2);
-        datlist.filter(ele=>{
-            if(ele.createTime.split(' ')[0]==nowdata2){
+        addNotifyStr('今日获取积分为：【' + scoreamoun + '】', false);
+        var nowdata2 = getDate(2);
+        datlist.filter(ele => {
+            if (ele.createTime.split(' ')[0] == nowdata2) {
                 return true
-            }else{
-                return  false;
+            } else {
+                return false;
             }
-        }).map(ele=>{
-            scoreamoun1+=ele.score;
+        }).map(ele => {
+            scoreamoun1 += ele.score;
         })
         //addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
     } else {
         console.log('查询积分记录失败：' + result.message)
     }
 }
+
 //查询任务完成情况
 async function taskList(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/member/taskList`
@@ -592,7 +620,7 @@ async function taskList(token) {
         })
         // addNotifyStr('任务完成情况:',false);
         for (let index = 0; index < taskinfo.length; index++) {
-            addNotifyStr(`${taskinfo[index].name}:${taskinfo[index].isfinish}(${taskinfo[index].total})`,false)
+            addNotifyStr(`${taskinfo[index].name}:${taskinfo[index].isfinish}(${taskinfo[index].total})`, false)
         }
     } else {
         console.log('查询任务完成情况失败：' + result.message)
@@ -601,7 +629,7 @@ async function taskList(token) {
 }
 
 //查询商城订单
-async function userOrderList(token,phone,index) {
+async function userOrderList(token, phone, index) {
     let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/list?orderStatus=&pageNum=1&pageSize=10&sourceApp=DC`
     let body = '';
     let urlObject = populateUrlObject(url, token, body)
@@ -632,9 +660,10 @@ async function userOrderList(token,phone,index) {
 
     }
 }
+
 //查询商品详情  87ebbfb3cb036f9247e993a1401ec006
-async function userCommodity(token,commodityId) {
-    let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userCommodity/detail?commodityId=`+commodityId;
+async function userCommodity(token, commodityId) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userCommodity/detail?commodityId=` + commodityId;
     let body = '';
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('get', urlObject)
@@ -643,13 +672,13 @@ async function userCommodity(token,commodityId) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         // console.log('查询商城订单成功！！！');
-        var total=result.data.total;
-        addNotifyStr(`订单数量：【 ${total}【个`,false)
-        var list=result.data.list;
+        var total = result.data.total;
+        addNotifyStr(`订单数量：【 ${total}【个`, false)
+        var list = result.data.list;
         for (var j = 0; j < list.length; j++) {
-            var skuName= list[j].skuName;
-            var orderStatusDetailStr= list[j].orderStatusDetailStr;
-            addNotifyStr(`[${j+1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`,false)
+            var skuName = list[j].skuName;
+            var orderStatusDetailStr = list[j].orderStatusDetailStr;
+            addNotifyStr(`[${j + 1}]:商品名称：${skuName} 状态：${orderStatusDetailStr}`, false)
         }
     } else {
         console.log('查询商城订单失败：' + result.message)
@@ -660,7 +689,18 @@ async function userCommodity(token,commodityId) {
 //地址保存
 async function saveUserAddress(token) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/userAddress/saveUserAddress';
-    let body = {"receiverName":"王先生","receiverPhone":"19121901086","address":"百尺竿镇 百尺杆村村东农村信用社","isDefault":0,"provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681"};
+    let body = {
+        "receiverName": "王先生",
+        "receiverPhone": "19121901086",
+        "address": "百尺竿镇 百尺杆村村东农村信用社",
+        "isDefault": 0,
+        "provinceName": "河北省",
+        "provinceCode": "130000",
+        "cityName": "保定市",
+        "cityCode": "130600",
+        "districtName": "涿州市",
+        "districtCode": "130681"
+    };
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -673,9 +713,10 @@ async function saveUserAddress(token) {
 
     }
 }
+
 //快递信息
-async function getLogisticsTrackMapInfo(token,orderid) {
-    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/cainiao/getLogisticsTrackMapInfo/1/'+orderid;
+async function getLogisticsTrackMapInfo(token, orderid) {
+    let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/cainiao/getLogisticsTrackMapInfo/1/' + orderid;
     let body = '';
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('get', urlObject)
@@ -684,38 +725,40 @@ async function getLogisticsTrackMapInfo(token,orderid) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         //console.log('快递信息查询成功！！！');
-        var datainfo=result.data;
-        var statis=datainfo.detail[0].logisticName;//发货状态
-        var address=datainfo.addressInfo.address;//地址
-        var receiverPhone=datainfo.addressInfo.receiverPhone;//手机
-        var receiverName=datainfo.addressInfo.receiverName;//姓名
-        addNotifyStr1(`地址：【${address}】`,false)
-        addNotifyStr1(`收货人：【${receiverName}】,手机：【${receiverPhone}】`,false)
-        addNotifyStr1(`单号：${datainfo.expressNo}`,false)
+        var datainfo = result.data;
+        var statis = datainfo.detail[0].logisticName;//发货状态
+        var address = datainfo.addressInfo.address;//地址
+        var receiverPhone = datainfo.addressInfo.receiverPhone;//手机
+        var receiverName = datainfo.addressInfo.receiverName;//姓名
+        addNotifyStr1(`地址：【${address}】`, false)
+        addNotifyStr1(`收货人：【${receiverName}】,手机：【${receiverPhone}】`, false)
+        addNotifyStr1(`单号：${datainfo.expressNo}`, false)
     } else {
         console.log('快递信息查询失败：' + result.message)
 
     }
 }
+
 ///////////////////////////////////////////////////////////////////
 //获取  1 今天   2 昨天
-function getDate(type){
-    var myDate ='';
-    if(type==1){
-        myDate=new Date();
-    }else{
-        var time=(new Date).getTime()-24*60*60*1000;
-        myDate=new Date(time);
+function getDate(type) {
+    var myDate = '';
+    if (type == 1) {
+        myDate = new Date();
+    } else {
+        var time = (new Date).getTime() - 24 * 60 * 60 * 1000;
+        myDate = new Date(time);
     }
     const getFullYear = myDate.getFullYear();
-    const getMonth = myDate.getMonth()+1 > 9? myDate.getMonth()+1:'0'+(myDate.getMonth()+1);
-    const date =myDate.getDate() > 9 ? myDate.getDate() : ("0" + myDate.getDate());
+    const getMonth = myDate.getMonth() + 1 > 9 ? myDate.getMonth() + 1 : '0' + (myDate.getMonth() + 1);
+    const date = myDate.getDate() > 9 ? myDate.getDate() : ("0" + myDate.getDate());
     const getHours = myDate.getHours();
     const getMinutes = myDate.getMinutes();
     const getSeconds = myDate.getSeconds();
-    const t = getFullYear+'-'+getMonth+'-'+date;
+    const t = getFullYear + '-' + getMonth + '-' + date;
     return t;
 }
+
 function isEmpty(val) {
     if (val === undefined || val === null || val === "") {
         return true;
@@ -727,6 +770,7 @@ function isEmpty(val) {
         return false;
     }
 }
+
 async function Envs() {
     if (dfxtlphone) {
         if (dfxtlphone.indexOf("@") != -1) {
@@ -743,8 +787,6 @@ async function Envs() {
     } else {
         log(`\n提示：未填写提现变量，不会执行自动提现`)
     }
-
-
 
 
     return true;
@@ -767,13 +809,15 @@ function addNotifyStr(str, log = true) {
     }
     notifyStr += `${str}\n`
 }
+
 function addNotifyStr1(str, log = true) {
     notifyStr1 += `${str}\n`
 }
+
 //通知
 async function showmsg() {
     // if (!(notifyStr && curHour == 22 || notifyStr.includes('失败'))) return
-    notifyBody = jsname + "运行通知\n\n" + notifyStr1+notifyStr
+    notifyBody = jsname + "运行通知\n\n" + notifyStr1 + notifyStr
     if (notifyFlag == 1) {
         $.msg(notifyBody);
         if ($.isNode()) {
@@ -794,8 +838,7 @@ function test100(num) {
 function populateUrlObject(url, cookie, body = '') {
     let host = (url.split('//')[1]).split('/')[0]
     let urlObject = {
-        url: url,
-        headers: {
+        url: url, headers: {
             'Host': host,
             'Connection': 'keep-alive',
             'Accept': 'application/json, text/plain, */*',

@@ -9,8 +9,8 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='3'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
-
+let searchtype='4'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
+let skuid1="1050656787101050899"
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
 const fs = require("fs");
@@ -22,41 +22,23 @@ let notifyStr = ''
 let notifyStr1 = ''
 
 let httpResult //global buffer
-
-let userCookie ='1';
-
-
-let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
-let userList = [];
 let list1 = []
 let list2 = []
 let haslist = []
 let nohaslist = []
 
 
-let dfxtlphone=process.env.dfxtlphone3;
+let dfxtlphone=process.env.dfxtlphone4;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
-
-
-
-
 let avatarLIST = []; //头像数组
 let nickNameLIST = []; //姓名数组
 let nickName = ''; //这账号姓名
-
-
 let dfxtlphoneArr = [];
 let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
-let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
-let imageArr=[];//图片资源
-
-let disableStartTime = "" //以下时间段不做任务
-let disableEndTime = "" //以下时间段不做任务
-let curHour = (new Date()).getHours()
 
 ///////////////////////////////////////////////////////////////////
 
@@ -93,8 +75,6 @@ let curHour = (new Date()).getHours()
                 return
             }
         }
-
-
         if(searchtype==5){
             for (let index = 0; index < userinfo1.length; index++) {
                 let num = index + 1
@@ -140,7 +120,7 @@ let curHour = (new Date()).getHours()
                 }else if(searchtype==3){
                     //变量参数为 手机号
                     //抢商品
-                    await userOrdercreate(token,'1031569179343501243',dfxtlphoneArr[index]);
+                    await userOrdercreate(token,skuid1,dfxtlphoneArr[index]);
 
                 }else if(searchtype==4){
                     //获取用户token 并保存
@@ -439,7 +419,6 @@ async function changeinfo4(token, userid) {
     }
 }
 
-
 //获取商店详情
 async function selectHomePageData(token) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/mallConfig/selectHomePageData?id=';
@@ -584,10 +563,7 @@ async function userOrdercreate(token,skuId,phone) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/create';
 
     //var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
-
-    var body= {"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王老师","receiverPhone":"15720101086","provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681","address":"百尺竿镇百尺杆村03694号"}
-
-
+    var body= {"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"绿本子小姐","receiverPhone":"18072044681","provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681","address":"百尺竿镇百尺杆村03694号"}
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
