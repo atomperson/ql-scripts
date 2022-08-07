@@ -120,16 +120,12 @@ let curHour = (new Date()).getHours()
         if (checkphoneFlag) {
             checkphone();
         }
-
-
         showmsg()
 
     }
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
-
-
 /////---------------------------方法
 
 async function checkphone(){
