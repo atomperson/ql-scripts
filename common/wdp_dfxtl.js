@@ -6,7 +6,7 @@
 0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙, enabled=true
 */
 const jsname = '东风雪铁龙'
-const $ = Env('东风雪铁龙')
+const $ = new Env('东风雪铁龙');
 const logDebug = 0
 
 const axios = require("axios");
@@ -28,7 +28,6 @@ let dfxtlphone = process.env.dfxtlphone;
 let dfxtlpassword = process.env.dfxtlpassword;
 let Sign = process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp = process.env.dfxtlTime//app的sign 签名时间
-
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
