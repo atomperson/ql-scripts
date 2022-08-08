@@ -78,8 +78,11 @@ let curHour = (new Date()).getHours()
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
             if (test100(index)) {
-                console.log('\n============开始【第' + num + '个账号:' + phone + '】\n')
-            }         //console.log(`\n============开始【第 ${num} 个账号:${phone}】\n`)
+                console.log('============开始【第' + num + '个账号:' + phone + '】\n')
+                console.log(`当前时间：${new Date(
+                    new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
+                    8 * 60 * 60 * 1000).toLocaleString()} \n\n`);
+            }
             //token 校验  只是校验token是否正确
             if (await getSignStatus(dfxtlTokenArr[index].token)) {
                 console.log(`【第 (${index + 1}) 个手机号:${phone},token失效】`);
