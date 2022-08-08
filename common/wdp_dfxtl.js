@@ -77,8 +77,8 @@ let curHour = (new Date()).getHours()
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
             if (test100(index)) {
-                console.log('\n============开始【第' + num + '个账号:' + phone + '】\n')
-                console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
+                console.log('\n============开始【第' + num + '个账号:' + phone + '】')
+                console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
             }
             //token 校验  只是校验token是否正确
             if (await getSignStatus(dfxtlTokenArr[index].token)) {
