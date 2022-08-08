@@ -464,12 +464,12 @@ async function selectHomePageData(token) {
 
     for (let i=0;i<haslist.length;i++) {
         addNotifyStr('商品名称:【'+haslist[i].title+'】',false);
-        addNotifyStr('库存:【'+haslist[i].stock+'】,积分:'+haslist[i].itemScore+'\n【skuId】:'+haslist[i].skuId,false);
+        addNotifyStr('总量:【'+haslist[i].totalStock+'】,库存:【'+haslist[i].stock+'】,积分:'+haslist[i].itemScore+'\n【skuId】:'+haslist[i].skuId,false);
     }
     addNotifyStr('=====================【无库存商品】==========',false);
     for (let j=0;j<nohaslist.length;j++) {
         addNotifyStr('商品名称:【'+nohaslist[j].title+'】',false);
-        addNotifyStr('库存:【'+nohaslist[j].stock+'】,积分:'+nohaslist[j].itemScore+'',false);
+        addNotifyStr('总量:【'+nohaslist[i].totalStock+'】,库存:【'+nohaslist[j].stock+'】,积分:'+nohaslist[j].itemScore+'',false);
 
     }
 }
@@ -488,10 +488,11 @@ async function detailBycommodityId(token,commodityId) {
         var title=datainfo.title;
         var skuId=datainfo.skuList[0].id;//积分
         var itemScore=datainfo.skuList[0].itemScore;//积分
+        var totalStock=datainfo.skuList[0].totalStock;//商品总量
         if(stock>0){
-            haslist.push({"title":title,"stock":stock,"itemScore":itemScore,"skuId":skuId});
+            haslist.push({"title":title,"stock":stock,"itemScore":itemScore,"skuId":skuId,"totalStock":totalStock});
         }else{
-            nohaslist.push({"title":title,"stock":stock,"itemScore":itemScore,"skuId":skuId});
+            nohaslist.push({"title":title,"stock":stock,"itemScore":itemScore,"skuId":skuId,"totalStock":totalStock});
         }
     } else {
         console.log('查询商品库存信息失败：' + result.message)
