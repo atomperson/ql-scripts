@@ -9,8 +9,8 @@ const jsname = '东风雪铁龙修改用户信息'
 const $ = Env('东风雪铁龙修改用户信息')
 const logDebug = 0
 
-let searchtype='4'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情
-
+let searchtype='1'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
+let skuid1="1050656787101050899"
 const ckkey = 'wbtcCookie';
 const axios = require("axios");
 const fs = require("fs");
@@ -22,39 +22,23 @@ let notifyStr = ''
 let notifyStr1 = ''
 
 let httpResult //global buffer
-
-let userCookie ='1';
-
-
-let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
-let userList = [];
 let list1 = []
 let list2 = []
 let haslist = []
 let nohaslist = []
 
 
-let dfxtlphone=process.env.dfxtlphone3;
+let dfxtlphone=process.env.dfxtlphone4;
 let dfxtlpassword=process.env.dfxtlpassword;
 let Sign=process.env.dfxtlSign;   //app的sign 签名
 let TimeStamp =process.env.dfxtlTime//app的sign 签名时间
 
-
-
 let avatarLIST = []; //头像数组
 let nickNameLIST = []; //姓名数组
 let nickName = ''; //这账号姓名
-
-
 let dfxtlphoneArr = [];
 let dfxtlpasswordArr = [];
 let dfxtlTokenArr = [];
-let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
-let imageArr=[];//图片资源
-
-let disableStartTime = "" //以下时间段不做任务
-let disableEndTime = "" //以下时间段不做任务
-let curHour = (new Date()).getHours()
 
 ///////////////////////////////////////////////////////////////////
 
@@ -62,6 +46,10 @@ let curHour = (new Date()).getHours()
     if (typeof $request !== "undefined") {
         await GetRewrite()
     } else {
+        if(searchtype==3){
+            console.log("开始强商品 切换为 dfxtlphone5 变量！！！")
+            dfxtlphone=process.env.dfxtlphone5;
+        }
         if (!(await Envs())) return
         console.log('====================\n')
         console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(
@@ -87,8 +75,6 @@ let curHour = (new Date()).getHours()
                 return
             }
         }
-
-
         if(searchtype==5){
             for (let index = 0; index < userinfo1.length; index++) {
                 let num = index + 1
@@ -100,6 +86,7 @@ let curHour = (new Date()).getHours()
                 //获取积分信息
                 const score = await scoreGet(token);
                 addNotifyStr1(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+                await scoreGetlist(token);
                 //任务完成情况
                 //await taskList(token);
                 //商城订单信息
@@ -131,8 +118,9 @@ let curHour = (new Date()).getHours()
                     await changeinfo4(token,userid);//修改姓名
                     await saveUserAddress(token,userid);//修改地址
                 }else if(searchtype==3){
+                    //变量参数为 手机号
                     //抢商品
-                    await userOrdercreate(token,'8bcb6cc16bad81b41a61b4932f6bd946');
+                    await userOrdercreate(token,skuid1,dfxtlphoneArr[index]);
 
                 }else if(searchtype==4){
                     //获取用户token 并保存
@@ -185,6 +173,45 @@ async function scoreGet(token) {
     } else {
         console.log('查询积分失败：' + result.message)
 
+    }
+}
+//查询积分记录
+async function scoreGetlist(token) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/list`
+    let body = {"pageSize":15,"pageNum":1,"operateType":1};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    //console.log(JSON.stringify(result))
+    var scoreamoun=0;
+    var scoreamoun1=0;
+    if (result.code == 0) {
+        var datlist=result.data.list;
+        var nowdata=getDate(1);
+        datlist.filter(ele=>{
+            if(ele.createTime.split(' ')[0]==nowdata){
+                return true
+            }else{
+                return  false;
+            }
+        }).map(ele=>{
+            scoreamoun+=ele.score;
+        })
+        addNotifyStr1('今日获取积分为：【' + scoreamoun+'】',false);
+        var nowdata2=getDate(2);
+        datlist.filter(ele=>{
+            if(ele.createTime.split(' ')[0]==nowdata2){
+                return true
+            }else{
+                return  false;
+            }
+        }).map(ele=>{
+            scoreamoun1+=ele.score;
+        })
+        //addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
+    } else {
+        console.log('查询积分记录失败：' + result.message)
     }
 }
 //查询商城订单
@@ -392,7 +419,6 @@ async function changeinfo4(token, userid) {
     }
 }
 
-
 //获取商店详情
 async function selectHomePageData(token) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/app/mallConfig/selectHomePageData?id=';
@@ -533,23 +559,42 @@ async function saveUserAddress(token) {
     }
 }
 //购买商品
-async function userOrdercreate(token,skuId) {
+async function userOrdercreate(token,skuId,phone) {
     let url = 'https://gateway-sapp.dpca.com.cn/api-mall/v1/mall/app/userOrder/create';
 
-    var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
+    //var body={"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"王大朋","receiverPhone":"15720101086","provinceCode":"110000","provinceName":"北京市","cityCode":"110100","cityName":"北京","districtCode":"110112","districtName":"通州区","address":"玉桥街道 梨花园小区1号楼361"};
+    var body= {"skuId":skuId,"buyQuantity":1,"shipMethod":"1","remark":"","receiverName":"绿本子小姐","receiverPhone":"18072044681","provinceName":"河北省","provinceCode":"130000","cityName":"保定市","cityCode":"130600","districtName":"涿州市","districtCode":"130681","address":"百尺竿镇百尺杆村03694号"}
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('购买商品成功！！！');
+        console.log('购买商品成功！手机【'+phone+'】，地址【'+body.address+'】\n');
+        console.log('姓名【'+body.receiverName+'】电话 【'+body.receiverPhone+'】\n');
     } else {
         console.log('购买商品失败：' + result.message)
     }
 }
 ///////////////////////////////////////////////////////////////////
-
+//获取  1 今天   2 昨天
+function getDate(type){
+    var myDate ='';
+    if(type==1){
+        myDate=new Date();
+    }else{
+        var time=(new Date).getTime()-24*60*60*1000;
+        myDate=new Date(time);
+    }
+    const getFullYear = myDate.getFullYear();
+    const getMonth = myDate.getMonth()+1 > 9? myDate.getMonth()+1:'0'+(myDate.getMonth()+1);
+    const date =myDate.getDate() > 9 ? myDate.getDate() : ("0" + myDate.getDate());
+    const getHours = myDate.getHours();
+    const getMinutes = myDate.getMinutes();
+    const getSeconds = myDate.getSeconds();
+    const t = getFullYear+'-'+getMonth+'-'+date;
+    return t;
+}
 async function Envs() {
     if(searchtype==1){
         dfxtlphone = '19121901086';
