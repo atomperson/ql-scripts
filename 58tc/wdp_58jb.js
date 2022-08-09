@@ -29,7 +29,7 @@
     每小时一次, 但是跑久了有可能触发滑块，需要自己去点一次，否则要被反撸矿石
 
     [Script]
-    cron "10 0,6,8,11,14,17,19,21 * * *" script-path=kbg_58sjb.js, tag=58同城, enabled=true
+    cron "0 10 0/2 * * ?" script-path=kbg_58sjb.js, tag=58同城, enabled=true
 */
 const axios = require("axios");
 const jsname = '58同城';
@@ -2013,11 +2013,11 @@ class UserInfo {
             console.log(`${TASK_TIME[0]}点到${TASK_TIME[1]}点之间会做金币任务`);
         }
 
-        console.log('\n======== 首页签到再赚矿石 ========');
-        for(let user of userList) {
-            await user.doHomeContinueTask();
-            console.log(`\n`);
-        }
+        // console.log('\n======== 首页签到再赚矿石 ========');
+        // for(let user of userList) {
+        //     await user.doHomeContinueTask();
+        //     console.log(`\n`);
+        // }
 
         console.log('\n======== 查询账户 ========');
         for(let user of userList) {

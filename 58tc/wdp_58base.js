@@ -25,7 +25,7 @@
     定时不跑小游戏就每天7点后跑5次，跑小游戏就每小时一次
 
     [Script]
-    cron "1 * * * *" script-path=kbg_58sjb.js, tag=58同城, enabled=true
+    cron "1 * * * *" script-path=wdp_58base.js, tag=58同城, enabled=true
 */
 const axios = require("axios");
 //import axios from "axios";
@@ -37,16 +37,15 @@ const logDebug = 0
 const ckkey = 'wbtcCookie';
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
-//const notify = $.isNode() ? require('./sendNotify') : '';
+const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
 let httpResult //global buffer
 
-//let userCookie = ($.isNode() ? process.env[ckkey] : $.getdata(ckkey)) || '';
+let userCookie = ($.isNode() ? process.env[ckkey] : $.getdata(ckkey)) || '';
+//let userCookie = 'PPU=UID=88529706992435&UN=sqk8p6gkt&TT=354a468fd148c589fe46d813ef517e98&PBODY=B83N4y2LdYM75BceLbDz8wXATSXi6wTCN8GTSZq8gBE648-nbYuk4fKVu1esl2lQruhCPfKWGGWv81grEtgd2YWDg2vX4u5WrqCS5wfJzvaIGVQyckNB8k7ChugBPRdW96VvmzkJhvws-7Tr5TTj_88CSNclJ-JTZKRkToZaaxI&VER=1&CUID=SwwkFOIjAqZVdYBKPUo4Lg#1@PPU=UID=54402120302351&UN=sn280q6ir&TT=aadbee7beb303d53fcbf8ee986a4a764&PBODY=ihR3d0fGwQqq9uddd_Idx_cj02pNxhNr7WTj16As6mMQWK-KHkpGp0Bz3793pC5nPcqX9Kldp-WhN5K0fZ_GF_2OeeFsj5Jr5mzZ4M37aa-xXnYAMnNF3tzgzgjz7LNIhxi6P-GDchpQsItG0JVKUyLgRPwFmafMP23zYbnmIac&VER=1&CUID=m5Seg793ugyGYph7h_ctZw#1@PPU=UID=88693105101867&UN=eoorptgar&TT=82fa6f25b060efd8b307290c7c0891e9&PBODY=GSSc43-RAknPkFjgR6s-eHIFj79iCrVxBVGuMEQM9SjDtGFkTH0XyuQxswigbEte51mEDntdSRJ8TqdpMXwlPNyh_QFCBCLYP7tvJT4r9v0flm7n_SOPnIDyIGfIFBiYFGvCPqqmbuez9Ffk8aoIDfv4oddqQjr6MMqFTsmVh9A&VER=1&CUID=8sTBgQ91PmySpvjJLQX5XQ#1@PPU=UID=88663072651010&UN=2ku6gu7iw&TT=ea07e374a7fabdf295b780fd44fd9060&PBODY=eiC9BReoBJca4Y5TCrGrVP-zueTLaunAZCxgzTzrNFj07Wz4ZVDL88X2eBnVxSRUf3zJcFIq8XIIyamPuMYeRwGQCQAAnuP95SIO1G_tqhXptQ912tMfiRqufYjdqsYUZ883PfFfKhXimLXciSwOuyPA8FD0zYTbFHSxSLqfG1U&VER=1&CUID=r0f997a6BgAPJmiVoKSmQQ#1@PPU=UID=89046758285828&UN=byenjnl5h&TT=104773d62f23d8b5cb9e6eac8ecbf60f&PBODY=iWu2d-fq1j_hHHOr-USg2V2WhSetGUQrbZBjp4sFuQ_gjHGJdUtJmsfbDvTxwLfZU3UWpsRjaB3HsEswR75zPq3qHbVftXPzcYsPyy8bTSvAGIdhKguAv287g_eSF2NPA23OiZTOm8ZiLB1MPkieC_pxH0PChtNt_nBwJZnsaTc&VER=1&CUID=842xdMuLhg-pnb6aknuVOA#1@PPU=UID=89047189096200&UN=d1xs6orts&TT=ad02806ae811c695e6ddc8453169ae51&PBODY=UYMqNlkhqLqHdsDGwUZqOmmVAtFvioJciycxXjSTQTUgsF4zWbFJwqQaQQtn9MQIZh6rmYPDUojxzer6lJi1fb-15s_inA2IfpXWGXpS42irE2nM5jAeTaNETeVHU1BxaCXT3euCxFwSc0aLKU9X3onYeJVlCtlvBPdS2uD0Xek&VER=1&CUID=o7Yttr9AXNQQJKSb6fIKDg#1'
 
-let userCookie = 'PPU=UID=88529706992435&UN=sqk8p6gkt&TT=354a468fd148c589fe46d813ef517e98&PBODY=B83N4y2LdYM75BceLbDz8wXATSXi6wTCN8GTSZq8gBE648-nbYuk4fKVu1esl2lQruhCPfKWGGWv81grEtgd2YWDg2vX4u5WrqCS5wfJzvaIGVQyckNB8k7ChugBPRdW96VvmzkJhvws-7Tr5TTj_88CSNclJ-JTZKRkToZaaxI&VER=1&CUID=SwwkFOIjAqZVdYBKPUo4Lg#1@PPU=UID=54402120302351&UN=sn280q6ir&TT=aadbee7beb303d53fcbf8ee986a4a764&PBODY=ihR3d0fGwQqq9uddd_Idx_cj02pNxhNr7WTj16As6mMQWK-KHkpGp0Bz3793pC5nPcqX9Kldp-WhN5K0fZ_GF_2OeeFsj5Jr5mzZ4M37aa-xXnYAMnNF3tzgzgjz7LNIhxi6P-GDchpQsItG0JVKUyLgRPwFmafMP23zYbnmIac&VER=1&CUID=m5Seg793ugyGYph7h_ctZw#1@PPU=UID=88693105101867&UN=eoorptgar&TT=82fa6f25b060efd8b307290c7c0891e9&PBODY=GSSc43-RAknPkFjgR6s-eHIFj79iCrVxBVGuMEQM9SjDtGFkTH0XyuQxswigbEte51mEDntdSRJ8TqdpMXwlPNyh_QFCBCLYP7tvJT4r9v0flm7n_SOPnIDyIGfIFBiYFGvCPqqmbuez9Ffk8aoIDfv4oddqQjr6MMqFTsmVh9A&VER=1&CUID=8sTBgQ91PmySpvjJLQX5XQ#1@PPU=UID=88663072651010&UN=2ku6gu7iw&TT=ea07e374a7fabdf295b780fd44fd9060&PBODY=eiC9BReoBJca4Y5TCrGrVP-zueTLaunAZCxgzTzrNFj07Wz4ZVDL88X2eBnVxSRUf3zJcFIq8XIIyamPuMYeRwGQCQAAnuP95SIO1G_tqhXptQ912tMfiRqufYjdqsYUZ883PfFfKhXimLXciSwOuyPA8FD0zYTbFHSxSLqfG1U&VER=1&CUID=r0f997a6BgAPJmiVoKSmQQ#1@PPU=UID=89046758285828&UN=byenjnl5h&TT=104773d62f23d8b5cb9e6eac8ecbf60f&PBODY=iWu2d-fq1j_hHHOr-USg2V2WhSetGUQrbZBjp4sFuQ_gjHGJdUtJmsfbDvTxwLfZU3UWpsRjaB3HsEswR75zPq3qHbVftXPzcYsPyy8bTSvAGIdhKguAv287g_eSF2NPA23OiZTOm8ZiLB1MPkieC_pxH0PChtNt_nBwJZnsaTc&VER=1&CUID=842xdMuLhg-pnb6aknuVOA#1@PPU=UID=89047189096200&UN=d1xs6orts&TT=ad02806ae811c695e6ddc8453169ae51&PBODY=UYMqNlkhqLqHdsDGwUZqOmmVAtFvioJciycxXjSTQTUgsF4zWbFJwqQaQQtn9MQIZh6rmYPDUojxzer6lJi1fb-15s_inA2IfpXWGXpS42irE2nM5jAeTaNETeVHU1BxaCXT3euCxFwSc0aLKU9X3onYeJVlCtlvBPdS2uD0Xek&VER=1&CUID=o7Yttr9AXNQQJKSb6fIKDg#1'
-
-//let userUA = ($.isNode() ? process.env.wbtcUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
-let userUA = 'Dalvik/2.1.0 (Linux; U; Android 12; M2012K11AC Build/SKQ1.220303.001)'
+let userUA = ($.isNode() ? process.env.wbtcUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
+//let userUA = 'Dalvik/2.1.0 (Linux; U; Android 12; M2012K11AC Build/SKQ1.220303.001)'
 
 let userList = []
 
@@ -1057,7 +1056,55 @@ class UserInfo {
             }
         }
     }
+    // 保养矿车
+    async maintenance() {
+        const mineCarPercent = Number(this.mineMaininfo.updateInfo.mineCarPercent);
+        //损坏程度大于%20
+        if (0.2 < mineCarPercent) {
+            console.log('需要保养！！')
+            let url = `https://dreamtown.58.com/web/minecar/maintenance`
+            let body = ``
+            let urlObject = populateUrlObject(url, this.cookie, body)
+            await httpRequest('get', urlObject)
+            let result = httpResult;
+            if (!result) return
+            // console.log(JSON.stringify(result))
+            if (result.code == 0) {
+                console.log(`账号[${this.index}]保养矿车成功`);
+            } else {
+                console.log(`账号[${this.index}]保养矿车失败: ${result.message}`)
+            }
+        } else {
+            console.log('矿车损坏程度小于20%，不需要保养！！')
 
+        }
+
+    }
+    // 矿车升级
+    async maintenanceandupgrade() {
+        const nextMineCarCapacityLimit = Number(this.mineMaininfo.updateInfo.nextMineCarCapacityLimit);
+        if (nextMineCarCapacityLimit != 0) {
+            console.log(`下次升级数量 ${nextMineCarCapacityLimit}`);//升级成功不需要在维修
+            console.log('矿车升级！！')
+            let url = `https://dreamtown.58.com/web/minecar/upgrade`
+            let body = ``
+            let urlObject = populateUrlObject(url, this.cookie, body)
+            await httpRequest('get', urlObject)
+            let result = httpResult;
+            if (!result) return
+            console.log(JSON.stringify(result))
+            if (result.code == 0) {
+                console.log(`账号[${this.index}]矿车升级成功`);//升级成功不需要在维修
+                return;
+            } else {
+                console.log(`账号[${this.index}]矿车升级失败: ${result.message}`)
+            }
+        } else {
+            console.log('矿车已经满级，不需要升级！！')
+        }
+        console.log('开始执行维修矿车！！')
+        await this.maintenance();
+    }
     // 查询抽奖次数
     async rouletteInfo() {
         let url = `https://magicisland.58.com/web/roulette/info`
@@ -1759,7 +1806,7 @@ class UserInfo {
         if (result.code == 0) {
             console.log(`账号[${this.index}]初始化矿山成功`)
         } else {
-            console.log(`账号[${this.index}]初始化矿山${step}失败: ${result.message}`,'\n')
+            console.log(`账号[${this.index}]初始化矿山${step}失败: ${result.message}`, '\n')
         }
     }
 
@@ -1839,11 +1886,11 @@ class UserInfo {
         })
 
         console.log('\n======== 现金签到 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             await user.oreMainpage(false);
             await $.wait(200);
         }
-        for(let user of userList) {
+        for (let user of userList) {
             await user.cashSigninlist();
             // 未签到的去签到
             if (user.cashSign) {
@@ -1855,13 +1902,13 @@ class UserInfo {
         }
 
         console.log('\n======== 首页签到再赚矿石 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             await user.doHomeContinueTask();
             console.log(`\n`)
         }
 
         console.log('\n======== 我的家签到 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             // 查询我的家签到状态
             await user.houseSignStatus();
             await $.wait(500);
@@ -1870,7 +1917,7 @@ class UserInfo {
 
         console.log('\n======== 神奇矿山（挖矿） ========')
         console.log('活动路径：我的->神奇矿->免费领矿石')
-        for(let user of userList) {
+        for (let user of userList) {
             // 神奇矿页面查询
             await user.getMineMaininfo();
             const cumulativeOre = Number(user.mineMaininfo?.superInfo?.cumulativeOre || 0).toFixed(2) || '0.00'
@@ -1891,7 +1938,7 @@ class UserInfo {
             await user.doEmploy();
             await $.wait(200);
 
-            if (['1','2'].includes(user.runTask)) {
+            if (['1', '2'].includes(user.runTask)) {
                 // 吃鸡腿加速
                 await user.doDrumstick();
                 await $.wait(6000);
@@ -1900,14 +1947,17 @@ class UserInfo {
             // 唤醒金币矿工
             await user.doWakeupEmploy();
             await $.wait(500);
+            //矿车升级及保养
+            await user.maintenanceandupgrade();
+            await $.wait(500);
 
             console.log(`\n`)
         }
 
         // 未绑定微信账号不能参加
         console.log('\n======== 小游戏：神奇矿山 ========')
-        for(let user of userList) {
-            if (['1','2'].includes(user.runTask)) {
+        for (let user of userList) {
+            if (['1', '2'].includes(user.runTask)) {
                 // 查询神奇矿山主页
                 await user.miningUserInfo();
                 await $.wait(500);
@@ -1919,7 +1969,7 @@ class UserInfo {
         }
 
         console.log('\n======== 小游戏：早起打卡 ========')
-        for(let user of userList) {
+        for (let user of userList) {
             // 查询神奇矿主页
             await user.oreMainpage(false);
             await $.wait(500);
@@ -1931,7 +1981,7 @@ class UserInfo {
 
         console.log('\n======== 小游戏：低价竞拍 ========')
         // 只有能提现账号才参加
-        for(let user of userList) {
+        for (let user of userList) {
             if (user.runTask == 1) {
                 // 查询低价竞拍主页
                 await user.auctionInfo();

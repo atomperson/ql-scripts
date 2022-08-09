@@ -3,7 +3,7 @@
     自动添加任务后，如果时间不对，请自己修改 10 0,10 * * *
 
     [Script]
-    cron "10 0,10 * * *" script-path=kbg_58sjb.js, tag=58同城我家收取金币, enabled=true
+    cron "0 10 0,7,10 * * ?" script-path=kbg_58sjb.js, tag=58同城我家收取金币, enabled=true
 */
 const axios = require("axios");
 const jsname = '58同城我家收取金币'
@@ -13,10 +13,13 @@ const logDebug = 0
 const ckkey = 'wbtcCookie';
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
-const notify = $.isNode() ? require('./sendNotify') : '';
+//const notify = $.isNode() ? require('./sendNotify') : '';
 let notifyStr = ''
 
 let httpResult //global buffer
+
+//let userCookie = 'PPU=UID=88529706992435&UN=sqk8p6gkt&TT=354a468fd148c589fe46d813ef517e98&PBODY=B83N4y2LdYM75BceLbDz8wXATSXi6wTCN8GTSZq8gBE648-nbYuk4fKVu1esl2lQruhCPfKWGGWv81grEtgd2YWDg2vX4u5WrqCS5wfJzvaIGVQyckNB8k7ChugBPRdW96VvmzkJhvws-7Tr5TTj_88CSNclJ-JTZKRkToZaaxI&VER=1&CUID=SwwkFOIjAqZVdYBKPUo4Lg#1@PPU=UID=54402120302351&UN=sn280q6ir&TT=aadbee7beb303d53fcbf8ee986a4a764&PBODY=ihR3d0fGwQqq9uddd_Idx_cj02pNxhNr7WTj16As6mMQWK-KHkpGp0Bz3793pC5nPcqX9Kldp-WhN5K0fZ_GF_2OeeFsj5Jr5mzZ4M37aa-xXnYAMnNF3tzgzgjz7LNIhxi6P-GDchpQsItG0JVKUyLgRPwFmafMP23zYbnmIac&VER=1&CUID=m5Seg793ugyGYph7h_ctZw#1@PPU=UID=88693105101867&UN=eoorptgar&TT=82fa6f25b060efd8b307290c7c0891e9&PBODY=GSSc43-RAknPkFjgR6s-eHIFj79iCrVxBVGuMEQM9SjDtGFkTH0XyuQxswigbEte51mEDntdSRJ8TqdpMXwlPNyh_QFCBCLYP7tvJT4r9v0flm7n_SOPnIDyIGfIFBiYFGvCPqqmbuez9Ffk8aoIDfv4oddqQjr6MMqFTsmVh9A&VER=1&CUID=8sTBgQ91PmySpvjJLQX5XQ#1@PPU=UID=88663072651010&UN=2ku6gu7iw&TT=ea07e374a7fabdf295b780fd44fd9060&PBODY=eiC9BReoBJca4Y5TCrGrVP-zueTLaunAZCxgzTzrNFj07Wz4ZVDL88X2eBnVxSRUf3zJcFIq8XIIyamPuMYeRwGQCQAAnuP95SIO1G_tqhXptQ912tMfiRqufYjdqsYUZ883PfFfKhXimLXciSwOuyPA8FD0zYTbFHSxSLqfG1U&VER=1&CUID=r0f997a6BgAPJmiVoKSmQQ#1@PPU=UID=89046758285828&UN=byenjnl5h&TT=104773d62f23d8b5cb9e6eac8ecbf60f&PBODY=iWu2d-fq1j_hHHOr-USg2V2WhSetGUQrbZBjp4sFuQ_gjHGJdUtJmsfbDvTxwLfZU3UWpsRjaB3HsEswR75zPq3qHbVftXPzcYsPyy8bTSvAGIdhKguAv287g_eSF2NPA23OiZTOm8ZiLB1MPkieC_pxH0PChtNt_nBwJZnsaTc&VER=1&CUID=842xdMuLhg-pnb6aknuVOA#1@PPU=UID=89047189096200&UN=d1xs6orts&TT=ad02806ae811c695e6ddc8453169ae51&PBODY=UYMqNlkhqLqHdsDGwUZqOmmVAtFvioJciycxXjSTQTUgsF4zWbFJwqQaQQtn9MQIZh6rmYPDUojxzer6lJi1fb-15s_inA2IfpXWGXpS42irE2nM5jAeTaNETeVHU1BxaCXT3euCxFwSc0aLKU9X3onYeJVlCtlvBPdS2uD0Xek&VER=1&CUID=o7Yttr9AXNQQJKSb6fIKDg#1'
+//let userUA = 'Dalvik/2.1.0 (Linux; U; Android 12; M2012K11AC Build/SKQ1.220303.001)'
 
 let userCookie = ($.isNode() ? process.env[ckkey] : $.getdata(ckkey)) || '';
 
@@ -97,7 +100,7 @@ class UserInfo {
         await httpRequest('get',urlObject)
         let result = httpResult;
         if(!result) return
-        console.log(JSON.stringify(result))
+        //console.log(JSON.stringify(result))
         if(result.code == 0) {
 
             if( !(JSON.stringify(result.resultEntity) == "{}")){
@@ -107,7 +110,10 @@ class UserInfo {
                     //console.log(JSON.stringify(result))
                     var ballSource=result.resultEntity.awardList[i].ballSource
                     console.log(`账号[${this.index}-${this.nickName}]梦想小镇无 可领取任务名称-${ballSource}`)
-                    //await this.goldCoinBallobtain(result.resultEntity.awardList[i]);
+                    //现金签到才领取 其他领取的殴都是一金币 没必要
+                    if(result.resultEntity.awardList[i].awardType=='1'){
+                        await this.goldCoinBallobtain(result.resultEntity.awardList[i]);
+                    }
                 }
             }else{
                 console.log(`账号[${this.index}-${this.nickName}]梦想小镇无可领取领取金币`)
@@ -130,7 +136,12 @@ class UserInfo {
         if(!result) return
         // console.log(JSON.stringify(result))
         if(result.code == 0) {
-            console.log(`账号[${this.index}-${this.nickName}]--${data.ballSource} 任务领取金币成功`)
+            if(result.resultEntity.state!=6){
+                console.log(`账号[${this.index}-${this.nickName}]--${data.ballSource} 任务领取金币成功`)
+            }else{
+                console.log(`账号[${this.index}-${this.nickName}]--${data.ballSource} 任务领取金币失败，需要实名`)
+
+            }
         } else {
             console.log(`账号[${this.index}-${this.nickName}]--${data.ballSource} 任务领取金币失败`)
 
