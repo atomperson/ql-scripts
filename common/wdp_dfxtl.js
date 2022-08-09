@@ -88,8 +88,11 @@ let curHour = (new Date()).getHours()
             }
             await $.wait(500);
             if (dfxtlTokenArr[index].token == '') {
-                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
+                console.log(`【第 (${index + 1}) 个手机号:${phone},登录错误】`);
+                //addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
                 phoneErrorArr.push(phone);//错误手机数组
+                dfxtlTokenArr[index].score=0;
+                dfxtlTokenArr[index].number=index + 1;
                 continue;
             }
             phoneSuccessArr.push(phone);//正确手机数组
