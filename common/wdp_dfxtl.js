@@ -92,6 +92,7 @@ let curHour = (new Date()).getHours()
                 //addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
                 phoneErrorArr.push(phone);//错误手机数组
                 dfxtlTokenArr[index].score=0;
+                dfxtlTokenArr[index].scorenow=0;
                 dfxtlTokenArr[index].number=index + 1;
                 continue;
             }
