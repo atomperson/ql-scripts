@@ -14,7 +14,7 @@ const fs = require("fs");
 // import axios from "axios";
 // import fs from "fs";
 
-const openflag = 2; //1为做任务（默认）  2为 查询积分信息和快递信息
+const openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
 let checkphoneFlag=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
