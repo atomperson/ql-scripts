@@ -25,10 +25,10 @@ let notifyStr1 = ''
 let httpResult //global buffer
 
 
-let dfxtlphone = process.env.dfxtlphone;
-let dfxtlpassword = process.env.dfxtlpassword;
-let Sign = process.env.dfxtlSign;   //app的sign 签名
-let TimeStamp = process.env.dfxtlTime//app的sign 签名时间
+let dfxtlphone = ($.isNode() ? process.env.dfxtlphone : $.getdata('dfxtlphone')) || '';
+let dfxtlpassword = ($.isNode() ? process.env.dfxtlpassword : $.getdata('dfxtlpassword')) || '';
+let Sign = ($.isNode() ? process.env.bjqcCookie : $.getdata('bjqcToken')) || '';
+let TimeStamp = ($.isNode() ? process.env.TimeStamp : $.getdata('TimeStamp')) || '';
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
