@@ -104,7 +104,7 @@ let curHour = (new Date()).getHours()
                 await infoget(token, userid); //获取用户信息
                 await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
                 await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
-                await $.wait(4000);
+                await $.wait(2000);
             }
             const score = await scoreGet(token);//获取积分信息
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
@@ -115,14 +115,6 @@ let curHour = (new Date()).getHours()
             dfxtlTokenArr[index].number=index + 1;
             await userOrderList(token, phone, index + 1); //商城订单信息
         }
-        addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-        dfxtlTokenArr.sort(function (x,y) {
-            return y.score-x.score;
-        });
-        for(let i=0;i<dfxtlTokenArr.length;i++){
-            addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
-            addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
-        }
         if (changeFlag) {
             console.log("需要修改文件\n");
             //修改文件
@@ -130,6 +122,15 @@ let curHour = (new Date()).getHours()
                 if (err) console.log(err);
                 console.log("文件修改完成\n");
             })
+        }
+        await $.wait(500);
+        addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
+        dfxtlTokenArr.sort(function (x,y) {
+            return y.score-x.score;
+        });
+        for(let i=0;i<dfxtlTokenArr.length;i++){
+            addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
+            addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
         }
         //是否生成 错误和 正确手机数组
         if (checkphoneFlag) {
