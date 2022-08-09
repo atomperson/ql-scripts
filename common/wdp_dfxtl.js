@@ -14,7 +14,7 @@ const fs = require("fs");
 // import axios from "axios";
 // import fs from "fs";
 
-const openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
+const openflag = 2; //1为做任务（默认）  2为 查询积分信息和快递信息
 let checkphoneFlag=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
@@ -27,8 +27,8 @@ let httpResult //global buffer
 
 let dfxtlphone = ($.isNode() ? process.env.dfxtlphone : $.getdata('dfxtlphone')) || '';
 let dfxtlpassword = ($.isNode() ? process.env.dfxtlpassword : $.getdata('dfxtlpassword')) || '';
-let Sign = ($.isNode() ? process.env.bjqcCookie : $.getdata('bjqcToken')) || '';
-let TimeStamp = ($.isNode() ? process.env.TimeStamp : $.getdata('TimeStamp')) || '';
+let Sign = ($.isNode() ? process.env.dfxtlSign : $.getdata('dfxtlSign')) || '';
+let TimeStamp = ($.isNode() ? process.env.dfxtlTime : $.getdata('dfxtlTime')) || '';
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
@@ -106,17 +106,16 @@ let curHour = (new Date()).getHours()
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             dfxtlTokenArr[index].score=score;
             dfxtlTokenArr[index].number=index + 1;
-            await scoreGetlist(token);
             //任务完成情况-------//await taskList(token);
             await userOrderList(token, phone, index + 1); //商城订单信息
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-
         dfxtlTokenArr.sort(function (x,y) {
             return y.score-x.score;
         });
         for(let i=0;i<dfxtlTokenArr.length;i++){
             addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
+            await scoreGetlist(dfxtlTokenArr[i].token);
         }
         if (changeFlag) {
             console.log("需要修改文件\n");
@@ -139,20 +138,20 @@ let curHour = (new Date()).getHours()
 /////---------------------------方法
 
 async function checkphone(){
-        //修改文件
-        fs.writeFile("./phone1.json",
-            JSON.stringify(phoneErrorArr),
-            (err) => {
-                if (err) console.log(err);
-                console.log("文件修改完成1\n");
-            })
-        //修改文件
-        fs.writeFile("./phone2.json",
-            JSON.stringify(phoneSuccessArr),
-            (err) => {
-                if (err) console.log(err);
-                console.log("文件修改完成2\n");
-            });
+    //修改文件
+    fs.writeFile("./phone1.json",
+        JSON.stringify(phoneErrorArr),
+        (err) => {
+            if (err) console.log(err);
+            console.log("文件修改完成1\n");
+        })
+    //修改文件
+    fs.writeFile("./phone2.json",
+        JSON.stringify(phoneSuccessArr),
+        (err) => {
+            if (err) console.log(err);
+            console.log("文件修改完成2\n");
+        });
 }
 // d东风雪铁龙登录
 async function dfxtllogin(num) {
@@ -649,11 +648,11 @@ async function userOrderList(token, phone, index) {
         var total = result.data.total;
         var list2 = result.data.list;
         var list=list2.filter(ele=>{
-           if( ele.orderStatusDetailStr=='已发货'||ele.orderStatusDetailStr=='代发货'){
-               return true;
-           }else{
-               return  false;
-           }
+            if( ele.orderStatusDetailStr=='已发货'||ele.orderStatusDetailStr=='代发货'){
+                return true;
+            }else{
+                return  false;
+            }
         })
         if (list.length > 0) {
             addNotifyStr1(`\n=======第【${index}】个手机号【${phone}】======`, false)
