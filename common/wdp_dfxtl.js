@@ -103,12 +103,21 @@ let curHour = (new Date()).getHours()
                 await $.wait(4000);
             }
             const score = await scoreGet(token);//获取积分信息
-            addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+            // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+            dfxtlTokenArr[index].score=score;
+            dfxtlTokenArr[index].number=index + 1;
             await scoreGetlist(token);
             //任务完成情况-------//await taskList(token);
             await userOrderList(token, phone, index + 1); //商城订单信息
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
+
+        dfxtlTokenArr.sort(function (x,y) {
+            return y.score-x.score;
+        });
+        for(let i=0;i<dfxtlTokenArr.length;i++){
+            addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
+        }
         if (changeFlag) {
             console.log("需要修改文件\n");
             //修改文件
