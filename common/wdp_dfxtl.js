@@ -647,7 +647,7 @@ async function userOrderList(token, phone, index) {
            }
         })
         if (list.length > 0) {
-            addNotifyStr1(`\n=======第【${index}】个手机号【${phone}】======\n`, false)
+            addNotifyStr1(`\n=======第【${index}】个手机号【${phone}】======`, false)
             for (var j = 0; j < list.length; j++) {
                 var skuName = list[j].skuName;
                 var orderStatusDetailStr = list[j].orderStatusDetailStr;
