@@ -638,21 +638,29 @@ async function userOrderList(token, phone, index) {
     if (result.code == 0) {
         // console.log('查询商城订单成功！！！');
         var total = result.data.total;
-        var list = result.data.list;
+        var list2 = result.data.list;
+        var list=list2.filter(ele=>{
+           if( ele.orderStatusDetailStr=='已发货'||ele.orderStatusDetailStr=='代发货'){
+               return true;
+           }else{
+               return  false;
+           }
+        })
         if (list.length > 0) {
             addNotifyStr1(`\n=======第【${index}】个手机号【${phone}】======\n`, false)
-        }
-        for (var j = 0; j < list.length; j++) {
-            var skuName = list[j].skuName;
-            var orderStatusDetailStr = list[j].orderStatusDetailStr;
-            if (orderStatusDetailStr == '已发货') {
-                addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
-                var id = list[j].id;
-                await getLogisticsTrackMapInfo(token, id)
-            } else if (orderStatusDetailStr == '代发货') {
-                addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
+            for (var j = 0; j < list.length; j++) {
+                var skuName = list[j].skuName;
+                var orderStatusDetailStr = list[j].orderStatusDetailStr;
+                if (orderStatusDetailStr == '已发货') {
+                    addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
+                    var id = list[j].id;
+                    await getLogisticsTrackMapInfo(token, id)
+                } else if (orderStatusDetailStr == '代发货') {
+                    addNotifyStr1(`【${j + 1}】:商品名称:【${skuName}】:【${orderStatusDetailStr}】`, false)
+                }
             }
         }
+
     } else {
         console.log('查询商城订单失败：' + result.message)
 
