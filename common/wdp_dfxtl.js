@@ -107,9 +107,11 @@ let curHour = (new Date()).getHours()
             }
             const score = await scoreGet(token);//获取积分信息
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
-            dfxtlTokenArr[index].score=score;
-            dfxtlTokenArr[index].number=index + 1;
             //任务完成情况-------//await taskList(token);
+            var scorenow=await scoreGetlist(token);//获取今日积分
+            dfxtlTokenArr[index].score=score;
+            dfxtlTokenArr[index].scorenow=scorenow;
+            dfxtlTokenArr[index].number=index + 1;
             await userOrderList(token, phone, index + 1); //商城订单信息
         }
         addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
@@ -118,7 +120,7 @@ let curHour = (new Date()).getHours()
         });
         for(let i=0;i<dfxtlTokenArr.length;i++){
             addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
-            await scoreGetlist(dfxtlTokenArr[i].token);
+            addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
         }
         if (changeFlag) {
             console.log("需要修改文件\n");
@@ -573,7 +575,7 @@ async function scoreGetlist(token) {
     let result = httpResult;
     if (!result) return
     //console.log(JSON.stringify(result))
-    var scoreamoun = 0;
+    var scorenow = 0;
     var scoreamoun1 = 0;
     if (result.code == 0) {
         var datlist = result.data.list;
@@ -585,9 +587,10 @@ async function scoreGetlist(token) {
                 return false;
             }
         }).map(ele => {
-            scoreamoun += ele.score;
+            scorenow += ele.score;
         })
-        addNotifyStr('今日获取积分为：【' + scoreamoun + '】', false);
+        return scorenow;
+        //addNotifyStr('今日获取积分为：【' + scorenow + '】', false);
         var nowdata2 = getDate(2);
         datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata2) {
