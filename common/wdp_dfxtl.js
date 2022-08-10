@@ -27,8 +27,8 @@ let httpResult //global buffer
 
 let dfxtlphone = ($.isNode() ? process.env.dfxtlphone : $.getdata('dfxtlphone')) || '';
 let dfxtlpassword = ($.isNode() ? process.env.dfxtlpassword : $.getdata('dfxtlpassword')) || '';
-let Sign = ($.isNode() ? process.env.bjqcCookie : $.getdata('bjqcToken')) || '';
-let TimeStamp = ($.isNode() ? process.env.TimeStamp : $.getdata('TimeStamp')) || '';
+let Sign = ($.isNode() ? process.env.dfxtlSign : $.getdata('dfxtlSign')) || '';
+let TimeStamp = ($.isNode() ? process.env.dfxtlTime : $.getdata('dfxtlTime')) || '';
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
@@ -88,12 +88,9 @@ let curHour = (new Date()).getHours()
             }
             await $.wait(500);
             if (dfxtlTokenArr[index].token == '') {
-                await dfxtlloginchange(index);//对卖出的手机号进行二次登录
-                if (dfxtlTokenArr[index].token == '') {
-                    addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
-                    phoneErrorArr.push(phone);//错误手机数组
-                    continue;
-                }
+                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
+                phoneErrorArr.push(phone);//错误手机数组
+                continue;
             }
             phoneSuccessArr.push(phone);//正确手机数组
             var token = dfxtlTokenArr[index].token;
@@ -142,20 +139,20 @@ let curHour = (new Date()).getHours()
 /////---------------------------方法
 
 async function checkphone(){
-        //修改文件
-        fs.writeFile("./phone1.json",
-            JSON.stringify(phoneErrorArr),
-            (err) => {
-                if (err) console.log(err);
-                console.log("文件修改完成1\n");
-            })
-        //修改文件
-        fs.writeFile("./phone2.json",
-            JSON.stringify(phoneSuccessArr),
-            (err) => {
-                if (err) console.log(err);
-                console.log("文件修改完成2\n");
-            });
+    //修改文件
+    fs.writeFile("./phone1.json",
+        JSON.stringify(phoneErrorArr),
+        (err) => {
+            if (err) console.log(err);
+            console.log("文件修改完成1\n");
+        })
+    //修改文件
+    fs.writeFile("./phone2.json",
+        JSON.stringify(phoneSuccessArr),
+        (err) => {
+            if (err) console.log(err);
+            console.log("文件修改完成2\n");
+        });
 }
 // d东风雪铁龙登录
 async function dfxtllogin(num) {
@@ -187,36 +184,7 @@ async function dfxtllogin(num) {
         dfxtlTokenArr[num].token = '';
     }
 }
-// d东风雪铁龙登录
-async function dfxtlloginchange(num) {
-    var phone = '';
-    phone = dfxtlTokenArr[num].phone;
-    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/auth/loginForPwd`
-    let body = {
-        "pushId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
-        "password": 'dengmeng521',
-        "areaCode": "",
-        "pwdType": 1,
-        "deviceId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
-        "account": phone,
-    };
-    //console.log('登录获取token')
-    let urlObject = populateUrlObject(url, '', body)
-    await httpRequest('post', urlObject)
-    let result = httpResult;
-    if (!result) {
-        dfxtlTokenArr[num].token = '';
-        return
-    }
-    if (result.code == 0) {
-        dfxtlTokenArr[num].token = result.data.tokenValue;
-        dfxtlTokenArr[num].userid = result.data.userInfoVo.id;
-        console.log('token 卖出账号 从新获取成功！！！')
-    } else {
-        console.log('token 卖出账号 登录失败：' + result.message)
-        dfxtlTokenArr[num].token = '';
-    }
-}
+
 async function sign(token, userid) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/sign/sureNew?userId=` + userid;
     let body = ''
@@ -682,11 +650,11 @@ async function userOrderList(token, phone, index) {
         var total = result.data.total;
         var list2 = result.data.list;
         var list=list2.filter(ele=>{
-           if( ele.orderStatusDetailStr=='已发货'||ele.orderStatusDetailStr=='代发货'){
-               return true;
-           }else{
-               return  false;
-           }
+            if( ele.orderStatusDetailStr=='已发货'||ele.orderStatusDetailStr=='代发货'){
+                return true;
+            }else{
+                return  false;
+            }
         })
         if (list.length > 0) {
             addNotifyStr1(`\n=======第【${index}】个手机号【${phone}】======`, false)
