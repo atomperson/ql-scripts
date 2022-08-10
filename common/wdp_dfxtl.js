@@ -88,9 +88,12 @@ let curHour = (new Date()).getHours()
             }
             await $.wait(500);
             if (dfxtlTokenArr[index].token == '') {
-                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
-                phoneErrorArr.push(phone);//错误手机数组
-                continue;
+                await dfxtlloginchange(index);//对卖出的手机号进行二次登录
+                if (dfxtlTokenArr[index].token == '') {
+                    addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
+                    phoneErrorArr.push(phone);//错误手机数组
+                    continue;
+                }
             }
             phoneSuccessArr.push(phone);//正确手机数组
             var token = dfxtlTokenArr[index].token;
@@ -184,7 +187,36 @@ async function dfxtllogin(num) {
         dfxtlTokenArr[num].token = '';
     }
 }
-
+// d东风雪铁龙登录
+async function dfxtlloginchange(num) {
+    var phone = '';
+    phone = dfxtlTokenArr[num].phone;
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/auth/loginForPwd`
+    let body = {
+        "pushId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
+        "password": 'dengmeng521',
+        "areaCode": "",
+        "pwdType": 1,
+        "deviceId": "c36b3e0d6ffb4a88a332c9ab716f5d16",
+        "account": phone,
+    };
+    //console.log('登录获取token')
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) {
+        dfxtlTokenArr[num].token = '';
+        return
+    }
+    if (result.code == 0) {
+        dfxtlTokenArr[num].token = result.data.tokenValue;
+        dfxtlTokenArr[num].userid = result.data.userInfoVo.id;
+        console.log('token 卖出账号 从新获取成功！！！')
+    } else {
+        console.log('token 卖出账号 登录失败：' + result.message)
+        dfxtlTokenArr[num].token = '';
+    }
+}
 async function sign(token, userid) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/sign/sureNew?userId=` + userid;
     let body = ''
