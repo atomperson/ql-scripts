@@ -82,9 +82,10 @@ let curHour = (new Date()).getHours()
             }
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
-            if (test100(index)) {
-                console.log('\n============开始【第' + num + '个账号:' + phone + '】')
-                console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
+            //if (test100(index)) {
+             if (true) {
+                    console.log('\n============开始【第' + num + '个账号:' + phone + '】')
+                    //console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
             }
             //token 校验  只是校验token是否正确
             if (await getSignStatus(dfxtlTokenArr[index].token)) {
@@ -108,7 +109,7 @@ let curHour = (new Date()).getHours()
             if (openflag == 1) {
                 await sign(token, userid);//签到
                 await infoget(token, userid); //获取用户信息
-                await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
+                //await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
                 await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
@@ -549,7 +550,7 @@ async function publishPostsNew(token, data1, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        //  console.log('发表帖子成功！！！,主题为:' + data1.title)
+        console.log('发表帖子成功！！！,主题为:' + data1.title)
     } else {
         console.log('发表帖子失败：' + result.message)
 
