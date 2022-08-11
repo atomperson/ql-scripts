@@ -588,7 +588,7 @@ async function collect(token,id) {
     let result = httpResult;
     if (!result) return
     if (result.code == 0) {
-         console.log('收藏成功')
+        // console.log('收藏成功')
     } else {
         console.log('收藏失败：' + result.message)
     }
@@ -602,7 +602,7 @@ async function attention(token,id) {
     let result = httpResult;
     if (!result) return
     if (result.code == 0) {
-        console.log('关注成功')
+       // console.log('关注成功')
     } else {
         console.log('关注失败：' + result.message)
     }
@@ -616,7 +616,7 @@ async function like(token,id) {
     let result = httpResult;
     if (!result) return
     if (result.code == 0) {
-        console.log('点赞成功')
+        //console.log('点赞成功')
     } else {
         console.log('点赞失败：' + result.message)
     }
