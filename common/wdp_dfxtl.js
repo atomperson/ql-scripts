@@ -323,7 +323,7 @@ async function queryChoicenessNewList(token) {
         }
     }
     var data = NewListArr;
-    for (let index = 0; index < 5; index++) {//一次评价4条
+    for (let index = 0; index < 4; index++) {//一次评价4条
         var aNumber = (200) * Math.random();
         var aNumber1 = Math.floor(aNumber);//0-100随机取一条
         var conectTemId = data[aNumber1].id;
