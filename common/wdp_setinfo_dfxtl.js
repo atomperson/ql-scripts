@@ -1,12 +1,12 @@
 /*
-东风雪铁龙修改用户信息
+东风雪铁龙查询库存信息
 
 [task_local]
-#东风雪铁龙修改用户信息
-0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙修改用户信息, enabled=true
+#东风雪铁龙查询库存信息
+0 0,7,13 * * * wdp_dfxtl.js, tag=东风雪铁龙查询库存信息, enabled=true
 */
-const jsname = '东风雪铁龙修改用户信息'
-const $ = Env('东风雪铁龙修改用户信息')
+const jsname = '东风雪铁龙查询库存信息'
+const $ = Env('东风雪铁龙查询库存信息')
 const logDebug = 0
 
 let searchtype='1'; //1为查询库存信息 2为更改用户信息  3 为抢商品  4 为 获取token并保存  5为查询积分详情 和查快递
