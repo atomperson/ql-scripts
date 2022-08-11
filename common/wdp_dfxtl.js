@@ -309,7 +309,7 @@ async function queryChoicenessNewList(token) {
     if (NewListArr.length == 0) {
         //1102626767558049804
         let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
-        let body = {"pageNum": "1", "pageSize": "200"};//一次查100条
+        let body = {"pageNum": "1", "pageSize": "300"};//一次查100条
         let urlObject = populateUrlObject(url, token, body)
         await httpRequest('post', urlObject)
         let result = httpResult;
@@ -323,7 +323,7 @@ async function queryChoicenessNewList(token) {
         }
     }
     var data = NewListArr;
-    for (let index = 0; index < 4; index++) {//一次评价4条
+    for (let index = 0; index < 5; index++) {//一次评价4条
         var aNumber = (200) * Math.random();
         var aNumber1 = Math.floor(aNumber);//0-100随机取一条
         var conectTemId = data[aNumber1].id;
