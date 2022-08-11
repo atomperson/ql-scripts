@@ -550,7 +550,7 @@ async function publishPostsNew(token, data1, userid,index) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子成功！！！')
-        phoneSuccessArr.push(phone);//正确手机数组
+        phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
         //console.log('发表帖子失败：' + result.message)
     }
