@@ -15,7 +15,7 @@ const fs = require("fs");
 // import fs from "fs";
 
 const openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
-let checkphoneFlag=false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
+let checkphoneFlag=true;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -82,10 +82,9 @@ let curHour = (new Date()).getHours()
             }
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
-            //if (test100(index)) {
-             if (true) {
+            if (test100(index)) {
                     console.log('\n============开始【第' + num + '个账号:' + phone + '】')
-                    //console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
+                    console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
             }
             //token 校验  只是校验token是否正确
             if (await getSignStatus(dfxtlTokenArr[index].token)) {
@@ -103,14 +102,14 @@ let curHour = (new Date()).getHours()
                 dfxtlTokenArr[index].number=index + 1;
                 continue;
             }
-            phoneSuccessArr.push(phone);//正确手机数组
+            //phoneSuccessArr.push(phone);//正确手机数组
             var token = dfxtlTokenArr[index].token;
             var userid = dfxtlTokenArr[index].userid
             if (openflag == 1) {
                 await sign(token, userid);//签到
                 await infoget(token, userid); //获取用户信息
                 //await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
-                await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
+                await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
             const score = await scoreGet(token);//获取积分信息
@@ -351,7 +350,7 @@ async function queryChoicenessNewList(token) {
 
 
 //查询 账号关注的用户数量
-async function followList(token, userid) {
+async function followList(token, userid,index) {
     //followlistArr 关注人数的数组
     if (followlistArr.length == 0) {
         let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/follow/followList`
@@ -378,12 +377,12 @@ async function followList(token, userid) {
     var otherid = followlistArr[followlistNo];//随机用户id
     //console.log(JSON.stringify(otherid));
     //查询该用户的帖子信息
-    await queryChoicenessByUserDTO(token, userid, otherid)
+    await queryChoicenessByUserDTO(token, userid, otherid,index)
 
 }
 
 //查询某个用户发帖数
-async function queryChoicenessByUserDTO(token, userid, otherid) {
+async function queryChoicenessByUserDTO(token, userid, otherid,index) {
     //如果图片有数据则查询20条 第一次查询需查询多点 这样可以图片多
     var pageSize = 30;
     if (imageArr.length == 0) {
@@ -416,7 +415,7 @@ async function queryChoicenessByUserDTO(token, userid, otherid) {
         var infoData = result.data.list[aNumber1];
         var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
         infoData.imageUrl = imageArr[imageNo];//随机图片url
-        await publishPostsNew(token, infoData, userid)
+        await publishPostsNew(token, infoData, userid,index)
         await $.wait(500);
 
     } else {
@@ -527,7 +526,7 @@ async function randomtitle(title) {
 }
 
 //发表帖子---
-async function publishPostsNew(token, data1, userid) {
+async function publishPostsNew(token, data1, userid,index) {
     var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
     var data = JSON.parse(aa2);
     data.content = data1.content;
@@ -550,7 +549,8 @@ async function publishPostsNew(token, data1, userid) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('发表帖子成功！！！,主题为:' + data1.title)
+        console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子成功！！！')
+        phoneSuccessArr.push(phone);//正确手机数组
     } else {
         console.log('发表帖子失败：' + result.message)
 
