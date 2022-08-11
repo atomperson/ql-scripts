@@ -61,9 +61,10 @@ let curHour = (new Date()).getHours()
             console.log('文件读取错误' + error);
             return
         }
-        console.log('手机号数组数量：' + dfxtlphoneArr.length);
+        var phoneset=new Set(dfxtlphoneArr);
+        console.log('手机号数组数量：' + phoneset.size);
         console.log('token数组数量：' + dfxtlTokenArr.length);
-        if (dfxtlphoneArr.length != dfxtlTokenArr.length) {
+        if (phoneset.size != dfxtlTokenArr.length) {
             console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
             return
         }
