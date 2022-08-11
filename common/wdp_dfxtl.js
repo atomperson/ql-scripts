@@ -375,6 +375,8 @@ async function followList(token, userid,index) {
     await $.wait(500);
     var followlistNo = Math.floor((followlistArr.length) * Math.random());//随机取一名关注的用户
     var otherid = followlistArr[followlistNo];//随机用户id
+    //随机 关注
+    await attention(token, otherid)
     //console.log(JSON.stringify(otherid));
     //查询该用户的帖子信息
     await queryChoicenessByUserDTO(token, userid, otherid,index)
@@ -413,6 +415,10 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
         var aNumber1 = Math.floor(aNumber);
         //获取随机数据 该用户的某个帖子
         var infoData = result.data.list[aNumber1];
+        //喜欢
+        await like(token,infoData.id)
+        //收藏
+        await collect(token,infoData.id)
         var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
         infoData.imageUrl = imageArr[imageNo];//随机图片url
         await publishPostsNew(token, infoData, userid,index)
@@ -573,7 +579,48 @@ async function scoreGet(token) {
 
     }
 }
-
+//收藏
+async function collect(token,id) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/bbsCollect/collect`
+    let body = {"collectTemId":id,"collectTemType":"6"};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+         console.log('收藏成功')
+    } else {
+        console.log('收藏失败：' + result.message)
+    }
+}
+//关注
+async function attention(token,id) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/follow/attention`
+    let body = {"followedId":id};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        console.log('关注成功')
+    } else {
+        console.log('关注失败：' + result.message)
+    }
+}
+//关注
+async function like(token,id) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/bbsLike/like`
+    let body = {"collectTemId":id,"collectTemType":"6"};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        console.log('点赞成功')
+    } else {
+        console.log('点赞失败：' + result.message)
+    }
+}
 //查询积分记录
 async function scoreGetlist(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/list`
