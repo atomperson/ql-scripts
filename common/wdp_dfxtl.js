@@ -532,7 +532,8 @@ async function publishPostsNew(token, data1, userid) {
     data.content = data1.content;
     var str2 = data1.content.replace("<p>", "").replace("</p>", "");
     data.paragraphs.paragraphContent = str2;//去掉p 标签
-    data.title = await randomtitle(data1.title);
+    //data.title = await randomtitle(data1.title);
+    data.title =    data1.title;
     data.userId = userid;
     data.bbsFile[0].createBy = userid;
     data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
