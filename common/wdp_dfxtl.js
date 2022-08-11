@@ -74,6 +74,11 @@ let curHour = (new Date()).getHours()
         for (let index = 0; index < dfxtlTokenArr.length; index++) {
             var phone = '';
             phone = dfxtlTokenArr[index].phone;
+            phone2 = dfxtlphoneArr[index];
+            if (phone2 !=phone) {
+                console.log(`第${index+1} 个token手机号与变量手机号不对应 \n dfxtlTokenArr:【 ${phone}】,dfxtlphoneArr:【 ${phone2}】`);
+                continue;
+            }
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
             if (test100(index)) {
