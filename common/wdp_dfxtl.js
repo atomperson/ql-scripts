@@ -88,8 +88,12 @@ let curHour = (new Date()).getHours()
             }
             await $.wait(500);
             if (dfxtlTokenArr[index].token == '') {
-                addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
+                console.log(`【第 (${index + 1}) 个手机号:${phone},登录错误】`);
+                //addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
                 phoneErrorArr.push(phone);//错误手机数组
+                dfxtlTokenArr[index].score=0;
+                dfxtlTokenArr[index].scorenow=0;
+                dfxtlTokenArr[index].number=index + 1;
                 continue;
             }
             phoneSuccessArr.push(phone);//正确手机数组
@@ -100,23 +104,16 @@ let curHour = (new Date()).getHours()
                 await infoget(token, userid); //获取用户信息
                 await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
                 await followList(token, userid); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
-                await $.wait(4000);
+                await $.wait(2000);
             }
             const score = await scoreGet(token);//获取积分信息
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
-            dfxtlTokenArr[index].score=score;
-            dfxtlTokenArr[index].number=index + 1;
-            await scoreGetlist(token);
             //任务完成情况-------//await taskList(token);
+            var scorenow=await scoreGetlist(token);//获取今日积分
+            dfxtlTokenArr[index].score=score;
+            dfxtlTokenArr[index].scorenow=scorenow;
+            dfxtlTokenArr[index].number=index + 1;
             await userOrderList(token, phone, index + 1); //商城订单信息
-        }
-        addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-
-        dfxtlTokenArr.sort(function (x,y) {
-            return y.score-x.score;
-        });
-        for(let i=0;i<dfxtlTokenArr.length;i++){
-            addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
         }
         if (changeFlag) {
             console.log("需要修改文件\n");
@@ -125,6 +122,15 @@ let curHour = (new Date()).getHours()
                 if (err) console.log(err);
                 console.log("文件修改完成\n");
             })
+        }
+        await $.wait(500);
+        addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
+        dfxtlTokenArr.sort(function (x,y) {
+            return y.score-x.score;
+        });
+        for(let i=0;i<dfxtlTokenArr.length;i++){
+            addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
+            addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
         }
         //是否生成 错误和 正确手机数组
         if (checkphoneFlag) {
@@ -520,8 +526,7 @@ async function publishPostsNew(token, data1, userid) {
     data.content = data1.content;
     var str2 = data1.content.replace("<p>", "").replace("</p>", "");
     data.paragraphs.paragraphContent = str2;//去掉p 标签
-    //data.title = await randomtitle(data1.title);
-    data.title = data1.title;
+    data.title = await randomtitle(data1.title);
     data.userId = userid;
     data.bbsFile[0].createBy = userid;
     data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
@@ -572,7 +577,7 @@ async function scoreGetlist(token) {
     let result = httpResult;
     if (!result) return
     //console.log(JSON.stringify(result))
-    var scoreamoun = 0;
+    var scorenow = 0;
     var scoreamoun1 = 0;
     if (result.code == 0) {
         var datlist = result.data.list;
@@ -584,9 +589,10 @@ async function scoreGetlist(token) {
                 return false;
             }
         }).map(ele => {
-            scoreamoun += ele.score;
+            scorenow += ele.score;
         })
-        addNotifyStr('今日获取积分为：【' + scoreamoun + '】', false);
+        return scorenow;
+        //addNotifyStr('今日获取积分为：【' + scorenow + '】', false);
         var nowdata2 = getDate(2);
         datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata2) {
