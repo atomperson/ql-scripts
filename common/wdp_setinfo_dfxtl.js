@@ -124,11 +124,16 @@ let dfxtlTokenArr = [];
 
                 }else if(searchtype==4){
                     //获取用户token 并保存
+                    var score=0;
+                    var scorenow=0;
+                    var number=index + 1;
                     if(isnew){
-                        userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                        userinfo1.push({token: token, userid: userid, score: score, scorenow: scorenow, number: number
+                            , phone: dfxtlphoneArr[index]})
                     }else{
                         //TODO
-                        userinfo1.push({token: token, userid: userid, phone: dfxtlphoneArr[index]})
+                        userinfo1.push({token: token, userid: userid, score: score, scorenow: scorenow, number: number
+                            , phone: dfxtlphoneArr[index]})
                     }
                 } else{
 
