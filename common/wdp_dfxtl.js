@@ -31,6 +31,8 @@ let Sign = ($.isNode() ? process.env.dfxtlSign : $.getdata('dfxtlSign')) || '';
 let TimeStamp = ($.isNode() ? process.env.dfxtlTime : $.getdata('dfxtlTime')) || '';
 let vins = ($.isNode() ? process.env.vins : $.getdata('vins')) || '';
 let vinsArr = [];
+let vinsindex = -1;
+
 
 let changeFlag = false;
 let dfxtlphoneArr = [];
@@ -121,8 +123,8 @@ let curHour = (new Date()).getHours()
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             //任务完成情况-------//await taskList(token);
             var scorenow=await scoreGetlist(token);//获取今日积分
-            //await carOwnerOutletssave(token, userid, vinsArr[index]);//绑定车主
             await getMyCarList(token,userid,phone);//获取vin 码信息
+
             dfxtlTokenArr[index].score=score;
             dfxtlTokenArr[index].scorenow=scorenow;
             dfxtlTokenArr[index].number=index + 1;
@@ -156,6 +158,52 @@ let curHour = (new Date()).getHours()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 /////---------------------------方法
+//获取用户的车主人证
+async function getMyCarList(token, userid,phone) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/getMyCarList?phone=${phone}&userId=${userid}`;
+    let body = ''
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        var carList=result.data;
+        if(carList.length>0){
+            console.log('已绑定vin码 【'+phone +'】')
+            for(var i=0;i<carList.length;i++){
+                var vin=carList[i].vin;
+                vinArr.push({
+                    phone:phone,vin:vin
+                })
+            }
+        }else{
+            console.log('暂无绑定 车辆信息' )
+            await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
+        }
+    } else {
+        console.log('获取用户的车主人证失败：' + result.message)
+    }
+}
+//vin码校验
+async function checkVinIsMatchCar(token, userid) {
+    var vin='';
+    vinsindex=vinsindex+1;
+    for(;vinsindex<vinsArr.length;vinsindex++){
+        vin=vinsArr[vinsindex];
+        let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/checkVinIsMatchCar?vin=${vin}`;
+        let body ='';
+        let urlObject = populateUrlObject(url, token, body)
+        await httpRequest('get', urlObject)
+        let result = httpResult;
+        if (!result) return
+        if (result.code == 0) {
+            console.log('第【'+vinsindex+'】个vin码校验成功：【' +vin+'】');
+            await carOwnerOutletssave(token, userid, vin);//绑定车主
+        } else {
+            console.log('第【'+vinsindex+'】个vin码校验失败：' +vin);
+        }
+    }
+}
 //绑定人证
 async function carOwnerOutletssave(token, userId, vin) {
     let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/save`;
@@ -619,31 +667,7 @@ async function publishPostsNew(token, data1, userid,index) {
     }
 }
 
-//获取用户的车主人证
-async function getMyCarList(token, userid,phone) {
-    let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/getMyCarList?phone=${phone}&userId=${userid}`;
-    let body = ''
-    let urlObject = populateUrlObject(url, token, body)
-    await httpRequest('get', urlObject)
-    let result = httpResult;
-    if (!result) return
-    if (result.code == 0) {
-        var carList=result.data;
-        if(carList.length>0){
-            console.log('已绑定vin码 【'+phone +'】')
-            for(var i=0;i<carList.length;i++){
-                var vin=carList[i].vin;
-                vinArr.push({
-                    phone:phone,vin:vin
-                })
-            }
-        }else{
-            //console.log('暂无绑定 车辆信息' )
-        }
-    } else {
-        console.log('获取用户的车主人证失败：' + result.message)
-    }
-}
+
 
 //查询积分
 async function scoreGet(token) {
