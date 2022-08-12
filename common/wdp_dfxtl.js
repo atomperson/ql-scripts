@@ -29,6 +29,9 @@ let dfxtlphone = ($.isNode() ? process.env.dfxtlphone : $.getdata('dfxtlphone'))
 let dfxtlpassword = ($.isNode() ? process.env.dfxtlpassword : $.getdata('dfxtlpassword')) || '';
 let Sign = ($.isNode() ? process.env.dfxtlSign : $.getdata('dfxtlSign')) || '';
 let TimeStamp = ($.isNode() ? process.env.dfxtlTime : $.getdata('dfxtlTime')) || '';
+let vins = ($.isNode() ? process.env.vins : $.getdata('vins')) || '';
+let vinsArr = [];
+
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
@@ -85,8 +88,8 @@ let curHour = (new Date()).getHours()
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
             if (test100(index)) {
-                    console.log('\n============开始【第' + num + '个账号:' + phone + '】')
-                    console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
+                console.log('\n============开始【第' + num + '个账号:' + phone + '】')
+                console.log(`北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} ======\n`);
             }
             //token 校验  只是校验token是否正确
             if (await getSignStatus(dfxtlTokenArr[index].token)) {
@@ -118,6 +121,7 @@ let curHour = (new Date()).getHours()
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             //任务完成情况-------//await taskList(token);
             var scorenow=await scoreGetlist(token);//获取今日积分
+            //await carOwnerOutletssave(token, userid, vinsArr[index]);//绑定车主
             await getMyCarList(token,userid,phone);//获取vin 码信息
             dfxtlTokenArr[index].score=score;
             dfxtlTokenArr[index].scorenow=scorenow;
@@ -152,7 +156,49 @@ let curHour = (new Date()).getHours()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 /////---------------------------方法
-
+//绑定人证
+async function carOwnerOutletssave(token, userId, vin) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/save`;
+    var plateNumber = await getPlate();
+    let body = {
+        "dealerId": "75528V",
+        "fileUrl": "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/mmexport1660204659540.png",
+        "isEnable": 0,
+        "isTVehicle": "0",
+        "plateNumber": plateNumber,
+        "registrationDate": "null",
+        "status": 0,
+        "userId": userId,
+        "vin": vin
+    };
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        console.log('vin:【'+vin+'】绑定人证成功')
+    } else {
+        console.log('vin:【'+vin+'】绑定人证成失败：' + result.message)
+    }
+}
+//随机生成 车牌号码
+function getPlate() {
+    var shi = ["A", "B", "C"];
+    var carId = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    //省号
+    var sheng = ["京", "津", "沪", "渝", "冀", "吉", "辽", "黑", "湘", "鄂", "甘", "晋", "陕", "豫", "川", "云", "桂",
+        "蒙", "贵", "青", "藏", "新", "宁", "粤", "琼", "闽", "苏", "浙", "赣", "鲁", "皖"];
+    var shengi = parseInt(Math.random() * (sheng.length));
+    var shiIndex = parseInt(Math.random() * 3);
+    //console.debug ("随机生成 0-2 之间的数（包含 0 和 2）：" + shiIndex);
+    var carNumber = sheng[shengi] + shi [shiIndex];
+    //console.debug("随机生成车牌对焦点前面的内容：" + carNumber);
+    for (var i = 0; i < 5; i++) {
+        carNumber += carId[parseInt(Math.random() * carId.length - 1)];
+    }
+    console.log("生成的号牌是：" + carNumber);
+    return carNumber;
+}
 async function checkphone(){
     //修改文件
     fs.writeFile("./phone1.json",
@@ -639,7 +685,7 @@ async function attention(token,id) {
     let result = httpResult;
     if (!result) return
     if (result.code == 0) {
-       // console.log('关注成功')
+        // console.log('关注成功')
     } else {
         console.log('关注失败：' + result.message)
     }
@@ -899,6 +945,23 @@ async function Envs() {
     } else {
         log(`\n提示：未填写提现变量，不会执行自动提现`)
     }
+
+    if (vins) {
+        if (vins.indexOf("@") != -1) {
+            vins.split("@").forEach((item) => {
+                vinsArr.push(item);
+            });
+        } else if (vins.indexOf("\n") != -1) {
+            vins.split("\n").forEach((item) => {
+                vinsArr.push(item);
+            });
+        } else {
+            vinsArr.push(vins);
+        }
+    } else {
+        log(`\n提示：未填写提现变量，不会执行自动提现`)
+    }
+
 
 
     return true;
