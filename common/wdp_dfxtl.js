@@ -32,6 +32,8 @@ let TimeStamp = ($.isNode() ? process.env.dfxtlTime : $.getdata('dfxtlTime')) ||
 let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
+let vinArr = []; //vin 码数组
+
 let username = '';
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
 let imageArr = [];//图片资源
@@ -116,6 +118,7 @@ let curHour = (new Date()).getHours()
             // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
             //任务完成情况-------//await taskList(token);
             var scorenow=await scoreGetlist(token);//获取今日积分
+            await getMyCarList(token,userid,phone);//获取vin 码信息
             dfxtlTokenArr[index].score=score;
             dfxtlTokenArr[index].scorenow=scorenow;
             dfxtlTokenArr[index].number=index + 1;
@@ -164,6 +167,14 @@ async function checkphone(){
         (err) => {
             if (err) console.log(err);
             console.log("文件修改完成2\n");
+        });
+
+    //修改文件
+    fs.writeFile("./vin.json",
+        JSON.stringify(vinArr),
+        (err) => {
+            if (err) console.log(err);
+            console.log("vin文件文件修改完成2\n");
         });
 }
 // d东风雪铁龙登录
@@ -559,6 +570,32 @@ async function publishPostsNew(token, data1, userid,index) {
         phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
         //console.log('发表帖子失败：' + result.message)
+    }
+}
+
+//获取用户的车主人证
+async function getMyCarList(token, userid,phone) {
+    let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/getMyCarList?phone=${phone}&userId=${userid}`;
+    let body = ''
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        var carList=result.data;
+        if(carList.length>0){
+            console.log('已绑定vin码 【'+phone +'】')
+            for(var i=0;i<carList.length;i++){
+                var vin=carList[i].vin;
+                vinArr.push({
+                    phone:phone,vin:vin
+                })
+            }
+        }else{
+            //console.log('暂无绑定 车辆信息' )
+        }
+    } else {
+        console.log('获取用户的车主人证失败：' + result.message)
     }
 }
 
