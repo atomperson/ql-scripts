@@ -697,7 +697,7 @@ async function collect(token,id) {
     if (result.code == 0) {
         // console.log('收藏成功')
     } else {
-        console.log('收藏失败：' + result.message)
+      //  console.log('收藏失败：' + result.message)
     }
 }
 //关注
@@ -711,7 +711,7 @@ async function attention(token,id) {
     if (result.code == 0) {
         // console.log('关注成功')
     } else {
-        console.log('关注失败：' + result.message)
+       // console.log('关注失败：' + result.message)
     }
 }
 //关注
@@ -725,7 +725,7 @@ async function like(token,id) {
     if (result.code == 0) {
         //console.log('点赞成功')
     } else {
-        console.log('点赞失败：' + result.message)
+       // console.log('点赞失败：' + result.message)
     }
 }
 //查询积分记录
