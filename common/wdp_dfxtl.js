@@ -178,7 +178,7 @@ async function getMyCarList(token, userid,phone) {
             }
         }else{
             console.log('暂无绑定 车辆信息' )
-            await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
+            //await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
         }
     } else {
         console.log('获取用户的车主人证失败：' + result.message)
