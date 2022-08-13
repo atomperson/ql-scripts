@@ -72,6 +72,7 @@ let curHour = (new Date()).getHours()
         }
         //读取文件token    同步方法 不需要回调函数,出错直接抛出
         try {
+            //hqqctiezi.json
             let fireData = fs.readFileSync("./ftqctitle.json", "utf-8");
             ftqcArr = JSON.parse(fireData);
         } catch (error) {
