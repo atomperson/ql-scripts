@@ -38,6 +38,8 @@ let changeFlag = false;
 let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
 let vinArr = []; //vin 码数组
+let ftqcArr = []; //ftqcArr
+
 
 let username = '';
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
@@ -64,6 +66,14 @@ let curHour = (new Date()).getHours()
         try {
             let fireData = fs.readFileSync("./userinfo.json", "utf-8");
             dfxtlTokenArr = JSON.parse(fireData);
+        } catch (error) {
+            console.log('文件读取错误' + error);
+            return
+        }
+        //读取文件token    同步方法 不需要回调函数,出错直接抛出
+        try {
+            let fireData = fs.readFileSync("./ftqctitle.json", "utf-8");
+            ftqcArr = JSON.parse(fireData);
         } catch (error) {
             console.log('文件读取错误' + error);
             return
@@ -177,8 +187,8 @@ async function getMyCarList(token, userid,phone) {
                 })
             }
         }else{
-            console.log('暂无绑定 车辆信息' )
-            //await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
+           // console.log('暂无绑定 车辆信息' )
+           // await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
         }
     } else {
         console.log('获取用户的车主人证失败：' + result.message)
@@ -638,20 +648,36 @@ async function randomtitle(title) {
 
 //发表帖子---
 async function publishPostsNew(token, data1, userid,index) {
+    var aNumber = (ftqcArr.length) * Math.random();
+    var aNumber1 = Math.floor(aNumber);
+    var ftqcdata =ftqcArr[aNumber1];
     var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
     var data = JSON.parse(aa2);
-    data.content = data1.content;
+    data.content =ftqcdata.content    //data1.content;
     var str2 = data1.content.replace("<p>", "").replace("</p>", "");
     data.paragraphs.paragraphContent = str2;//去掉p 标签
-    //data.title = await randomtitle(data1.title);
-    data.title =    data1.title;
+    data.title =ftqcdata.title   ;//  data1.title
     data.userId = userid;
-    data.bbsFile[0].createBy = userid;
-    data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
-    data.bbsFile[0].fileAddress = data1.imageUrl;//图片影像
-    data.bbsFile[0].fileAddressSmall = data1.imageUrl;//图片影像
+    var bbsFile=[]
+    for(var t=0;t<ftqcdata.images.length;t++){
+        bbsFile.push({
+            createBy:userid,
+            compressPath:ftqcdata.images[t],
+            fileAddress:ftqcdata.images[t],
+            fileAddressSmall:ftqcdata.images[t]
+            ,"fileTemType":6,
+            "fileType":0,
+            "isSelectPic":false,
+            "localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"
+        })
+    }
+    data.bbsFile=bbsFile;
+    // data.bbsFile[0].createBy = userid;
+    // data.bbsFile[0].compressPath = data1.imageUrl;//图片影像
+    // data.bbsFile[0].fileAddress = data1.imageUrl;//图片影像
+    // data.bbsFile[0].fileAddressSmall = data1.imageUrl;//图片影像
 
-    //图片随机 TOdo
+
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/posts/publishPostsNew`
     let body = data;
     let urlObject = populateUrlObject(url, token, body)
