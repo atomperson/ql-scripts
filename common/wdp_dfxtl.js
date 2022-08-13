@@ -390,7 +390,7 @@ async function putComment(token, data,index) {
 }
 
 //查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
-async function queryChoicenessNewList(token,index) {
+async function queryChoicenessNewList(token,idttt) {
     if (NewListArr.length == 0) {
         //1102626767558049804
         let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
@@ -427,7 +427,7 @@ async function queryChoicenessNewList(token,index) {
             "replyName": "",
             "sendMsgType": 0
         }
-        await putComment(token, aa,index);
+        await putComment(token, aa,idttt);
         await $.wait(500);
     }
 
