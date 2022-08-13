@@ -129,16 +129,19 @@ let curHour = (new Date()).getHours()
                 await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
-            const score = await scoreGet(token);//获取积分信息
-            // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
-            //任务完成情况-------//await taskList(token);
-            var scorenow=await scoreGetlist(token);//获取今日积分
-            await getMyCarList(token,userid,phone);//获取vin 码信息
-
+            var score =0;
+            var scorenow=0;
+            if (openflag == 2) {
+                score= await scoreGet(token);//获取积分信息
+                // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
+                //任务完成情况-------//await taskList(token);
+                scorenow=await scoreGetlist(token);//获取今日积分
+                await getMyCarList(token,userid,phone);//获取vin 码信息
+                await userOrderList(token, phone, index + 1); //商城订单信息
+            }
             dfxtlTokenArr[index].score=score;
             dfxtlTokenArr[index].scorenow=scorenow;
             dfxtlTokenArr[index].number=index + 1;
-            await userOrderList(token, phone, index + 1); //商城订单信息
         }
         if (changeFlag) {
             console.log("需要修改文件\n");
@@ -149,18 +152,21 @@ let curHour = (new Date()).getHours()
             })
         }
         await $.wait(500);
-        addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-        dfxtlTokenArr.sort(function (x,y) {
-            return y.score-x.score;
-        });
-        for(let i=0;i<dfxtlTokenArr.length;i++){
-            addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
-            addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
+        if (openflag == 2) {
+            addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
+            dfxtlTokenArr.sort(function (x,y) {
+                return y.score-x.score;
+            });
+            for(let i=0;i<dfxtlTokenArr.length;i++){
+                addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
+                addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
+            }
         }
         //是否生成 错误和 正确手机数组
         if (checkphoneFlag) {
             checkphone();
         }
+        console.log("\n东风雪铁龙执行完成！！！！！！！！！！！\n");
         showmsg()
 
     }
