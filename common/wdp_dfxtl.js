@@ -126,7 +126,7 @@ let curHour = (new Date()).getHours()
             if (openflag == 1) {
                 await sign(token, userid);//签到
                 await infoget(token, userid); //获取用户信息
-                //await queryChoicenessNewList(token);//评论任务  -------------查询最近的帖子
+                await queryChoicenessNewList(token,index);//评论任务  -------------查询最近的帖子
                 await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
@@ -404,7 +404,7 @@ async function selectAdvertCarousel(token) {
 }
 
 //评论消息
-async function putComment(token, data) {
+async function putComment(token, data,index) {
 
     var plle = plArr.length;
     var aNumber = (plle) * Math.random();
@@ -420,14 +420,16 @@ async function putComment(token, data) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         // console.log('评论消息成功！！！')
+        phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
-        console.log('评论消息失败：' + result.message)
+        phoneErrorArr.push(dfxtlphoneArr[index]);//错误手机数组
+       // console.log('评论消息失败：' + result.message)
 
     }
 }
 
 //查询最近更新的帖子 以前逻辑为取最新的10条 发现他这个更新慢 所有优化取100条然后随机4条
-async function queryChoicenessNewList(token) {
+async function queryChoicenessNewList(token,index) {
     if (NewListArr.length == 0) {
         //1102626767558049804
         let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/infoFlow/queryChoicenessNewList`
@@ -445,7 +447,7 @@ async function queryChoicenessNewList(token) {
         }
     }
     var data = NewListArr;
-    for (let index = 0; index < 4; index++) {//一次评价4条
+    for (let index = 0; index < 1; index++) {//一次评价4条
         var aNumber = (200) * Math.random();
         var aNumber1 = Math.floor(aNumber);//0-100随机取一条
         var conectTemId = data[aNumber1].id;
@@ -453,7 +455,7 @@ async function queryChoicenessNewList(token) {
 
         var aa = {
             "bbsFileList": [],
-            "commentContent": "欣赏雪铁龙，加油棒棒哒",
+            "commentContent": "加油雪铁龙",
             "commentParentId": "",
             "commentTemId": conectTemId,
             "commentTemType": pickType,
@@ -464,7 +466,7 @@ async function queryChoicenessNewList(token) {
             "replyName": "",
             "sendMsgType": 0
         }
-        await putComment(token, aa);
+        await putComment(token, aa,index);
         await $.wait(500);
     }
 
@@ -697,7 +699,6 @@ async function publishPostsNew(token, data1, userid,index) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子成功！！！')
-        phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
         //console.log('发表帖子失败：' + result.message)
     }
