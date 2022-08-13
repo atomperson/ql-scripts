@@ -127,7 +127,7 @@ let curHour = (new Date()).getHours()
                 await sign(token, userid);//签到
                 await infoget(token, userid); //获取用户信息
                 await queryChoicenessNewList(token,index);//评论任务  -------------查询最近的帖子
-                await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
+                //await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
             var score =0;
