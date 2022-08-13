@@ -363,45 +363,6 @@ async function getSignStatus(token) {
     }
 }
 
-//评论列表查询
-async function selectAdvertCarousel(token) {
-    let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/advertising/selectAdvertCarousel?pushPosition=1`
-    let body = ''
-    let urlObject = populateUrlObject(url, token, body)
-    await httpRequest('get', urlObject)
-    let result = httpResult;
-    if (!result) return
-    //console.log(JSON.stringify(result))
-    if (result.code == 0) {
-        console.log('评论列表查询')
-        var data = result.data;
-        //开始评论for
-        for (let index = 0; index < data.length; index++) {
-            var conectTemId = data[index].conectTemId;
-            var pickType = data[index].pickType;
-
-            var aa = {
-                "bbsFileList": [],
-                "commentContent": "欣赏雪铁龙，加油棒棒哒",
-                "commentParentId": "",
-                "commentTemId": conectTemId,
-                "commentTemType": pickType,
-                "ids": "",
-                "pageNum": 0,
-                "pageSize": 0,
-                "parentId": "",
-                "replyName": "",
-                "sendMsgType": 0
-            }
-            await putComment(token, aa);
-
-        }
-
-    } else {
-        console.log('登录失败：' + result.message)
-
-    }
-}
 
 //评论消息
 async function putComment(token, data,index) {
