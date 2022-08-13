@@ -659,9 +659,10 @@ async function publishPostsNew(token, data1, userid,index) {
     if (!result) return
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
-        console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子成功！！！')
+        //console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子成功！！！')
     } else {
-        //console.log('发表帖子失败：' + result.message)
+        //console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子失败\n')
+        console.log('【'+dfxtlphoneArr[index]+'】发表帖子失败：' + result.message)
     }
 }
 
