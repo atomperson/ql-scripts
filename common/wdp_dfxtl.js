@@ -522,16 +522,19 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
         await like(token,infoData.id)
         //收藏
         await collect(token,infoData.id)
-        var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
-        infoData.imageUrl = imageArr[imageNo];//随机图片url
         var random123=index%2;
         for(var i=0;i<3;i++){
             //调整为一次发三个 省事
             if(random123==0){
+                var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
+                infoData.imageUrl = imageArr[imageNo];//随机图片url
                 await publishPosts_copy(token, infoData, userid,index)
                 await $.wait(500);
+                //从新随机 帖子
+                 aNumber1 = Math.floor((result.data.list.length) * Math.random());
+                infoData = result.data.list[aNumber1];
             }else if(random123==1){
-                await publishPostsNew(token, infoData, userid,index)
+                await publishPostsNew(token, '', userid,index)
                 await $.wait(500);
             }else{
             }
