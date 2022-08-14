@@ -14,7 +14,7 @@ const fs = require("fs");
 // import axios from "axios";
 // import fs from "fs";
 
-const openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
+let openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
 let checkphoneFlag=true;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
@@ -85,6 +85,10 @@ let curHour = (new Date()).getHours()
         if (phoneset.size != dfxtlTokenArr.length) {
             console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
             return
+        }
+        //晚上9点默认赋值为做任务 类型
+        if(curHour==21){
+            openflag=1;
         }
         console.log(`\nopenflag为${openflag} 执行操作为:【 ${(openflag==1?'账号做任务':'查询账号积分信息和快递信息')}】`)
         console.log(`checkphoneFlag为${checkphoneFlag} 执行操作为:【 ${(checkphoneFlag==true?'错误账号生成json文件':'错误账号不生成json文件')}】\n`)
