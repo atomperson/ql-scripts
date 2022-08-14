@@ -15,7 +15,7 @@ const fs = require("fs");
 // import fs from "fs";
 
 let openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
-let checkphoneFlag=true;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
+let checkphoneFlag = false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -108,6 +108,7 @@ let curHour = (new Date()).getHours()
             if (phone2 !=phone) {
                 console.log(`第${index+1} 个token手机号与变量手机号不对应 \n dfxtlTokenArr:【 ${phone}】,dfxtlphoneArr:【 ${phone2}】`);
                 continue;
+                //break;
             }
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
@@ -151,25 +152,27 @@ let curHour = (new Date()).getHours()
                 await getMyCarList(token, userid, phone);//获取vin 码信息
                 await userOrderList(token, phone, index + 1); //商城订单信息
             }
-            dfxtlTokenArr[index].score=score;
-            dfxtlTokenArr[index].scorenow=scorenow;
-            dfxtlTokenArr[index].number=index + 1;
+            dfxtlTokenArr[index].score = score;
+            dfxtlTokenArr[index].scorenow = scorenow;
+            dfxtlTokenArr[index].number = index + 1;
         }
-        if (changeFlag) {
+        //if (changeFlag) {
+        if (false) {
             console.log("需要修改文件\n");
             //修改文件
             fs.writeFile("./userinfo.json", JSON.stringify(dfxtlTokenArr), (err) => {
                 if (err) console.log(err);
-                console.log("文件修改完成\n");
+                console.log("userinfo文件修改完成\n");
             })
+
         }
         await $.wait(500);
         if (openflag == 2) {
             addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-            dfxtlTokenArr.sort(function (x,y) {
-                return y.score-x.score;
+            dfxtlTokenArr.sort(function (x, y) {
+                return y.score - x.score;
             });
-            for(let i=0;i<dfxtlTokenArr.length;i++){
+            for (let i = 0; i < dfxtlTokenArr.length; i++) {
                 addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
                 addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
             }
