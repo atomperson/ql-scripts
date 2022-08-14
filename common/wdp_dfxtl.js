@@ -525,7 +525,7 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
         var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
         infoData.imageUrl = imageArr[imageNo];//随机图片url
         var random123=index%2;
-        for(var i=0;i<1;i++){
+        for(var i=0;i<3;i++){
             //调整为一次发三个 省事
             if(random123==0){
                 await publishPosts_copy(token, infoData, userid,index)
