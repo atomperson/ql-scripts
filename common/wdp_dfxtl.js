@@ -80,6 +80,7 @@ let curHour = (new Date()).getHours()
             //hqqctiezi.json
             let fireData = fs.readFileSync("./ftqctitle.json", "utf-8");
             ftqcArr = JSON.parse(fireData);
+            console.log('帖子数量为:【' + ftqcArr.length+'】\n');
         } catch (error) {
             console.log('文件读取错误' + error);
             return
