@@ -121,9 +121,9 @@ let curHour = (new Date()).getHours()
                 console.log(`【第 (${index + 1}) 个手机号:${phone},登录错误】`);
                 //addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},登录错误】`, true)
                 phoneErrorArr.push(phone);//错误手机数组
-                dfxtlTokenArr[index].score=0;
-                dfxtlTokenArr[index].scorenow=0;
-                dfxtlTokenArr[index].number=index + 1;
+                dfxtlTokenArr[index].score = 0;
+                dfxtlTokenArr[index].scorenow = 0;
+                dfxtlTokenArr[index].number = index + 1;
                 continue;
             }
             //phoneSuccessArr.push(phone);//正确手机数组
@@ -136,14 +136,14 @@ let curHour = (new Date()).getHours()
                 await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
-            var score =0;
-            var scorenow=0;
+            var score = 0;
+            var scorenow = 0;
             if (openflag == 2) {
-                score= await scoreGet(token);//获取积分信息
+                score = await scoreGet(token);//获取积分信息
                 // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
                 //任务完成情况-------//await taskList(token);
-                scorenow=await scoreGetlist(token);//获取今日积分
-                await getMyCarList(token,userid,phone);//获取vin 码信息
+                scorenow = await scoreGetlist(token);//获取今日积分
+                await getMyCarList(token, userid, phone);//获取vin 码信息
                 await userOrderList(token, phone, index + 1); //商城订单信息
             }
             dfxtlTokenArr[index].score=score;
@@ -199,9 +199,9 @@ async function getMyCarList(token, userid,phone) {
                     phone:phone,vin:vin
                 })
             }
-        }else{
-           // console.log('暂无绑定 车辆信息' )
-           // await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
+        }else {
+            //console.log('暂无绑定 车辆信息')
+            //await checkVinIsMatchCar(token, userid);//校验车主 绑定vin码信息
         }
     } else {
         console.log('获取用户的车主人证失败：' + result.message)
@@ -211,17 +211,21 @@ async function getMyCarList(token, userid,phone) {
 async function checkVinIsMatchCar(token, userid) {
     var vin='';
     vinsindex=vinsindex+1;
-    for(;vinsindex<vinsArr.length;vinsindex++){
-        vin=vinsArr[vinsindex];
+    for(;vinsindex<vinsArr.length;vinsindex++) {
+        vin = vinsArr[vinsindex];
+        console.log('vinsindex：' + vinsindex)
+        console.log('vin：' + vin)
+
         let url = `https://gateway-sapp.dpca.com.cn/api-m/v1/mycar/carOwnerOutlets/checkVinIsMatchCar?vin=${vin}`;
-        let body ='';
+        let body = '';
         let urlObject = populateUrlObject(url, token, body)
         await httpRequest('get', urlObject)
         let result = httpResult;
         if (!result) return
         if (result.code == 0) {
-            console.log('第【'+vinsindex+'】个vin码校验成功：【' +vin+'】');
+            console.log('第【' + vinsindex + '】个vin码校验成功：【' + vin + '】');
             await carOwnerOutletssave(token, userid, vin);//绑定车主
+            return
         } else {
             console.log('第【'+vinsindex+'】个vin码校验失败：' +vin);
         }
@@ -390,7 +394,7 @@ async function putComment(token, data,index) {
         phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
         phoneErrorArr.push(dfxtlphoneArr[index]);//错误手机数组
-       // console.log('评论消息失败：' + result.message)
+        // console.log('评论消息失败：' + result.message)
 
     }
 }
@@ -702,7 +706,7 @@ async function collect(token,id) {
     if (result.code == 0) {
         // console.log('收藏成功')
     } else {
-      //  console.log('收藏失败：' + result.message)
+        //  console.log('收藏失败：' + result.message)
     }
 }
 //关注
@@ -716,7 +720,7 @@ async function attention(token,id) {
     if (result.code == 0) {
         // console.log('关注成功')
     } else {
-       // console.log('关注失败：' + result.message)
+        // console.log('关注失败：' + result.message)
     }
 }
 //关注
@@ -730,7 +734,7 @@ async function like(token,id) {
     if (result.code == 0) {
         //console.log('点赞成功')
     } else {
-       // console.log('点赞失败：' + result.message)
+        // console.log('点赞失败：' + result.message)
     }
 }
 //查询积分记录
