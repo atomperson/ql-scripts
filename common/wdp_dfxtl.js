@@ -61,7 +61,12 @@ let curHour = (new Date()).getHours()
         if (!(await Envs())) return
         console.log('====================\n')
         console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
-
+        //晚上9点默认赋值为做任务 类型
+        if(curHour==21){
+            openflag=1;
+        }else{
+            openflag=2;
+        }
         //读取文件token    同步方法 不需要回调函数,出错直接抛出
         try {
             let fireData = fs.readFileSync("./userinfo.json", "utf-8");
@@ -85,10 +90,6 @@ let curHour = (new Date()).getHours()
         if (phoneset.size != dfxtlTokenArr.length) {
             console.log('手机变量与 token 数组不对应，请检查后再试！！！！！');
             return
-        }
-        //晚上9点默认赋值为做任务 类型
-        if(curHour==21){
-            openflag=1;
         }
         console.log(`\nopenflag为${openflag} 执行操作为:【 ${(openflag==1?'账号做任务':'查询账号积分信息和快递信息')}】`)
         console.log(`checkphoneFlag为${checkphoneFlag} 执行操作为:【 ${(checkphoneFlag==true?'错误账号生成json文件':'错误账号不生成json文件')}】\n`)
