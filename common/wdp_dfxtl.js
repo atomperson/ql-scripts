@@ -39,6 +39,8 @@ let dfxtlphoneArr = [];
 let dfxtlTokenArr = [];
 let vinArr = []; //vin 码数组
 let ftqcArr = []; //ftqcArr
+let ftqcArrindex = 1; //帖子随即开始数
+
 
 
 let username = '';
@@ -81,6 +83,8 @@ let curHour = (new Date()).getHours()
             let fireData = fs.readFileSync("./ftqctitle.json", "utf-8");
             ftqcArr = JSON.parse(fireData);
             console.log('帖子数量为:【' + ftqcArr.length+'】\n');
+            var aNumber = (ftqcArr.length) * Math.random();
+            ftqcArrindex = Math.floor(aNumber);
         } catch (error) {
             console.log('文件读取错误' + error);
             return
@@ -631,9 +635,8 @@ async function randomtitle(title) {
 
 //发表帖子---
 async function publishPostsNew(token, data1, userid,index) {
-    var aNumber = (ftqcArr.length) * Math.random();
-    var aNumber1 = Math.floor(aNumber);
-    var ftqcdata =ftqcArr[aNumber1];
+    var ftqcArrindex1=ftqcArrindex%ftqcArr.length;
+    var ftqcdata =ftqcArr[ftqcArrindex1];
     var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
     var data = JSON.parse(aa2);
     data.content =ftqcdata.content    //data1.content;
@@ -674,6 +677,7 @@ async function publishPostsNew(token, data1, userid,index) {
         //console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子失败\n')
         console.log('【'+dfxtlphoneArr[index]+'】发表帖子失败：' + result.message)
     }
+    ftqcArrindex++;
 }
 
 
