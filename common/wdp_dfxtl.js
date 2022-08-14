@@ -194,7 +194,7 @@ async function getMyCarList(token, userid,phone) {
         if(carList.length>0){
             for(var i=0;i<carList.length;i++){
                 var vin=carList[i].vin;
-                console.log('已绑定vin码 【'+phone +'】,vin码【'+vin+'】')
+                console.log('已绑定vin码 【'+phone +'】,vin码个数【'+carList.length+'】')
                 vinArr.push({
                     phone:phone,vin:vin
                 })
