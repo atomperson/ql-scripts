@@ -540,7 +540,7 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
         }
 
     } else {
-        console.log('发表帖子失败：' + result.message)
+        console.log('发表帖子失败：' + result.message+'手机号：'+dfxtlphoneArr[index])
 
     }
 }
