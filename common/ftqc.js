@@ -21,15 +21,15 @@ let httpResult //global buffer
 let userUA = ($.isNode() ? process.env.gjzzUA : $.getdata('wbtcUA')) || 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 WUBA/10.26.5';
 let userList = []
 
-let titleFilter = ['丰田','亚洲龙','模型','汽车','','','','','','','','','','','','',]
+let titleFilter = ['丰田', '亚洲龙', '模型', '汽车', '', '', '', '', '', '', '', '', '', '', '', '',]
 let titleresult = [];
 
 let userinfo = '';
 let token = '';//token
-let datalist=[];
+let datalist = [];
 let hjjflyTokenArr = [];
 //let hjjflyToken = ($.isNode() ? process.env.hjjflyapp : $.getdata('hjjflyapp')) || '';
-let hjjflyToken='d96bb90cf5558aad77d9893a6930f751250774d7fc074dd0cb1d2115683f014016603127548451220';
+let hjjflyToken = '0a332050e459ca5270db2f966a42cce9250774d7fc074dd0cb1d2115683f014016604488468451220';
 
 
 let plArr = ['凡尔赛', '不错不错', '赞赞赞', '大多数人会希望你过好，但是前提条件是，不希望你过得比他好', '因你不同', '东风雪铁龙', '欣赏雪铁龙，加油棒棒哒', '66666', '加油，东风雪铁龙', '世界因你而存', '今生可爱与温柔，每一样都不能少', '远赴人间惊鸿宴，一睹人间盛世颜', '加油加油', 'upupUp', '东风雪铁龙，我的最爱', '赞赞赞'];
@@ -64,25 +64,14 @@ let curHour = (new Date()).getHours()
             token = hjjflyTokenArr[index];
 
 
+            //红旗查看关注的人并获取帖子
+            //await followinglist_hq();
 
-           //红旗查看关注的人并获取帖子
-            var data= await followinglist();
+            await followuser_tfqc();
+            var aaa = titleresult;
 
-            // await filtertitle();
-            //
-            // var aaa=titleresult;
-            // for(var i=0;i<titleresult.length;i++){
-            //    var data= await bbbspost(titleresult[i]);
-            //    //thumbs   title
-            //     var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
-            //     var newcontent = data.content.replace(re1,'');//执行替换成空字符
-            //     var obj={
-            //         images:data.thumbs, title:data.title, content:newcontent
-            //     }
-            //     datalist.push(obj);
-            // }
-            //修改文件
-            fs.writeFile("./userinfo.json", JSON.stringify(datalist), (err) => {
+            //修改文件 1474
+            fs.writeFile("./ftdata.json", JSON.stringify(datalist), (err) => {
                 if (err) console.log(err);
                 console.log("文件修改完成\n");
             })
@@ -97,81 +86,110 @@ let curHour = (new Date()).getHours()
 /////---------------------------方法------------------------------------------------
 
 //红旗汽车获取论坛数据
-async function followinglist() {
-
-    var followinglist=[{"followingId":723778,"followingName":"༼不怨誓言成失言༽","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLDtnt5y610Ll1c5GTg0eQzYRFom5qRNdYevDqKYRfIHWzx4w0Fn4ibz9KLfo53wuTXviaicjzHr1PJA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":774372,"followingName":"育人于心","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/tjhOILHBAmkSfRqyp1wibjdD2QuhchOn3gVDib2zLDfPicI9AUCBDrpweksLFKVdCSGplkzibHdKj1lFk86DR3Fpjg/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":266664,"followingName":"苦清","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/f992abec-8a83-4b40-a0aa-a6abca4e1841.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":518264,"followingName":"shaotao","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/oicHQhib8vQG1O84hKIsfibdyAThVGBfRRkY5BO7dnpDnBGPicHFibKJQLC3rLIz6qLwFokIPib9miaIXQGSW7RF8dNuw/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":647892,"followingName":"贝贝","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eqb6Tiaq8UdCLKhmpvq73eDDKEIw0rJsAZribHRUMQzlY2E9UTGxYujE7TcXo2fQmw1bmBoplVlP9EA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":602673,"followingName":"太阳花","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJEGBot0AcORJz3Bk1qKorHEBEz6icm8EqQ1RJjZhNWpgnARoTLxzxPaiac6UjibbtvavE9oo3UUXYRA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":731598,"followingName":"FHH","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Bkk5N5ZZ6p6auIfaDMiajec49icrqjPl3WLtUIBPiaR6Xib1ibaMovO5wbLyebIc3Nsuia5Prrn3okXnicVaDbSmadWyw/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":700539,"followingName":"廖开心","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/wxySH4oz4Kd1w842Lqk0uVaTUPTt9WhticvTDdH0cJTPR4w00LWOYnPaoUj513C7oy0zCVXXzqqhx1Tkyy8rwfA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":274961,"followingName":"Qxqy","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/ibqSTEDkib2cI2L1KjF96kcUFJv9tgruTLMc8Jul14ZvibS4ayGa82pLhc4uraAUVNFSKMfB4mkhJZmicfl6IiadnHw/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":263715,"followingName":"滴溜溜","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/747e3d6b-25bb-49aa-8459-bc3739e1f30f.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":731339,"followingName":"不能嘻","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/HHPWm2UZdIsVhcDllTzu0sq5RuNJricIQMqXGNJrfQNEOHNm5icFj5GEoIiagj3TZibTyFSvAFnNGhiat3xKic3dlKPA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":323665,"followingName":"\uD83D\uDC36 积累","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKPTicIBhf7npCCelU6J05oGfciaksbVvbpA0vo6n6yymc9W3kYI17kqUlj1YObffM5uaTJOX5EYXbA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":269525,"followingName":"因为喜欢，所以甘愿","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/bb3522d0-6cde-46d0-bf5d-89e2634e60da.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":309203,"followingName":"琦思妙想","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/1188b881-b4ed-44bf-9773-83e5a31aa701.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true}]
-    for(var i=0;i<followinglist.length;i++){
-        await hongqipostuser(followinglist[i].followingId);
+async function followinglist_hq() {
+    //followingId
+    //var followinglist=[{"followingId":723778,"followingName":"༼不怨誓言成失言༽","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLDtnt5y610Ll1c5GTg0eQzYRFom5qRNdYevDqKYRfIHWzx4w0Fn4ibz9KLfo53wuTXviaicjzHr1PJA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":774372,"followingName":"育人于心","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/tjhOILHBAmkSfRqyp1wibjdD2QuhchOn3gVDib2zLDfPicI9AUCBDrpweksLFKVdCSGplkzibHdKj1lFk86DR3Fpjg/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":266664,"followingName":"苦清","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/f992abec-8a83-4b40-a0aa-a6abca4e1841.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":518264,"followingName":"shaotao","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/oicHQhib8vQG1O84hKIsfibdyAThVGBfRRkY5BO7dnpDnBGPicHFibKJQLC3rLIz6qLwFokIPib9miaIXQGSW7RF8dNuw/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":647892,"followingName":"贝贝","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eqb6Tiaq8UdCLKhmpvq73eDDKEIw0rJsAZribHRUMQzlY2E9UTGxYujE7TcXo2fQmw1bmBoplVlP9EA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":602673,"followingName":"太阳花","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJEGBot0AcORJz3Bk1qKorHEBEz6icm8EqQ1RJjZhNWpgnARoTLxzxPaiac6UjibbtvavE9oo3UUXYRA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":731598,"followingName":"FHH","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Bkk5N5ZZ6p6auIfaDMiajec49icrqjPl3WLtUIBPiaR6Xib1ibaMovO5wbLyebIc3Nsuia5Prrn3okXnicVaDbSmadWyw/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":700539,"followingName":"廖开心","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/wxySH4oz4Kd1w842Lqk0uVaTUPTt9WhticvTDdH0cJTPR4w00LWOYnPaoUj513C7oy0zCVXXzqqhx1Tkyy8rwfA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":274961,"followingName":"Qxqy","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/ibqSTEDkib2cI2L1KjF96kcUFJv9tgruTLMc8Jul14ZvibS4ayGa82pLhc4uraAUVNFSKMfB4mkhJZmicfl6IiadnHw/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":263715,"followingName":"滴溜溜","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/747e3d6b-25bb-49aa-8459-bc3739e1f30f.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":731339,"followingName":"不能嘻","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/HHPWm2UZdIsVhcDllTzu0sq5RuNJricIQMqXGNJrfQNEOHNm5icFj5GEoIiagj3TZibTyFSvAFnNGhiat3xKic3dlKPA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":323665,"followingName":"\uD83D\uDC36 积累","followingAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKPTicIBhf7npCCelU6J05oGfciaksbVvbpA0vo6n6yymc9W3kYI17kqUlj1YObffM5uaTJOX5EYXbA/132","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":269525,"followingName":"因为喜欢，所以甘愿","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/bb3522d0-6cde-46d0-bf5d-89e2634e60da.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true},{"followingId":309203,"followingName":"琦思妙想","followingAvatarUrl":"https://hqpp-cos.faw.cn/images/1188b881-b4ed-44bf-9773-83e5a31aa701.png","followingRoleCode":"COMMON","followingRoleIconUrl":null,"followerId":861252,"followerName":"HAZY....","followerAvatarUrl":"https://thirdwx.qlogo.cn/mmopen/vi_32/UAzS4Iiaibb3qN2ZyhxI6nJnyWlLDTorMLXQcrw8hLGVXl8vYQmddD1WIemibID9973a7AMcYPicbP8pIs1DpnG3Qg/132","followerRoleCode":null,"followerRoleIconUrl":null,"isFollowing":true}]
+    var followinglist2 = await squarehot();
+    var followinglist = Array.from(followinglist2);
+    for (var i = 0; i < followinglist.length; i++) {
+        await hongqipostuser(followinglist[i]);
     }
-    for(var i=0;i<titleresult.length;i++){
+    for (var i = 0; i < titleresult.length; i++) {
         await square(titleresult[i]);
     }
 }
 
 //红旗汽车获取论坛数据
+async function squarehot() {
+    //323665
+    var result1 = []
+    for (var i = 0; i < 20; i++) {
+        let url = 'https://hqpp-gw.faw.cn/gimc-hongqi-webapp/f/square/post?_timestamp=1660449883212&pageNo=' + (i + 1) + '&pageSize=2000&sortType=HOT';
+        let body = ''
+        let urlObject = populateUrlObject(url, '', body)
+        await httpRequest('get', urlObject)
+        let result = httpResult;
+        if (!result) return
+        if (result.code == 200) {
+            var records = result.data.posts.records
+            var data2 = records.map(ele => {
+                return ele.createUser;
+            })
+            result1 = result1.concat(data2);
+
+        } else {
+            console.log('失败：');
+        }
+    }
+    var phoneset = new Set(result1);
+    return phoneset;
+}
+
+//红旗汽车获取论坛数据
 async function hongqipostuser(id) {
     //323665
-    let url = 'https://hqpp-gw.faw.cn/gimc-hongqi-webapp/f/square/post/user?_timestamp=1660367024098&pageNo=1&pageSize=2000&userId='+id;
+    let url = 'https://hqpp-gw.faw.cn/gimc-hongqi-webapp/f/square/post/user?_timestamp=1660367024098&pageNo=1&pageSize=2000&userId=' + id;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
     let result = httpResult;
     if (!result) return
     if (result.code == 200) {
-        var records=result.data.records;
-        var recod1=records.filter(ele=>{
-                if((ele.postTitle.includes('丰田')||ele.postTitle.includes('亚洲龙')||ele.postTitle.includes('模型')
-                    ||ele.postTitle.includes('汽车')||ele.postTitle.includes('丰田')||ele.postTitle.includes('丰田')
-                    ||ele.postTitle.includes('红旗')||ele.postTitle.includes('H5')||ele.postTitle.includes('H7')
-                    ||ele.postTitle.includes('丰田')||ele.postTitle.includes('丰田')
-                    ||ele.postContent.includes('丰田')
-                    ||ele.postContent.includes('红旗')||ele.postContent.includes('H5')||ele.postContent.includes('H7'))
-                    ||ele.postContent.length<80
-                ){
-                    return false;
-                }else{
-                    return  true;
-                }
-        }).map(ele=>{
+        var records = result.data.records;
+        var recod1 = records.filter(ele => {
+            if ((ele.postTitle.includes('丰田') || ele.postTitle.includes('亚洲龙') || ele.postTitle.includes('模型')
+                    || ele.postTitle.includes('汽车') || ele.postTitle.includes('丰田') || ele.postTitle.includes('丰田')
+                    || ele.postTitle.includes('红旗') || ele.postTitle.includes('H5') || ele.postTitle.includes('H7')
+                    || ele.postTitle.includes('丰田') || ele.postTitle.includes('丰田')
+                    || ele.postContent.includes('丰田')
+                    || ele.postContent.includes('红旗') || ele.postContent.includes('H5') || ele.postContent.includes('H7'))
+                || ele.postContent.length < 80
+            ) {
+                return false;
+            } else {
+                return true;
+            }
+        }).map(ele => {
             return ele.postId;
         })
         titleresult = titleresult.concat(recod1);
-    }else{
-        console.log('失败：');
-    }
-}
-//红旗汽车获取论坛数据 详情
-async function square(id) {
-    //323665
-    let url = 'https://hqpp-gw.faw.cn/gimc-hongqi-webapp/f/square/post/'+id+'?_timestamp=1660373962302';
-    let body = ''
-    let urlObject = populateUrlObject(url, '', body)
-    await httpRequest('get', urlObject)
-    let result = httpResult;
-    if (!result) return
-    if (result.code == 200) {
-        var reqdata=result.data;
-        var images=reqdata.images;
-        var imagesList=[];
-        if(images!=null&&images.length>0){
-             imagesList=images.map(ele=>{
-                return ele.fileUrl;
-            })
-        }
-        var obj={
-           images:imagesList, title:reqdata.postTitle, content:reqdata.postContent
-        }
-        datalist.push(obj);
-    }else{
+    } else {
         console.log('失败：');
     }
 }
 
+//红旗汽车获取论坛数据 详情
+async function square(id) {
+    //323665
+    let url = 'https://hqpp-gw.faw.cn/gimc-hongqi-webapp/f/square/post/' + id + '?_timestamp=1660373962302';
+    let body = ''
+    let urlObject = populateUrlObject(url, '', body)
+    await httpRequest('get', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 200) {
+        var reqdata = result.data;
+        var images = reqdata.images;
+        var imagesList = [];
+        var postContent = reqdata.postContent;
+        if (images != null && images.length > 0) {
+            imagesList = images.map(ele => {
+                return ele.fileUrl;
+            })
+        }
+        var obj = {
+            images: imagesList, title: reqdata.postTitle, content: postContent
+        }
+        datalist.push(obj);
+    } else {
+        console.log('失败：');
+    }
+}
 
 
 //签到
 async function bbbspost(id) {
-    let url = 'https://ftms-fcsj.cloud-top.com.cn/bbbs/post/'+id;
+    let url = 'https://ftms-fcsj.cloud-top.com.cn/bbbs/post/' + id;
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
@@ -179,44 +197,74 @@ async function bbbspost(id) {
     if (!result) return
     if (result.code == 200) {
         return result.data;
-    }else{
+    } else {
         console.log('失败：');
     }
 }
-async function filtertitle() {
-    for(var i=0;i<201;i++){
-        await someonepostlist(i);
+
+async function filtertitle(userid) {
+    for (var i = 0; i < 201; i++) {
+        await someonepostlist(i, userid);
     }
 
 }
+
+async function followuser_tfqc() {
+    //902263  1025895  2445952
+    var userLIst = ['902263', '1025895', '2445952']
+    for (var i = 0; i < userLIst.length; i++) {
+        await filtertitle(userLIst[i]);
+    }
+    for (var j = 0; j < titleresult.length; j++) {
+        var data = await bbbspost(titleresult[j]);
+        //thumbs   title
+        var re1 = new RegExp("<.+?>", "g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+        //JSON.stringify(data)
+        console.log('第几个：：' + (j + 1));//第几个：：16861,id为【194425
+        if (data == undefined || data.content == null || data.content == undefined || data.content == '') {
+            //console.log('第几个：：' + i+1+',id为【'+titleresult[i]);
+            continue;
+        }
+        var newcontent = data.content.replace(re1, '');//执行替换成空字符
+        if (newcontent.length < 80) {
+            continue;
+        }
+        var obj = {
+            images: data.thumbs, title: data.title, content: newcontent
+        }
+        datalist.push(obj);
+    }
+
+}
+
 //
-async function someonepostlist(num) {
-    let url = 'https://ftms-fcsj.cloud-top.com.cn/bbbs/someone-postlist?userOneId=2445952&pageNum='+num+'&maxId=0';
+async function someonepostlist(num, userid) {
+    let url = 'https://ftms-fcsj.cloud-top.com.cn/bbbs/someone-postlist?userOneId=' + userid + '&pageNum=' + num + '&maxId=0';
     let body = ''
     let urlObject = populateUrlObject(url, '', body)
     await httpRequest('get', urlObject)
     let result = httpResult;
     if (!result) return
     if (result.code == 200) {
-       var list1= result.data.list;
-       var list2= list1.filter(ele=>{
-            let titleFilter = ['丰田','亚洲龙','模型','汽车','','','','','','','','','','','','',]
-            if(ele.title.includes('丰田')||ele.title.includes('亚洲龙')||ele.title.includes('模型')
-                ||ele.title.includes('汽车')||ele.title.includes('丰田')||ele.title.includes('丰田')
-                ||ele.title.includes('丰田')||ele.title.includes('丰田')||ele.title.includes('丰田')
-                ||ele.title.includes('丰田')||ele.title.includes('丰田')||ele.title.includes('丰田')){
+        var list1 = result.data.list;
+        var list2 = list1.filter(ele => {
+            let titleFilter = ['丰田', '亚洲龙', '模型', '汽车', '', '', '', '', '', '', '', '', '', '', '', '',]
+            if (ele.title.includes('丰田') || ele.title.includes('亚洲龙') || ele.title.includes('模型')
+                || ele.title.includes('汽车') || ele.title.includes('丰田') || ele.title.includes('丰田')
+                || ele.title.includes('荣放') || ele.title.includes('卡罗拉') || ele.title.includes('丰田')
+            ) {
                 return false;
-            }else{
-                return  true;
+            } else {
+                return true;
             }
-        }).map(ele=>{
+        }).map(ele => {
             return ele.postId;
-       })
+        })
         // $.extend(titleresult, list2)  // 浅拷贝
         titleresult = titleresult.concat(list2);
 
     } else {
-        console.log('第【'+vinsindex+'】个vin码校验失败：' +vin);
+        console.log('第【' + vinsindex + '】个vin码校验失败：' + vin);
     }
 }
 
@@ -288,10 +336,10 @@ function populateUrlObject(url, cookie, body = '') {
             'Connection': 'keep-alive',
             'User-Agent': 'Mozilla/5.0 (Linux; Android 9; Mi Note 3 Build/PKQ1.181007.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/4273 MMWEBSDK/20220604 Mobile Safari/537.36 MMWEBID/4710 MicroMessenger/8.0.24.2180(0x28001837) WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64 MiniProgramEnv/android',
             'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-            Size : "446",
+            Size: "446",
             'Accept-Encoding': 'gzip',
-            'x-token':token,
-            cookie:'JSESSIONID=a56f83ee-2005-4820-b506-146d0f9c48ec',
+            'x-token': token,
+            cookie: 'JSESSIONID=66eedc2b-0485-4dd7-a724-75f537e90392',
         },
     }
     if (body) urlObject.body = body
