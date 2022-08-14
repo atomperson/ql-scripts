@@ -64,12 +64,9 @@ let curHour = (new Date()).getHours()
             token = hjjflyTokenArr[index];
 
 
-            //红旗查看关注的人并获取帖子
-            //await followinglist_hq();
 
-            await followuser_tfqc();
-            var aaa = titleresult;
-
+            //await followinglist_hq(); //红旗查看关注的人并获取帖子
+            await followuser_tfqc(); //丰田 查看关注的人并获取帖子
             //修改文件 1474
             fs.writeFile("./ftdata.json", JSON.stringify(datalist), (err) => {
                 if (err) console.log(err);
