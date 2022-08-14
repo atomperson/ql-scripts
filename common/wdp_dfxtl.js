@@ -529,16 +529,14 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
             //调整为一次发三个 省事
             if(random123==0){
                 await publishPosts_copy(token, infoData, userid,index)
-                await $.wait(1000);
+                await $.wait(500);
             }else if(random123==1){
                 await publishPostsNew(token, infoData, userid,index)
-                await $.wait(1000);
+                await $.wait(500);
             }else{
-
             }
-
         }
-
+        await $.wait(5000);
     } else {
         console.log('发表帖子失败：' + result.message+'手机号：'+dfxtlphoneArr[index])
 
