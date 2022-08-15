@@ -149,7 +149,7 @@ let curHour = (new Date()).getHours()
                 // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
                 //任务完成情况-------//await taskList(token);
                 scorenow = await scoreGetlist(token);//获取今日积分
-                await getMyCarList(token, userid, phone);//获取vin 码信息
+                //await getMyCarList(token, userid, phone);//获取vin 码信息
                 await userOrderList(token, phone, index + 1); //商城订单信息
             }
             dfxtlTokenArr[index].score = score;
