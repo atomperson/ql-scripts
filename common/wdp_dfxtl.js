@@ -144,20 +144,24 @@ let curHour = (new Date()).getHours()
             }
             var score = 0;
             var scorenow = 0;
+            var yesscore = 0;
             if (openflag == 2) {
                 score = await scoreGet(token);//获取积分信息
                 // addNotifyStr(`【第 (${index + 1}) 个手机号:${phone},积分:${score}】`, false)
                 //任务完成情况-------//await taskList(token);
-                scorenow = await scoreGetlist(token);//获取今日积分
+                var scoreList = await scoreGetlist(token);//获取今日积分和昨日
+                scorenow=scoreList.scorenow;
+                yesscore=scoreList.yesscore;
                 //await getMyCarList(token, userid, phone);//获取vin 码信息
                 await userOrderList(token, phone, index + 1); //商城订单信息
             }
             dfxtlTokenArr[index].score = score;
             dfxtlTokenArr[index].scorenow = scorenow;
+            dfxtlTokenArr[index].yesscore = yesscore;
             dfxtlTokenArr[index].number = index + 1;
         }
-        //if (changeFlag) {
-        if (false) {
+        if (changeFlag) {
+        //if (false) {
             console.log("需要修改文件\n");
             //修改文件
             fs.writeFile("./userinfo.json", JSON.stringify(dfxtlTokenArr), (err) => {
@@ -169,9 +173,9 @@ let curHour = (new Date()).getHours()
         await $.wait(500);
         if (openflag == 2) {
             addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-            dfxtlTokenArr.sort(function (x, y) {
-                return y.score - x.score;
-            });
+            // dfxtlTokenArr.sort(function (x, y) {
+            //     return y.score - x.score;
+            // });
             for (let i = 0; i < dfxtlTokenArr.length; i++) {
                 addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
                 addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
@@ -696,7 +700,8 @@ async function like(token,id) {
 //查询积分记录
 async function scoreGetlist(token) {
     let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/score/list`
-    let body = {"pageSize": 15, "pageNum": 1, "operateType": 1};
+    //operateType": 0 里面包括 减分的数据  1 为只是加分的数据
+    let body = {"pageSize": 20, "pageNum": 1, "operateType": 0};
     let urlObject = populateUrlObject(url, token, body)
     await httpRequest('post', urlObject)
     let result = httpResult;
@@ -707,16 +712,22 @@ async function scoreGetlist(token) {
     if (result.code == 0) {
         var datlist = result.data.list;
         var nowdata = getDate(1);
-        datlist.filter(ele => {
+        var ddlist=datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata) {
                 return true
             } else {
                 return false;
             }
-        }).map(ele => {
-            scorenow += ele.score;
+        }) .map(ele => {
+            if(ele.operateType==1){
+                //1为得分
+                scorenow += ele.score;
+            }else if(ele.operateType==2){
+                //2为减分
+                scorenow -= ele.score;
+            }else{
+            }
         })
-        return scorenow;
         //addNotifyStr('今日获取积分为：【' + scorenow + '】', false);
         var nowdata2 = getDate(2);
         datlist.filter(ele => {
@@ -726,11 +737,20 @@ async function scoreGetlist(token) {
                 return false;
             }
         }).map(ele => {
-            scoreamoun1 += ele.score;
+            if(ele.operateType==1){
+                //1为得分
+                scoreamoun1 += ele.score;
+            }else if(ele.operateType==2){
+                //2为减分
+                scoreamoun1 -= ele.score;
+            }else{
+            }
         })
+        return {scorenow:scorenow,yesscore:scoreamoun1}
         //addNotifyStr('昨日获取积分为：【' + scoreamoun1+'】',false);
     } else {
         console.log('查询积分记录失败：' + result.message)
+        return {scorenow:scorenow,yesscore:scoreamoun1}
     }
 }
 
