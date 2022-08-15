@@ -62,13 +62,37 @@ let curHour = (new Date()).getHours()
             console.log('\n======== 检查登录状态 ========')
             //token获取
             token = hjjflyTokenArr[index];
-
+            //读取文件token
+            // 同步方法 不需要回调函数,出错直接抛出
+            // var count=1;
+            // try {
+            //     var fireData = fs.readFileSync("./hqdata.json", "utf-8");
+            //     var hqdata = JSON.parse(fireData);
+            //     datalist= hqdata.filter(ele=>{
+            //         if(ele.title==''||ele.title==undefined||ele.title==null){
+            //             count++;
+            //             return false
+            //         }else{
+            //             return true
+            //         }
+            //         // if(ele.images.length==0){
+            //         //     count++;
+            //         //     return false
+            //         // }else{
+            //         //     return true
+            //         // }
+            //     })
+            //
+            // } catch (error) {
+            //     console.log('文件读取错误' + error);
+            //     return
+            // }
 
 
             //await followinglist_hq(); //红旗查看关注的人并获取帖子
-            await followuser_tfqc(); //丰田 查看关注的人并获取帖子
+            //await followuser_tfqc(); //丰田 查看关注的人并获取帖子
             //修改文件 1474
-            fs.writeFile("./ftdata.json", JSON.stringify(datalist), (err) => {
+            fs.writeFile("./ftdata1.json", JSON.stringify(datalist), (err) => {
                 if (err) console.log(err);
                 console.log("文件修改完成\n");
             })
@@ -140,7 +164,7 @@ async function hongqipostuser(id) {
                     || ele.postTitle.includes('丰田') || ele.postTitle.includes('丰田')
                     || ele.postContent.includes('丰田')
                     || ele.postContent.includes('红旗') || ele.postContent.includes('H5') || ele.postContent.includes('H7'))
-                || ele.postContent.length < 80
+                || ele.postContent.length < 80 ||ele.postTitle==null||ele.postTitle==''||ele.postTitle==undefined
             ) {
                 return false;
             } else {
