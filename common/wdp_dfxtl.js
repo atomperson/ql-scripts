@@ -534,7 +534,9 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
                  aNumber1 = Math.floor((result.data.list.length) * Math.random());
                 infoData = result.data.list[aNumber1];
             }else if(random123==1){
-                await publishPostsNew(token, '', userid,index)
+                var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
+                var  imageUrl = imageArr[imageNo];//随机图片url
+                await publishPostsNew(token, imageUrl, userid,index)
                 await $.wait(500);
             }else{
             }
@@ -548,7 +550,7 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
 
 
 //发表帖子---
-async function publishPostsNew(token, data1, userid,index) {
+async function publishPostsNew(token, imageUrl, userid,index) {
     var ftqcArrindex1=ftqcArrindex%ftqcArr.length;
     var ftqcdata =ftqcArr[ftqcArrindex1];
     var aa2 = ' {"content":"","postsType":0,"pickType":1,"paragraphs":[{"paragraphContent":"","paragraphType":0}],"topicVOList":[{"contentCount":4817,"fileVOList":[{"createBy":"17","createDate":"2022-07-13 03:25:01","fileAddress":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/46ac56e37a0944cdb01051028b2b9673.jpg?imageView2/1/q/85","fileTemId":"1089045376593117191","fileTemType":"2","fileType":"0","id":"1101547940492624005","isEnable":"1","publishTime":"2022-07-13 03:25:01","publisher":"孙焕辰","sourceApp":"DC","sourceType":"SYSTEM","updateTime":"2022-07-13 03:25:01"}],"id":"1089045376593117191","selectedType":2,"title":"生活有你 爱有天逸"}],"atUserList":[],"bbsFile":[{"compressPath":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","createBy":"1110135246564106277","fileAddress":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileAddressSmall":"https://h5-sapp.dpca.com.cn/Loong-Citroen/images/Android/vctacywba1658634321334.jpg","fileTemType":6,"fileType":0,"isSelectPic":false,"localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"}],"userId":"1110135246564106277","sourceApp":"DC","sourceType":"ANDROID","coordinateDto":{"address":"","latitude":"","longitude":""},"title":""}';
@@ -559,17 +561,30 @@ async function publishPostsNew(token, data1, userid,index) {
     data.title =ftqcdata.title ;
     data.userId = userid;
     var bbsFile=[]
-    for(var t=0;t<ftqcdata.images.length;t++){
+    if(ftqcdata.images.length==0){
         bbsFile.push({
             createBy:userid,
-            compressPath:ftqcdata.images[t],
-            fileAddress:ftqcdata.images[t],
-            fileAddressSmall:ftqcdata.images[t]
+            compressPath:imageUrl,
+            fileAddress:imageUrl,
+            fileAddressSmall:imageUrl
             ,"fileTemType":6,
             "fileType":0,
             "isSelectPic":false,
             "localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"
         })
+    }else{
+        for(var t=0;t<ftqcdata.images.length;t++){
+            bbsFile.push({
+                createBy:userid,
+                compressPath:ftqcdata.images[t],
+                fileAddress:ftqcdata.images[t],
+                fileAddressSmall:ftqcdata.images[t]
+                ,"fileTemType":6,
+                "fileType":0,
+                "isSelectPic":false,
+                "localPath":"/storage/emulated/0/Pictures/WeiXin/mmexport1658634024185.jpg"
+            })
+        }
     }
     data.bbsFile=bbsFile;
     let url = `https://gateway-sapp.dpca.com.cn/api-c/v1/community/posts/publishPostsNew`
