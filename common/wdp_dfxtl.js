@@ -179,6 +179,7 @@ let curHour = (new Date()).getHours()
             for (let i = 0; i < dfxtlTokenArr.length; i++) {
                 addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
                 addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
+                addNotifyStr('昨日获取积分为：【' + dfxtlTokenArr[i].yesscore + '】', false);
             }
         }
         //是否生成 错误和 正确手机数组
