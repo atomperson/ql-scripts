@@ -81,7 +81,7 @@ let curHour = (new Date()).getHours()
         //读取文件token    同步方法 不需要回调函数,出错直接抛出
         try {
             //hqdata.json  ftqctitle.json
-            let fireData = fs.readFileSync("./hqdata.json", "utf-8");
+            let fireData = fs.readFileSync("./hqdata1.json", "utf-8");
             ftqcArr = JSON.parse(fireData);
             console.log('帖子数量为:【' + ftqcArr.length+'】\n');
             var aNumber = (ftqcArr.length) * Math.random();
