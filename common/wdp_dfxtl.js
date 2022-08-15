@@ -54,7 +54,8 @@ let phoneSuccessArr = [];//正确手机号集合
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
-
+let nowdata = getDate(1);
+let nowdata2 = getDate(2);
 ///////////////////////////////////////////////////////////////////
 
 !(async () => {
@@ -714,7 +715,7 @@ async function scoreGetlist(token) {
     var scoreamoun1 = 0;
     if (result.code == 0) {
         var datlist = result.data.list;
-        var nowdata = getDate(1);
+
         var ddlist=datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata) {
                 return true
@@ -732,7 +733,6 @@ async function scoreGetlist(token) {
             }
         })
         //addNotifyStr('今日获取积分为：【' + scorenow + '】', false);
-        var nowdata2 = getDate(2);
         datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata2) {
                 return true
