@@ -56,6 +56,29 @@ let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
 let nowdata = getDate(1);
 let nowdata2 = getDate(2);
+let imageArrs=[
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25644acf7eb875b910b875b910644acf7e.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25f5e48c3f9d918a319d918a31f5e48c3f.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-2505e0a37bb7ed8fabb7ed8fab05e0a37b.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-251461ba8bf0831da4f0831da41461ba8b.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25f1ea83aa2f92ce022f92ce02f1ea83aa.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-2552c824acee7fc478ee7fc47852c824ac.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-255964e29efe93e906fe93e9065964e29e.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-2506ff0e13966f775e966f775e06ff0e13.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-05b7cb871d5a8df9425a8df942b7cb871d.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-05cf630dcb36bef47736bef477cf630dcb.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-05a341cc48b9f88486b9f88486a341cc48.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-05f74798c8bb07b252bb07b252f74798c8.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-054d5c912b5ffef9b95ffef9b94d5c912b.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-05136982c1a745b270a745b270136982c1.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-05aa4d1cc099e87ce599e87ce5aa4d1cc0.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-050bfa63f8598d4e81598d4e810bfa63f8.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-0541de8808587b086e587b086e41de8808.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-08-11a02aa37a45d4a05845d4a058a02aa37a.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-08-1187c62f06f6d2e7d7f6d2e7d787c62f06.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-08-1160ef5ef1baf7956abaf7956a60ef5ef1.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-08-116124bed59ae5ccd49ae5ccd46124bed5.jpg",
+    "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-08-1116bbf9c52d29762c2d29762c16bbf9c5.jpg"];
 ///////////////////////////////////////////////////////////////////
 
 !(async () => {
@@ -158,8 +181,8 @@ let nowdata2 = getDate(2);
                 var wordindex=scorenow/40;
                 for(var m=0;m<(3-wordindex);m++){
                     //任务没有做满 继续补任务
-                    var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
-                    var  imageUrl = imageArr[imageNo];//随机图片url
+                    var imageNo = Math.floor((imageArrs.length) * Math.random());//随机图片数据
+                    var  imageUrl = imageArrs[imageNo];//随机图片url
                     await publishPostsNew(token, imageUrl, userid,index)
                     await $.wait(500);
                     console.log('手机号【'+phone+'】补充发帖任务完成');
