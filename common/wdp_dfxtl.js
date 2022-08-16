@@ -154,6 +154,15 @@ let curHour = (new Date()).getHours()
                 yesscore=scoreList.yesscore;
                 //await getMyCarList(token, userid, phone);//获取vin 码信息
                 await userOrderList(token, phone, index + 1); //商城订单信息
+                var wordindex=scorenow/40;
+                for(var m=0;m<(3-wordindex);m++){
+                    //任务没有做满 继续补任务
+                    var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
+                    var  imageUrl = imageArr[imageNo];//随机图片url
+                    await publishPostsNew(token, imageUrl, userid,index)
+                    await $.wait(500);
+                    console.log('手机号【'+phone+'】补充发帖任务完成');
+                }
             }
             dfxtlTokenArr[index].score = score;
             dfxtlTokenArr[index].scorenow = scorenow;
