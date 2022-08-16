@@ -134,6 +134,10 @@ let imageArrs=[
                 console.log(`第${index+1} 个token手机号与变量手机号不对应 \n dfxtlTokenArr:【 ${phone}】,dfxtlphoneArr:【 ${phone2}】`);
                 continue;
             }
+            //自定义判断数据做任务
+            // if(index<100){
+            //     continue
+            // }
             // await $.wait(delay()); //  随机延时
             let num = index + 1;
             if (test100(index)) {
