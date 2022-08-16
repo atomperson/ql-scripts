@@ -15,7 +15,7 @@ const fs = require("fs");
 // import fs from "fs";
 
 let openflag = 1; //1为做任务（默认）  2为 查询积分信息和快递信息
-let checkphoneFlag = false;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
+let checkphoneFlag = true;// 是否 把账号错误的和正确的分开 并生成 phone1.json  和phone.json   默认false
 
 const notifyFlag = 1; //0为关闭通知，1为打开通知,默认为1
 const notify = $.isNode() ? require('./sendNotify') : '';
@@ -54,7 +54,8 @@ let phoneSuccessArr = [];//正确手机号集合
 let disableStartTime = "" //以下时间段不做任务
 let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
-
+let nowdata = getDate(1);
+let nowdata2 = getDate(2);
 ///////////////////////////////////////////////////////////////////
 
 !(async () => {
@@ -413,9 +414,7 @@ async function putComment(token, data,index) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         // console.log('评论消息成功！！！')
-        phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
-        phoneErrorArr.push(dfxtlphoneArr[index]);//错误手机数组
         // console.log('评论消息失败：' + result.message)
 
     }
@@ -610,7 +609,9 @@ async function publishPostsNew(token, imageUrl, userid,index) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         //console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子成功！！！')
+        phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
+        phoneErrorArr.push(dfxtlphoneArr[index]);//错误手机数组
         //console.log('第'+(index+1)+'个 手机【'+dfxtlphoneArr[index]+'】，发表帖子失败\n')
         console.log('【'+dfxtlphoneArr[index]+'】发表帖子失败：' + result.message)
     }
@@ -641,7 +642,9 @@ async function publishPosts_copy(token, data1, userid,index) {
     //console.log(JSON.stringify(result))
     if (result.code == 0) {
         //  console.log('发表帖子成功！！！,主题为:' + data1.title)
+        phoneSuccessArr.push(dfxtlphoneArr[index]);//正确手机数组
     } else {
+        phoneErrorArr.push(dfxtlphoneArr[index]);//错误手机数组
         console.log('发表帖子失败：' + result.message+'手机号：'+dfxtlphoneArr[index])
 
     }
@@ -721,7 +724,7 @@ async function scoreGetlist(token) {
     var scoreamoun1 = 0;
     if (result.code == 0) {
         var datlist = result.data.list;
-        var nowdata = getDate(1);
+
         var ddlist=datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata) {
                 return true
@@ -739,7 +742,6 @@ async function scoreGetlist(token) {
             }
         })
         //addNotifyStr('今日获取积分为：【' + scorenow + '】', false);
-        var nowdata2 = getDate(2);
         datlist.filter(ele => {
             if (ele.createTime.split(' ')[0] == nowdata2) {
                 return true
