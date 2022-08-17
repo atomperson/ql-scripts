@@ -198,13 +198,14 @@ let imageArrs=[
                     }
                 }
             }
+            //await changeinfo3(dfxtltoken, userid);//修改个签
             dfxtlTokenArr[index].score = score;
             dfxtlTokenArr[index].scorenow = scorenow;
             dfxtlTokenArr[index].yesscore = yesscore;
             dfxtlTokenArr[index].number = index + 1;
         }
         if (changeFlag) {
-        //if (false) {
+            //if (false) {
             console.log("需要修改文件\n");
             //修改文件
             fs.writeFile("./userinfo.json", JSON.stringify(dfxtlTokenArr), (err) => {
@@ -310,6 +311,21 @@ async function carOwnerOutletssave(token, userId, vin) {
         console.log('vin:【'+vin+'】绑定人证成功')
     } else {
         console.log('vin:【'+vin+'】绑定人证成失败：' + result.message)
+    }
+}
+//修改个签
+async function changeinfo3(token, userid) {
+    var personalProfile = await poem();
+    let url = `https://gateway-sapp.dpca.com.cn/api-u/v1/user/info/change`
+    let body = {"personalProfile": personalProfile, "id": userid};
+    let urlObject = populateUrlObject(url, token, body)
+    await httpRequest('post', urlObject)
+    let result = httpResult;
+    if (!result) return
+    if (result.code == 0) {
+        console.log('修改个签成功！！！')
+    } else {
+        console.log('修改个签失败：' + result.message)
     }
 }
 //随机生成 车牌号码
@@ -577,7 +593,7 @@ async function queryChoicenessByUserDTO(token, userid, otherid,index) {
                 await publishPosts_copy(token, infoData, userid,index)
                 await $.wait(500);
                 //从新随机 帖子
-                 aNumber1 = Math.floor((result.data.list.length) * Math.random());
+                aNumber1 = Math.floor((result.data.list.length) * Math.random());
                 infoData = result.data.list[aNumber1];
             }else if(random123==1){
                 var imageNo = Math.floor((imageArr.length) * Math.random());//随机图片数据
@@ -952,6 +968,16 @@ async function getLogisticsTrackMapInfo(token, orderid) {
 }
 
 ///////////////////////////////////////////////////////////////////
+/**
+ * 获取随机诗词
+ */
+async function poem() {
+    let urlObject = populateUrlObject('https://v1.jinrishici.com/all.json', '', '')
+    await httpRequest('post', urlObject);
+    let result = httpResult;
+    var shici = result.content + '\n' + '————————《' + result.origin + '》' + result.author;
+    return shici;
+}
 //获取  1 今天   2 昨天
 function getDate(type) {
     var myDate = '';
