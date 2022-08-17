@@ -217,9 +217,9 @@ let imageArrs=[
         await $.wait(500);
         if (openflag == 2) {
             addNotifyStr1(`\n【=======查询用户积分信息=======】\n`, false)
-            // dfxtlTokenArr.sort(function (x, y) {
-            //     return y.score - x.score;
-            // });
+            dfxtlTokenArr.sort(function (x, y) {
+                return y.score - x.score;
+            });
             for (let i = 0; i < dfxtlTokenArr.length; i++) {
                 addNotifyStr(`【第 (${dfxtlTokenArr[i].number}) 个手机号:${dfxtlTokenArr[i].phone},积分:${dfxtlTokenArr[i].score}】`, false)
                 addNotifyStr('今日获取积分为：【' + dfxtlTokenArr[i].scorenow + '】', false);
