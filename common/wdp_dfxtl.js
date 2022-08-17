@@ -174,6 +174,7 @@ let imageArrs=[
                 await followList(token, userid,index); //发帖任务     ---------先从关注的用户随机取一个 用户  再从该用户随机取一个帖子复制
                 await $.wait(2000);
             }
+            //await changeinfo3(dfxtltoken, userid);//修改个签
             var score = 0;
             var scorenow = 0;
             var yesscore = 0;
@@ -198,7 +199,6 @@ let imageArrs=[
                     }
                 }
             }
-            //await changeinfo3(dfxtltoken, userid);//修改个签
             dfxtlTokenArr[index].score = score;
             dfxtlTokenArr[index].scorenow = scorenow;
             dfxtlTokenArr[index].yesscore = yesscore;
