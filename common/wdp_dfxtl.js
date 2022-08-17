@@ -185,7 +185,7 @@ let imageArrs=[
                 await userOrderList(token, phone, index + 1); //商城订单信息
                 if(needBuFatiezi){
                     var wordindex=scorenow/40;
-                    for(var m=0;m<(3-wordindex);m++){
+                    if(wordindex<3){
                         //任务没有做满 继续补任务
                         var imageNo = Math.floor((imageArrs.length) * Math.random());//随机图片数据
                         var  imageUrl = imageArrs[imageNo];//随机图片url
