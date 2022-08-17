@@ -56,7 +56,7 @@ let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
 let nowdata = getDate(1);
 let nowdata2 = getDate(2);
-let needBuFatiezi = true;
+let needBuFatiezi = false;
 let imageArrs=[
     "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25644acf7eb875b910b875b910644acf7e.jpg",
     "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25f5e48c3f9d918a319d918a31f5e48c3f.jpg",
@@ -94,6 +94,9 @@ let imageArrs=[
             openflag=1;
         }else{
             openflag=2;
+        }
+        if(curHour==8){//8点为补充任务
+            needBuFatiezi=true;
         }
         //读取文件token    同步方法 不需要回调函数,出错直接抛出
         try {
@@ -186,7 +189,7 @@ let imageArrs=[
                 if(needBuFatiezi){
                     var wordindex=scorenow/40;
                     if(wordindex<3){
-                        //任务没有做满 继续补任务
+                        //任务没有做满 继续补任务 补一个
                         var imageNo = Math.floor((imageArrs.length) * Math.random());//随机图片数据
                         var  imageUrl = imageArrs[imageNo];//随机图片url
                         await publishPostsNew(token, imageUrl, userid,index)
