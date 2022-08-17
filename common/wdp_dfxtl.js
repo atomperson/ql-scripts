@@ -56,7 +56,7 @@ let disableEndTime = "" //以下时间段不做任务
 let curHour = (new Date()).getHours()
 let nowdata = getDate(1);
 let nowdata2 = getDate(2);
-let needFatiezi = false;
+let needBuFatiezi = true;
 let imageArrs=[
     "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25644acf7eb875b910b875b910644acf7e.jpg",
     "https://h5-sapp.dpca.com.cn/Loong-Citroen/images/iOS/2022-07-25f5e48c3f9d918a319d918a31f5e48c3f.jpg",
@@ -90,7 +90,7 @@ let imageArrs=[
         console.log('====================\n')
         console.log(`\n=============================================    \n脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} \n=============================================\n`);
         //晚上9点默认赋值为做任务 类型
-        if(curHour==21){
+        if(curHour==6){
             openflag=1;
         }else{
             openflag=2;
@@ -183,7 +183,7 @@ let imageArrs=[
                 yesscore=scoreList.yesscore;
                 //await getMyCarList(token, userid, phone);//获取vin 码信息
                 await userOrderList(token, phone, index + 1); //商城订单信息
-                if(needFatiezi){
+                if(needBuFatiezi){
                     var wordindex=scorenow/40;
                     for(var m=0;m<(3-wordindex);m++){
                         //任务没有做满 继续补任务
